@@ -24,8 +24,8 @@ The shared catalogue has 21 entries. The generated PTC SDK contains 19 APIs: 16 
 
 | Tool | Purpose | Full-access requirement |
 | --- | --- | --- |
-| `ops_read_many` | Resident bounded UTF-8 ranges from 1-32 files | No command permission gate¹ |
-| `ops_inspect_local_file` | Bounded UTF-8 text lines and hex | No command permission gate¹ |
+| `ops_read_many` | Resident bounded text ranges from 1-32 files | No command permission gate¹ |
+| `ops_inspect_local_file` | Bounded text lines and hex (auto-detected codec) | No command permission gate¹ |
 | `ops_grep` | Rust regex search, multiple file filters, counts/summaries | No command permission gate¹ |
 | `ops_glob` | Multiple path patterns with exclusions | No command permission gate¹ |
 | `ops_replace` | Mechanical cross-file literal replacement; use host edit for precise changes | No command permission gate¹ |
@@ -46,13 +46,13 @@ The shared catalogue has 21 entries. The generated PTC SDK contains 19 APIs: 16 
 
 Only the bounded multi-file reader `ops_read_many` is resident; `ops_inspect_local_file`, including hex reading, is discoverable. The advanced contracts below are activated through [tool discovery](discovery.md) or explicit always-loaded choices. Routing lists only the tools currently published.
 
-File paths resolve relative to the DSH session cwd. `ops_read_many` takes a `files` array of paths with independent 1-based offsets and limits; single-file operations take `path`. The Native reference pager accepts the original reference `root`. No file tool accepts `workspace`, `cwd` or `file_path` aliases. Text tools are UTF-8 first; document tools use their own bounded format/encoding contracts. glob and grep do not traverse symlinks, junctions, reparse points, hidden files or `.git`.
+File paths resolve relative to the DSH session cwd. `ops_read_many` takes a `files` array of paths with independent 1-based offsets and limits; single-file operations take `path`. The Native reference pager accepts the original reference `root`. No file tool accepts `workspace`, `cwd` or `file_path` aliases. Text tools auto-detect UTF-8, GB18030 and BOM-marked UTF-16; document tools use their own bounded format/encoding contracts. glob and grep do not traverse symlinks, junctions, reparse points, hidden files or `.git`.
 
 When the host provides its `fs` service, `ops_inspect_local_file` reads and real `ops_replace` writes are recorded in the host's read-before-edit table (`fs/observed`) exactly like host `read`/`edit`: a file read with ops can be edited with host `edit` directly, and an ops write does not make the host's earlier read look like an external change. `ops_grep`, `ops_glob` and `dryRun` record nothing.
 
 ### `ops_inspect_local_file`
 
-Read bounded UTF-8 text lines, or a hex view of one path. Directories are rejected — use `ops_glob` or `ops_grep` instead.
+Read bounded text lines (auto-detected UTF-8, GB18030 or BOM-marked UTF-16), or a hex view of one path. Directories are rejected — use `ops_glob` or `ops_grep` instead.
 
 Native emits a file header, numbered escaped source lines and revision/continuation notices. PTC retains canonical typed records. Backslashes, controls and Unicode line separators are reversibly escaped; source text cannot forge extra rows. Worker byte limits and long-line continuation remain explicit. See [Native range rendering](native-ranges.md). Rendered bytes are not measured tokens.
 
@@ -61,7 +61,7 @@ Native emits a file header, numbered escaped source lines and revision/continuat
 | `path` | string | Resolved against the DSH session cwd |
 | `offset` | integer ≥ 0 | 1-based line/hex row, default 1; legacy 0 also reads the first unit |
 | `limit` | integer 1–10000 | Maximum lines returned |
-| `encoding` | `utf-8` | Encoding |
+| `encoding` | `auto` (default) \| `utf-8` \| `gb18030` \| `utf-16le` \| `utf-16be` | Auto-detects the file codec; a forced codec must decode the bytes |
 | `view` | `text` \| `hex` | View mode |
 
 ### `ops_glob`
@@ -99,7 +99,7 @@ Use `summary` for aggregate file/match totals, `count` for per-file counts, `con
 
 ### `ops_replace`
 
-Perform a deterministic UTF-8 replacement under `path`. `pattern` is **literal text, not a regex**; `glob` works as in `ops_grep`. `dryRun` observes only; writes use revision checks and atomic replacement. Read-only sessions are rejected.
+Perform a deterministic replacement in decodable text files under `path`, preserving each file's detected codec (UTF-8, GB18030 or BOM-marked UTF-16). `pattern` is **literal text, not a regex**; `glob` works as in `ops_grep`. `dryRun` observes only; writes use revision checks and atomic replacement. Read-only sessions are rejected.
 
 Cooperating writers serialise on a persistent, hidden update-lock sidecar beside each target (`.dsh-ops-update-<sha256 of the lowercased name>.lock`). It is created before the target is read, so a refused call can leave it behind; see [Update-lock sidecars](native-ptc.md#update-lock-sidecars) for why it is not removed and who may clean it up.
 
@@ -188,7 +188,7 @@ The routing table the model sees is rendered by the plugin from what it actually
 
 | Task | Tool |
 | --- | --- |
-| Bounded UTF-8 text / hex | ops_inspect_local_file |
+| Bounded text lines / hex | ops_inspect_local_file |
 | Images | read_image (host) |
 | Search contents | ops_grep |
 | Find paths | ops_glob |
@@ -206,12 +206,12 @@ Disabled by default, with `replaceTools: []`. Explicit selections switch the mod
 <!-- hide-official-scope:start -->
 | Official tool | OPS alternative | Reviewed purpose |
 | --- | --- | --- |
-| `read` | `ops_inspect_local_file` | Bounded local UTF-8 text reading; optional hex view |
+| `read` | `ops_inspect_local_file` | Bounded local text reading (UTF-8, GB18030 or BOM-marked UTF-16); optional hex view |
 | `glob` | `ops_glob` | Bounded regular-file path search |
 | `grep` | `ops_grep` | Bounded UTF-8 content search |
 <!-- hide-official-scope:end -->
 
-- **read:** both use 1-based line offsets and bounded limits. OPS additionally offers hex viewing, returns revision and paging information, and uses its local-file permission and credential fences. This selection does not replace `read_image`, attachments, directories, or non-local filesystem providers.
+- **read:** both use 1-based line offsets and bounded limits. OPS additionally auto-detects UTF-8, GB18030 and BOM-marked UTF-16, offers hex viewing, returns revision and paging information, and uses its local-file permission and credential fences. This selection does not replace `read_image`, attachments, directories, or non-local filesystem providers.
 - **glob:** the host accepts one pattern string and matches a bare basename at any depth, including hidden and ignored files. OPS accepts an array of globs relative to `path`; `*.ts` matches only the top level, so use `**/*.ts` for recursion. OPS supports exclusions and paging, and does not traverse symlinks, reparse points, hidden files or `.git`. The search coverage and ordering are not identical.
 - **grep:** the host accepts a single glob filter and ripgrep regular expressions. OPS uses Rust regex, an array of relative globs, optional context and output modes, plus bounded paged coverage. Read its completion/truncation fields; a partial scan is not an exhaustive negative result. Host overflow artifacts and OPS paging are different workflows.
 

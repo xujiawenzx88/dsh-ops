@@ -215,8 +215,11 @@ repeating file contents.
 Only physical LF ends a line (CRLF is one boundary). Empty files have zero lines;
 a final LF adds no empty line. Bare CR and Unicode separators do not add lines; control separators are escaped
 in the display so they cannot break a numbered line.
-Writing text preserves its bytes and line endings. Invalid UTF-8 or an unsupported
-text encoding returns `ERR_INVALID_ENCODING`, with guidance to use a document/binary
+Writing text preserves its bytes and line endings. Reads auto-detect UTF-8, GB18030
+and BOM-marked UTF-16 (LE/BE); `ops_inspect_local_file` can force one codec with
+`encoding`. Edits and overwrites keep the detected codec (a lone UTF-16 BOM is
+re-attached); new files are UTF-8. Bytes no supported codec can decode, or characters
+it cannot encode, return `ERR_INVALID_ENCODING`, with guidance to use a document/binary
 reader or `view: "hex"`; no lossy text replacement is performed.
 
 Native content blocks are capped at 64 KiB after JSON escaping. A clipped display

@@ -67,10 +67,10 @@ await test('descriptors are strict and bounded before observations, with a 200-l
   })
 })
 
-await test('per-file missing, directory, UTF-8, and size failures preserve successful neighbors', async () => {
+await test('per-file missing, directory, encoding, and size failures preserve successful neighbors', async () => {
   await withTempDir('many-errors', async root => {
     const good = path.join(root, 'good.txt'); fs.writeFileSync(good, 'visible\n')
-    const binary = path.join(root, 'binary'); fs.writeFileSync(binary, Buffer.from([255, 254]))
+    const binary = path.join(root, 'binary'); fs.writeFileSync(binary, Buffer.from([255, 97]))
     const large = path.join(root, 'large'); const fd = fs.openSync(large, 'w')
     try { fs.ftruncateSync(fd, 32 * 1024 * 1024 + 1) } finally { fs.closeSync(fd) }
     const paths = [good, path.join(root, 'missing'), root, binary, large, good]

@@ -2,12 +2,13 @@
 
 中文版：[文件批量操作.md](文件批量操作.md)。
 
-`ops_read_many` reads 1-32 UTF-8 ranges with one one-shot worker invocation. Every relative
+`ops_read_many` reads 1-32 text ranges with one one-shot worker invocation; each file's
+codec (UTF-8, GB18030 or BOM-marked UTF-16) is detected. Every relative
 path resolves against the current session cwd on that call. Each entry has `path`, optional
 1-based `offset` (default 1), and `limit` from 1 to 10000 (default 200). Unlike the legacy
 inspector, offset 0 is invalid. Unknown fields, invalid bounds and malformed descriptors reject
-the request. A binary file requires a binary/document reader or `ops_inspect_local_file` with
-`view: "hex"`; text is never decoded lossily.
+the request. Bytes no supported codec can decode require a binary/document reader or
+`ops_inspect_local_file` with `view: "hex"`; text is never decoded lossily.
 
 ```json
 {"files":[{"path":"src/index.ts","offset":1,"limit":80},{"path":"README.md","offset":10,"limit":40}]}
@@ -36,7 +37,8 @@ a smaller original range, never advancing past unseen content. Native renders fi
 physical line numbers, per-file errors and continuation notices; the programmatic value stays
 structured.
 
-`ops_edit_many` applies 1-100 edits to **one** UTF-8 file, atomically. Supply `path`, the exact
+`ops_edit_many` applies 1-100 edits to **one** text file, atomically, keeping its detected
+codec (UTF-8, GB18030 or BOM-marked UTF-16). Supply `path`, the exact
 SHA-256 `expectedRevision` from a read/stat, and `edits: [{oldText,newText}]`. Each nonempty
 `oldText` must occur exactly once in the same original bytes; overlaps, ambiguity or stale
 revision reject all edits before publication. Empty `newText` deletes the match. Preserve

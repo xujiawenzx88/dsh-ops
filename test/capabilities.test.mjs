@@ -53,9 +53,9 @@ const snapshot = (names, definition) => names.map(name => {
     concurrent: d.isConcurrencySafe?.({}) ?? false, timeoutMs: d.timeoutMs ?? null }
 })
 await test('business file and batch definitions retain their original serialized contracts', () => {
-  // Captured before this migration, covering every argument/output contract and published description.
+  // Captured before the registry migration; re-captured for the encoding-adaptation contract update. Still covers every argument/output contract and published description.
   const hash = value => createHash('sha256').update(JSON.stringify(value)).digest('hex')
-  assert.equal(hash(snapshot(FILE_TOOLS.filter(name => !['glob', 'grep', 'read_many', 'edit_many', 'table_read', 'doc_read', 'pdf_read'].includes(name)), fileDefinition)), 'f32e33306b4052fdb3d19a11e0fe9d65c255a87d2d485de08a9d7b1275e958fc')
+  assert.equal(hash(snapshot(FILE_TOOLS.filter(name => !['glob', 'grep', 'read_many', 'edit_many', 'table_read', 'doc_read', 'pdf_read'].includes(name)), fileDefinition)), '9e1aca7da7e4c2f6a9726c8984c9d88c900ebb96d43c09e92b2a2e20d6f17036')
   const batch = ptcDefinition('batch', async () => null)
   assert.equal(batch.parameters, ptcParameters.batch); assert.ok(batch.description.startsWith(ptcDescriptions.batch)); assert.match(batch.description, /PTC returns Outcome/)
   assert.ok(batch.output.schema.oneOf.every(branch => branch.properties.status))

@@ -66,13 +66,32 @@ await test('real grep context and glob paths survive the Native projection', asy
   })
 })
 
-await test('invalid UTF-8 and unsupported encoding report an actionable refusal without lossy decoding or mutation', async () => {
-  await withTempDir('native-encoding', async root => {
-    const target = path.join(root, 'binary'); const bytes = Buffer.from([0xff, 0xfe, 0x61, 0])
+await test('a BOM-marked UTF-16 file is text: inspect, diff and edit keep its codec byte-exact', async () => {
+  await withTempDir('native-utf16', async root => {
+    const target = path.join(root, 'le.txt'); const bytes = Buffer.from([0xff, 0xfe, 0x61, 0])
+    fs.writeFileSync(target, bytes)
+    const read = await call('inspect_local_file', { path: target }, root)
+    assert.equal(read.status, 'completed', JSON.stringify(read))
+    assert.equal(read.revision, hash(bytes))
+    assert.equal(read.lineCount, 1)
+    assert.deepEqual(read.items.map(item => item.text), ['\uFEFFa'])
+    const diff = await call('diff', { path: target, content: '\uFEFFab\n' }, root)
+    assert.equal(diff.status, 'completed', JSON.stringify(diff))
+    assert.equal(diff.before.revision, hash(bytes))
+    assert.equal(diff.after.revision, hash(Buffer.from([0xff, 0xfe, 0x61, 0x00, 0x62, 0x00, 0x0a, 0x00])))
+    const edited = await call('edit_file', { path: target, expectedRevision: hash(bytes), edits: [{ oldText: 'a', newText: 'b' }] }, root)
+    assert.equal(edited.status, 'completed', JSON.stringify(edited))
+    assert.deepEqual(fs.readFileSync(target), Buffer.from([0xff, 0xfe, 0x62, 0x00]), 'the edit wrote UTF-16LE back')
+    assert.equal(edited.revision, hash(Buffer.from([0xff, 0xfe, 0x62, 0x00])))
+  })
+})
+
+await test('binary bytes report an actionable refusal without lossy decoding or mutation', async () => {
+  await withTempDir('native-binary', async root => {
+    const target = path.join(root, 'binary'); const bytes = Buffer.from([0xff, 0x61])
     fs.writeFileSync(target, bytes)
     for (const [tool, extra] of [
-      ['inspect_local_file', {}], ['inspect_local_file', { encoding: 'utf-16' }],
-      ['diff', { content: 'new' }], ['edit_file', { expectedRevision: hash(bytes), edits: [{ oldText: 'a', newText: 'b' }] }],
+      ['inspect_local_file', {}], ['diff', { content: 'new' }], ['edit_file', { expectedRevision: hash(bytes), edits: [{ oldText: 'a', newText: 'b' }] }],
     ]) {
       const args = { path: target, ...extra }
       const value = await call(tool, args, root)
@@ -84,8 +103,13 @@ await test('invalid UTF-8 and unsupported encoding report an actionable refusal 
       assert.match(render(tool, args, value), /retry=after-input-change/)
       assert.deepEqual(fs.readFileSync(target), bytes)
     }
+    const bad = await call('inspect_local_file', { path: target, encoding: 'utf-16' }, root)
+    assert.equal(bad.status, 'error', JSON.stringify(bad))
+    assert.equal(bad.error.code, 'ERR_INVALID_ENCODING')
+    assert.equal(bad.error.effectState, 'none')
+    assert.match(bad.error.nextAction, /Supported encodings: auto/)
     const hex = await call('inspect_local_file', { path: target, view: 'hex' }, root)
-    assert.equal(hex.items[0].text, 'ff fe 61 00')
+    assert.equal(hex.items[0].text, 'ff 61')
     assert.equal(hex.lineCount, null)
     assert.deepEqual(fs.readdirSync(root), ['binary'], 'refused text edit leaves no lock or publication artifact')
   })

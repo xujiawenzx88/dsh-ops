@@ -89,7 +89,7 @@ single strings. Directory traversal skips symlink/junction/reparse entries,
 hidden entries, `.git`, `.dsh-ops`, `node_modules`, `target` and `.venv` without
 turning skipped children into a whole-operation failure. Root access failures
 return `ACCESS_DENIED`; outside-workspace failures return `POLICY_DENIED` with
-the active workspace root in the message. Results are bounded and UTF-8-first.
+the active workspace root in the message. Results are bounded and text decoding detects UTF-8, GB18030 or BOM-marked UTF-16.
 
 ### Update-lock sidecars
 
@@ -151,8 +151,10 @@ Their important fields are (paths resolve relative to the DSH session cwd):
 - `ops_inspect_local_file`: one optional `path` (session cwd by default; a directory
   is rejected), `offset` (1-based line or 16-byte hex row, default 1; legacy 0
   also reads the first unit), `limit`
-  (1-10000, default 200), `encoding: "utf-8"`, `view: "text" | "hex"`.
-  No multiple-file, PDF, arbitrary-encoding or `pages` interface is exposed.
+  (1-10000, default 200), `encoding: "auto"` (default; detects UTF-8, GB18030 or
+  BOM-marked UTF-16) or a forced `"utf-8" | "gb18030" | "utf-16le" | "utf-16be"`,
+  `view: "text" | "hex"`.
+  No multiple-file, PDF or `pages` interface is exposed.
 - `ops_replace`: required literal `pattern` and `replacement`, optional `path`,
   `glob`, `maxReplacements` (1-100000, default 100) and `dryRun`.
 
@@ -180,8 +182,8 @@ execution data in a typed Outcome envelope. Content blocks are capped at
 64 KiB after JSON escaping; clipped displays instruct the caller to recover
 undisplayed content without blindly advancing a cursor or repeating a write.
 Physical LF defines line counts across projections; bare CR/control separators
-are escaped for display. Invalid text encoding returns `ERR_INVALID_ENCODING`
-with document/binary-reader guidance. Use hex byte rows to read beyond an in-line
+are escaped for display. Bytes no supported codec can decode return `ERR_INVALID_ENCODING`
+with document/binary-reader guidance (hex still reads raw bytes). Use hex byte rows to read beyond an in-line
 cut. See [usage](usage.md#native-file-results) / [使用指南](使用指南.md#native-文件结果).
 
 ## Plan and execution semantics

@@ -6,6 +6,7 @@ mod search;
 use ops_protocol::{Failure, Request, Result};
 use ops_files::{file_path, target, relative_display, read_bytes, result, lock_and_read_for_update, atomic_write, MAX_OUTPUT_BYTES};
 use ops_files as publication;
+use ops_files::text_encoding;
 use cap_fs_ext::DirExt;
 use regex::RegexBuilder;
 use serde::Deserialize;
@@ -173,10 +174,13 @@ fn replace(request: &Request) -> Result<Value> {
         // relabel ENOENT: avoid the race between cooperating writers instead.
         let (guard, bytes) = if args.dry_run { (None, read_bytes(&file)?) }
             else { let (guard, bytes) = lock_and_read_for_update(&file)?; (Some(guard), bytes) };
-        match String::from_utf8(bytes.clone()) {
-            Ok(text) => {
+        // What counts as text is the shared codec detection: a file no codec
+        // reads losslessly is reported as binary and skipped, exactly as it is
+        // for inspect and edit; UTF-8, GB18030 and BOM-marked UTF-16 all edit.
+        match text_encoding::decode(None, &bytes) {
+            Ok((text, encoding)) => {
                 let count = text.match_indices(&args.pattern).count();
-                if count > 0 { total += count; plans.push((file, bytes, text, count)); update_guards.push(guard); }
+                if count > 0 { total += count; let text = text.into_owned(); plans.push((file, bytes, text, count, encoding)); update_guards.push(guard); }
             }
             Err(_) => binary.push(file),
         }
@@ -184,11 +188,14 @@ fn replace(request: &Request) -> Result<Value> {
     let skipped = binary.len();
     let skipped_paths: Vec<Value> = binary.iter().take(8).map(|file| json!(relative_display(&request.root_path(), file))).collect();
     if total > args.max_replacements { return Err(Failure::new("OUTPUT_LIMIT", format!("{total} matches exceed maxReplacements ({}); no file was changed. maxReplacements is a ceiling, not a truncation: raise it to {total} or more and retry.", args.max_replacements))); }
-    let mut items=Vec::new(); for (file, original, text, count) in plans { let revision=format!("{:x}", Sha256::digest(&original)); let next=text.replace(&args.pattern,&args.replacement); items.push(json!({"path":file,"replacements":count,"revision":revision,"revisionAfter":format!("{:x}", Sha256::digest(next.as_bytes())),"bytesBefore":original.len(),"bytesAfter":next.len(),"lineCountBefore":text.lines().count(),"lineCount":next.lines().count()})); }
+    // Re-encoding at plan time proves the replacement fits the file's codec; a
+    // failure here runs before any publication, so nothing was changed.
+    let mut items=Vec::new(); for (file, original, text, count, encoding) in &plans { let revision=format!("{:x}", Sha256::digest(original)); let replaced=text.replace(&args.pattern,&args.replacement); let next=text_encoding::encode(*encoding, &replaced)?; items.push(json!({"path":file,"replacements":count,"revision":revision,"revisionAfter":format!("{:x}", Sha256::digest(&next)),"bytesBefore":original.len(),"bytesAfter":next.len(),"lineCountBefore":text.lines().count(),"lineCount":replaced.lines().count()})); }
     if serde_json::to_vec(&items)?.len() > MAX_OUTPUT_BYTES / 2 { return Err(Failure::new("OUTPUT_LIMIT", "Replacement receipts exceed the bounded output budget; narrow path/glob. No files changed.")); }
     if args.dry_run { return Ok(json!({"status":"completed","phase":"observe","changed":0,"matched":total,"skipped":skipped,"failed":0,"complete":true,"omitted":0,"dryRun":true,"items":items,"skippedPaths":skipped_paths})); }
     for item in &items { publication::authorize_write(request, item["path"].as_str().unwrap_or(""))?; }
-    let mut changed=0usize; for item in &mut items {
+    let mut changed=0usize; for (index, item) in items.iter_mut().enumerate() {
+        let encoding = plans[index].4;
         let applied = (|| -> Result<()> { let file=PathBuf::from(item["path"].as_str().unwrap_or(""));
         publication::authorize_write(request, file.to_str().unwrap_or(""))?;
         // Observation guards above remain owned until every publication settles.
@@ -196,10 +203,12 @@ fn replace(request: &Request) -> Result<Value> {
         // The revision is checked against the bytes the lock returned, so the check
         // and the write cannot be separated by another open — see the lock for why.
         let expected=item["revision"].as_str().unwrap_or(""); publication::check_revision(Some(&bytes), expected)?;
-        let text=String::from_utf8(bytes).map_err(|_| Failure::new("ERR_INVALID_ENCODING", "Replace only supports UTF-8 files"))?; let next=text.replace(&args.pattern,&args.replacement);
+        // The bytes just passed the revision check, so they are the bytes the plan
+        // decoded; re-decoding with the planned codec cannot fail.
+        let (text, _) = text_encoding::decode(Some(encoding), &bytes)?; let next=text_encoding::encode(encoding, &text.replace(&args.pattern,&args.replacement))?;
         // Report what the replacement kept. The fields are additive, so a caller
         // that ignores them sees exactly the envelope it saw before.
-        if let Some((metadata,warnings))=atomic_write(&file,next.as_bytes())? { item["metadata"]=metadata; if !warnings.is_empty() { item["metadataWarnings"]=json!(warnings); } }
+        if let Some((metadata,warnings))=atomic_write(&file,&next)? { item["metadata"]=metadata; if !warnings.is_empty() { item["metadataWarnings"]=json!(warnings); } }
         Ok(()) })();
         if let Err(mut error) = applied {
             if changed > 0 { error.effect_state = "applied".into(); error.next_action = "Earlier files were already replaced. Inspect postconditions; do not repeat the batch blindly.".into(); }

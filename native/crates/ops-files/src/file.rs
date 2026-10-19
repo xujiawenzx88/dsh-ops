@@ -1,6 +1,7 @@
 //! Native file-operation capabilities. All paths are host-resolved absolute paths;
 //! this module never invokes a shell and never follows links.
 use crate::contract::{Failure, Request, Result};
+use crate::text_encoding;
 use cap_fs_ext::{FollowSymlinks, OpenOptionsFollowExt};
 use fs2::FileExt;
 use serde::Deserialize;
@@ -31,7 +32,7 @@ struct InspectArgs {
     offset: usize,
     #[serde(default = "two_hundred")]
     limit: usize,
-    #[serde(default = "utf8")]
+    #[serde(default = "auto")]
     encoding: String,
     #[serde(default = "text")]
     view: String,
@@ -39,7 +40,7 @@ struct InspectArgs {
 fn one() -> usize { 1 }
 fn two_hundred() -> usize { 200 }
 fn one_hundred() -> usize { 100 }
-fn utf8() -> String { "utf-8".into() }
+fn auto() -> String { "auto".into() }
 fn text() -> String { "text".into() }
 
 pub fn dispatch(request: &Request) -> Result<Value> {
@@ -83,7 +84,7 @@ fn inspect(request: &Request) -> Result<Value> {
 }
 fn inspect_args(args: InspectArgs, budget: usize, include_path: bool, capture: Option<(&ops_protocol::capture::OutputSink, bool)>) -> Result<Value> {
     if args.limit == 0 || args.limit > 10_000 { return Err(Failure::new("INVALID_ARGUMENT", "inspect limit is 1-10000")); }
-    if !args.encoding.eq_ignore_ascii_case("utf-8") { return Err(Failure::new("ERR_INVALID_ENCODING", "Text inspection supports UTF-8 only")); }
+    let encoding = text_encoding::parse(&args.encoding)?;
     let path = target(&args.path, false)?;
     if !path.is_file() { return Err(Failure::new("INVALID_ARGUMENT", "path is a directory; use ops_glob or ops_grep")); }
     let bytes = read_bytes(&path)?;
@@ -103,7 +104,7 @@ fn inspect_args(args: InspectArgs, budget: usize, include_path: bool, capture: O
         return Ok(json!({"status":"completed","phase":"verify","changed":0,"matched":1,"skipped":start,"failed":0,"complete":end == bytes.len(),"truncated":end < bytes.len(),"nextOffset":end.div_ceil(16)+1,"omitted":bytes.len().saturating_sub(end),"bytesTotal":bytes.len(),"revision":facts["revision"],"bytes":facts["bytes"],"lineCount":facts["lineCount"],"items":[{"path":path,"view":"hex","offset":start,"text":text}]}));
     }
     if args.view != "text" { return Err(Failure::new("INVALID_ARGUMENT", "view must be text or hex")); }
-    let text = String::from_utf8(bytes).map_err(|_| Failure::new("ERR_INVALID_ENCODING", "File is not valid UTF-8"))?;
+    let (text, _) = text_encoding::decode(encoding, &bytes)?;
     // str::lines splits physical LF/CRLF, never bare CR or Unicode separators.
     // Empty files have zero lines; a final LF does not create a phantom line.
     let lines: Vec<_> = text.lines().enumerate().skip(args.offset.saturating_sub(1)).take(args.limit).map(|(i, line)| json!({"path":path,"line":i+1,"text":line})).collect();

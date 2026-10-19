@@ -47,19 +47,19 @@ export function renderToolingPolicy({ published, mounted, levels, shellComponent
     if (names.has(publicToolName(raw))) lines.push(`| ${task} | ${publicToolName(raw)} |`)
   }
   row('discover', 'Find advanced capabilities for the next model step')
-  row('read_many', 'Read UTF-8 ranges from multiple files')
+  row('read_many', 'Read text ranges from multiple files')
   row('table_read', 'Read bounded CSV / TSV lexical rows')
   row('doc_read', 'Read DOCX main-body paragraphs')
   row('pdf_read', 'Read supported PDF text-layer pages')
   row('edit_many', 'Atomic original-text edits in one file (CAS)')
-  row('inspect_local_file', 'Bounded UTF-8 lines / hex')
+  row('inspect_local_file', 'Bounded text lines / hex')
   if (hasFiles && names.has('read_image')) lines.push('| Images | read_image (host) |')
   row('grep', 'Search contents')
   row('glob', 'Find paths')
   row('replace', 'Batch literal replacement')
-  row('write_file', 'Create / full UTF-8 write (CAS)')
+  row('write_file', 'Create / full text write (CAS)')
   row('edit_file', 'Precise original-text patch (CAS)')
-  row('diff', 'Preview proposed UTF-8 content')
+  row('diff', 'Preview proposed text content')
   row('stat', 'Revision / bytes / line count / metadata')
   row('copy', 'Copy one regular file, no clobber')
   row('move', 'Move one regular file, same filesystem')
@@ -73,7 +73,7 @@ export function renderToolingPolicy({ published, mounted, levels, shellComponent
   if (names.has(publicToolName('grep'))) lines.push('- ops_grep: summary for aggregate file/match totals; count for per-file counts; content for matching text. Follow nextOffset for remaining pages, but do not loop blindly on truncated/failed scans: they are not exhaustive.')
   if (hasFiles) lines.push(
     '- Single-file tools use `path`, resolved relative to the current DSH session cwd. Use `/` separators; do not pass workspace, cwd, or file_path aliases.',
-    '- Native file tools are UTF-8 first and bounded.',
+    '- Native file tools auto-detect UTF-8, GB18030 or BOM-marked UTF-16 and are bounded.',
   )
   if (names.has(publicToolName('copy')) || names.has(publicToolName('move'))) lines.push('- The destination `to` uses the same session cwd base as `path`.')
   if (names.has(publicToolName('glob')) || names.has(publicToolName('grep'))) lines.push('- Published searches exclude symlinks, junctions, reparse points, hidden files and `.git`.')

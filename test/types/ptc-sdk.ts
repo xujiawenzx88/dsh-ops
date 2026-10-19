@@ -31,6 +31,9 @@ async function metadata() {
 void tools.ops_inspect_local_file({ path: 'a.ts', view: 'hex' })
 // @ts-expect-error Tool arguments preserve the original enum contract.
 void tools.ops_inspect_local_file({ path: 'a.ts', view: 'pdf' })
+void tools.ops_inspect_local_file({ path: 'a.ts', encoding: 'gb18030' })
+// @ts-expect-error Encoding is a finite strict-decoding contract.
+void tools.ops_inspect_local_file({ path: 'a.ts', encoding: 'latin1' })
 // @ts-expect-error Multi-read requires a list of file ranges.
 void tools.ops_read_many({ path: 'a.ts' })
 // @ts-expect-error Editing requires the observed revision.

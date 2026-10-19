@@ -10,6 +10,7 @@ publish = false
 ops-protocol = { path = "../ops-protocol" }
 cap-std = "3.4"
 cap-fs-ext = "3.4"
+encoding_rs = "0.8.42"
 fs2 = "0.4.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"

@@ -54,8 +54,10 @@ struct DiffArgs {
 }
 
 pub(super) fn content_facts(bytes: &[u8]) -> Value {
-    json!({"revision":format!("{:x}", Sha256::digest(bytes)), "bytes":bytes.len(),
-        "lineCount":std::str::from_utf8(bytes).ok().map(|s| s.lines().count())})
+    // lineCount follows the same codec detection as inspect: text in any accepted
+    // encoding reports lines, bytes no codec reads stay null.
+    let line_count = text_encoding::decode(None, bytes).ok().map(|(text, _)| text.lines().count());
+    json!({"revision":format!("{:x}", Sha256::digest(bytes)), "bytes":bytes.len(), "lineCount":line_count})
 }
 pub(super) fn run(request: &Request) -> Result<Value> {
     match request.tool.as_str() {
@@ -68,7 +70,10 @@ pub(super) fn run(request: &Request) -> Result<Value> {
                 &args.path,
                 &args.expected_revision,
                 args.dry_run,
-                |_| Ok(args.content.clone().into_bytes()),
+                // An overwrite keeps the existing file's codec, so untouched
+                // lines are written back byte-identically; a new file, or bytes
+                // no codec reads, is UTF-8 as before.
+                |original| text_encoding::encode_for_rewrite(original, &args.content),
             )
         }
         "edit_file" | "edit_many" => {
@@ -80,10 +85,10 @@ pub(super) fn run(request: &Request) -> Result<Value> {
                 &args.expected_revision,
                 args.dry_run,
                 |original| {
-                    let text = std::str::from_utf8(original.ok_or_else(|| {
+                    let original = original.ok_or_else(|| {
                         Failure::new("NOT_FOUND", "Edit requires an existing file")
-                    })?)
-                    .map_err(|_| Failure::new("ERR_INVALID_ENCODING", "Edit requires UTF-8"))?;
+                    })?;
+                    let (text, encoding) = text_encoding::decode(None, original)?;
                     if args.edits.is_empty() || args.edits.len() > 100 {
                         return Err(Failure::new("INVALID_ARGUMENT", "Use 1-100 exact edits"));
                     }
@@ -130,7 +135,7 @@ pub(super) fn run(request: &Request) -> Result<Value> {
                         cursor = end;
                     }
                     next.push_str(&text[cursor..]);
-                    Ok(next.into_bytes())
+                    text_encoding::encode(encoding, &next)
                 },
             )
         }
@@ -257,8 +262,7 @@ fn diff_file(request: &Request) -> Result<Value> {
         return Err(Failure::new("INVALID_ARGUMENT", "diff limit is 1-1000"));
     }
     let bytes = read_bytes(Path::new(&args.path))?;
-    let text = std::str::from_utf8(&bytes)
-        .map_err(|_| Failure::new("ERR_INVALID_ENCODING", "Diff requires UTF-8"))?;
+    let (text, encoding) = text_encoding::decode(None, &bytes)?;
     let old: Vec<_> = text.split_inclusive('\n').collect();
     let new: Vec<_> = args.content.split_inclusive('\n').collect();
     let prefix = old.iter().zip(&new).take_while(|(a, b)| a == b).count();
@@ -286,7 +290,9 @@ fn diff_file(request: &Request) -> Result<Value> {
         .collect();
     let mut output = result(request, items, total, args.offset, args.offset, total, false);
     output["before"] = content_facts(&bytes);
-    output["after"] = content_facts(args.content.as_bytes());
+    // The after side is what write_file would publish: the same content encoded
+    // with the codec the existing file already uses.
+    output["after"] = content_facts(&text_encoding::encode(encoding, &args.content)?);
     output["hunk"] = json!({"startLine":prefix+1,"removed":removed.len(),"added":added.len()});
     Ok(output)
 }

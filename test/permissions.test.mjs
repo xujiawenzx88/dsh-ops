@@ -326,7 +326,7 @@ await test('owned Modify-only workspace starts real DSH sandbox; three modes and
       assert.notEqual(badEncoding.status,'completed',JSON.stringify(badEncoding))
       assert.equal(badEncoding.error.code,'ERR_INVALID_ENCODING',JSON.stringify(badEncoding))
       assert.equal(badEncoding.error.effectState,'none')
-      assert.match(badEncoding.error.nextAction,/document\/binary.*view=hex/)
+      assert.match(badEncoding.error.nextAction,/Supported encodings: auto/)
       const replaced=await fileCall(ctx,worker,'replace',{path:'data.txt',pattern:'before',replacement:'after'},exec,exec.signal)
       assert.equal(replaced.changed,1,JSON.stringify(replaced))
       const batch=await ptcCall(ctx,worker,'batch',{root,action:'run',operations:[{op:'copy',path:'data.txt',to:'copy.txt'}]},exec,exec.signal)

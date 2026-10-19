@@ -7,6 +7,9 @@ this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- Treat UTF-8, GB18030 and BOM-marked UTF-16 as text across the native file tools: reads detect each file's codec, edits and overwrites preserve it byte-exactly (a lone UTF-16 BOM is re-attached), new files stay UTF-8, and `ops_inspect_local_file` accepts an explicit `encoding` to force one codec. Bytes no codec reads, and characters it cannot encode, still refuse with `ERR_INVALID_ENCODING` and publish nothing. The file/discovery schema subtotal now measures 263 tokens / 1160 bytes, still within the approved ≤400 scope.
+- native 文件工具将 UTF-8、GB18030 与带 BOM 的 UTF-16 一律视为文本：读取逐文件检测编码，编辑与覆写逐字节保留编码（孤立 UTF-16 BOM 会重挂），新文件仍为 UTF-8；`ops_inspect_local_file` 可用 `encoding` 强制指定编码。任何编码都无法解码的字节及无法编码的字符仍以 `ERR_INVALID_ENCODING` 拒绝且不发布任何变更。文件/发现 schema 小计现为 263 tokens / 1160 字节，仍在已批准的 ≤400 范围内。
+
 - Prepare the 0.4.0 candidate version across owned npm/plugin and Rust workspace metadata without dependency changes. Audit paired release, usage, component, SDK, discovery and manual-validation documentation; record the explicitly approved benchmark scope and retain historical failures separately from functional CI. No release/tag is created.
 - 将自有 npm/插件与 Rust workspace 版本统一为 0.4.0 候选，不变更依赖；同步双语发布、使用、组件、SDK、发现和手动验收文档。记录明确批准的基准范围并保留历史失败，不以功能 CI 代替验收，不创建发布或 tag。
 - Apply the confirmed acceptance scopes: BM-01 gates against OPS 0.3.x with official-reader comparisons reported separately; BM-03 gates file/discovery schemas while retaining startup Bash, exact full-inventory readiness and separate full totals. Preserve historical failed evidence.

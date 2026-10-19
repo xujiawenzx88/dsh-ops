@@ -38,7 +38,7 @@ pub(super) fn read_many(request: &Request) -> Result<Value> {
         if sink.is_some_and(|sink| sink.exhausted()) { break; }
         if room < 1024 { if sink.is_none() { break; } inline_closed = true; }
         let observed = request.authorize_path(Path::new(&file.path)).and_then(|()| {
-            inspect_args(InspectArgs { path: file.path.clone(), offset: file.offset, limit: file.limit, encoding: utf8(), view: text() }, room.saturating_sub(1), true, sink.map(|sink| (sink, true)))
+            inspect_args(InspectArgs { path: file.path.clone(), offset: file.offset, limit: file.limit, encoding: auto(), view: text() }, room.saturating_sub(1), true, sink.map(|sink| (sink, true)))
         });
         let item = match observed {
             Ok(item) => item,

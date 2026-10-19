@@ -41,7 +41,7 @@ await test('every file tool states that failures are values, not thrown errors',
 await test('current component routing does not advertise removed inspect capabilities', () => {
   for (const name of ['component-reference.md', '组件参考.md']) {
     const doc = fs.readFileSync(new URL(`../docs/${name}`, import.meta.url), 'utf8')
-    assert.match(doc, /Bounded UTF-8 text \/ hex \| ops_inspect_local_file/)
+    assert.match(doc, /Bounded text lines \/ hex \| ops_inspect_local_file/)
     assert.doesNotMatch(doc, /Text \/ multiple ranges \/ encoding \/ PDF text/)
   }
 })

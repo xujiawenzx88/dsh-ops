@@ -4,6 +4,7 @@ mod file;
 pub mod file_path;
 pub mod cache_io;
 pub mod paths;
+pub mod text_encoding;
 pub use file::{dispatch, target, relative_display, read_bytes, result, lock_and_read_for_update, atomic_write, authorize_write, check_revision, MAX_OUTPUT_BYTES};
 #[cfg(unix)]
 use cap_std::fs::Dir;
