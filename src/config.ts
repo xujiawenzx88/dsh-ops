@@ -101,6 +101,7 @@ export interface ResolvedConfig {
   binaryPath: string | undefined
   required: boolean
   denyCredentialReads: boolean
+  prewarmWorker: boolean
   shellPolicy: 'advise' | 'deny-host-shell'
   deniedHostTools: string[]
   promptPolicy: boolean
@@ -135,6 +136,7 @@ export function resolveConfig(rawConfig?: unknown): ResolvedConfig {
     'publishBashTool',
     'allowSystemShellFallback',
     'denyCredentialReads',
+    'prewarmWorker',
     'configUpdateVersion',
   ])
 
@@ -182,6 +184,10 @@ export function resolveConfig(rawConfig?: unknown): ResolvedConfig {
     // needs one of them can turn the fence off for this row; the environment
     // variable only ever widens the list, so a model cannot open it.
     denyCredentialReads: optionalBoolean(raw, 'denyCredentialReads', true),
+    // Keep idle one-shot workers ready after a call, so the next call does not
+    // pay the process startup. Each worker still accepts one request and exits;
+    // opt out for deployments that forbid any idle child process.
+    prewarmWorker: optionalBoolean(raw, 'prewarmWorker', true),
   }
 }
 

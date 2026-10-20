@@ -13,6 +13,7 @@ const manifest = JSON.parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'dsh-plugin.
 await test('seven stable row defaults and manifest agree, including the host-evaluated platform expression', () => {
   assert.equal(rows.length, 7)
   assert.deepEqual(rows.find(row => row.id === 'dsh-ops-shell').disabled, { __jsExpr: SHELL_DISABLED_EXPRESSION })
+  assert.equal(rows.find(row => row.id === 'dsh-ops-file').config.prewarmWorker, true)
   for (const component of COMPONENTS) {
     const row = rows.find(row => row.id === `dsh-ops-${component}`)
     assert.ok(row)

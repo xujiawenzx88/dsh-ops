@@ -179,7 +179,7 @@ Use `ops_bash`'s `command` for short commands and pipelines. For scripts longer 
 
 ## Process reclamation
 
-This version starts no long-lived server process: the native file worker is owned by the file component and stops with it. Earlier versions with the background component started `fastctx serve` clients and could leave a shared FastCtx `runtime-host`; that process exits on its own after about ten minutes without clients. This release does not sweep processes left by older versions; do not kill them by process-name sweeps.
+This version starts no long-lived server process or persistent IPC. After a call that starts a worker, the native file component may keep at most four idle one-shot workers; each exits after five minutes without work, handles exactly one request, rechecks authority per call, is discarded when its session is disposed or its sandbox mode changes, and stops with the file component. Set `prewarmWorker: false` to disable prewarming. Earlier versions with the background component started `fastctx serve` clients and could leave a shared FastCtx `runtime-host`; that process exits on its own after about ten minutes without clients. This release does not sweep processes left by older versions; do not kill them by process-name sweeps.
 
 ---
 

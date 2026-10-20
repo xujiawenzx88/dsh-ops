@@ -21,7 +21,9 @@ batch, result and sdk. The complete shared catalogue also includes bash and disc
 The SDK and Native projections expose separate typed/text outputs; catalogue membership is not startup
 residency. Current scopes, allowed pools and permissions still govern publication and every call.
 
-The one-shot Rust worker checks authority per call. Native text is bounded and uses reversible line
+The one-shot Rust worker checks authority per call. Prewarming is enabled by default and keeps at most four idle
+one-shot workers for five minutes; it reuses process startup only, never a request, and
+`prewarmWorker: false` disables it. Native text is bounded and uses reversible line
 escaping; PTC returns typed Outcomes. References preserve source scan/page/capture completeness and do
 not grant filesystem access. Same-content re-read suppression requires exact provider-input evidence;
 retained message history alone is insufficient. See [re-read evidence](context-read-dedup.md).
@@ -67,7 +69,7 @@ The detailed limits above and in linked contracts remain part of acceptance.
 | 1 — Build | src → lib build and assets preserve published paths; source Git installs require a build. | build and packed-artifact gates; JavaScript migration allowance removed in step 16. |
 | 2 — Contracts | One capability catalogue; typed Outcome, error/retry, coverage and reference contracts. | kernel-types, kernel-errors and schema checks; Native text and PTC data remain distinct. |
 | 3 — Native projection | Numbered reversible source text, bounded receipts and explicit incomplete output; 64 KiB escaped display cap. | native-projection, native-line-encoding, native-ranges; no universal percentage saving. |
-| 4 — Worker | Workspace crates and v1 bounded one-shot requests, authority rechecked per call. | Cargo workspace and protocol regressions; persistent IPC remains deferred to a separate security review. |
+| 4 — Worker | Workspace crates and v1 bounded one-shot requests, authority rechecked per call; idle prewarm enabled by default, opt out with `prewarmWorker: false`. | Cargo workspace and protocol regressions; prewarm is not persistent IPC, which remains deferred to a separate security review. |
 | 5 — Reads, edits, search | Up to 32 independent read ranges; atomic multi-edit within one file; honest search gaps/continuations. | file-batching-worker and search regressions; no cross-file atomic edit or complete total after a scan gap. |
 | 6 — References/budgets | 10 MiB/result, 100 MiB/session; two active/eight waiting calls and 30-second worker ceiling; audit data separate. | result-references/spill/lifecycle, call-budget, native-result; permission-limited cleanup can leave invalidated temp blobs. |
 | 7 — PTC | 19 typed SDK APIs, three resident entries; allowed pools and next-step loading independent of Native. | ptc-outcome/schema/sdk and progressive-loop; current frozen SDK cannot call queued APIs. |

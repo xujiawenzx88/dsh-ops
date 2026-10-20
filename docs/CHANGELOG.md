@@ -7,6 +7,11 @@ this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- Slim the release worker so its per-call startup is cheaper: strip debug sections, enable fat LTO and build one codegen unit. The one-shot process model, per-call authority checks and the protocol are unchanged. Measured on Windows x64, `inspect_local_file` spawn-to-close fell from 7.41 MiB / 49 ms to 3.52 MiB / 34 ms (p50; 40 runs).
+- 精简发布版 worker，降低每次调用都支付的启动成本：移除调试段，启用 fat LTO 并只生成一个 codegen unit。一次性进程模型、逐调用权限检查和协议均不变。Windows x64 实测 `inspect_local_file` 的 spawn-to-close 从 7.41 MiB / 49 ms 降至 3.52 MiB / 34 ms（p50，40 次）。
+- Prewarm the Native one-shot worker after a file call: the file row keeps at most four idle workers for five minutes, and every worker still handles exactly one request with authority rechecked before input. `prewarmWorker: false` disables it; aborted calls never prime and session disposal or a sandbox-mode change discards idle workers. Through the real host subprocess provider on Windows x64, `stat` and `inspect_local_file` p50 fell from about 180 ms cold to 84 ms warm (25 runs); the provider's runner IPC imposes a floor that raw worker microbenchmarks do not show.
+- 一次 Native 文件调用后预热一个一次性 worker：file 行最多保留四个空闲 worker，空闲五分钟退出；每个 worker 仍只处理一个请求，写入前重检权限。`prewarmWorker: false` 可关闭；调用被取消后不再预热，会话销毁或沙箱模式变化会丢弃空闲 worker。经真实宿主 subprocess provider 在 Windows x64 实测，`stat` 与 `inspect_local_file` 的 p50 从冷启动约 180 ms 降至预热约 84 ms（25 次）；provider runner 的 IPC 有固定开销，裸 worker 微基准不包含这部分。
+
 - Treat UTF-8, GB18030 and BOM-marked UTF-16 as text across the native file tools: reads detect each file's codec, edits and overwrites preserve it byte-exactly (a lone UTF-16 BOM is re-attached), new files stay UTF-8, and `ops_inspect_local_file` accepts an explicit `encoding` to force one codec. Bytes no codec reads, and characters it cannot encode, still refuse with `ERR_INVALID_ENCODING` and publish nothing. The file/discovery schema subtotal now measures 263 tokens / 1160 bytes, still within the approved ≤400 scope.
 - native 文件工具将 UTF-8、GB18030 与带 BOM 的 UTF-16 一律视为文本：读取逐文件检测编码，编辑与覆写逐字节保留编码（孤立 UTF-16 BOM 会重挂），新文件仍为 UTF-8；`ops_inspect_local_file` 可用 `encoding` 强制指定编码。任何编码都无法解码的字节及无法编码的字符仍以 `ERR_INVALID_ENCODING` 拒绝且不发布任何变更。文件/发现 schema 小计现为 263 tokens / 1160 字节，仍在已批准的 ≤400 范围内。
 

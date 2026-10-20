@@ -26,6 +26,15 @@ ops-batch = { path = "crates/ops-batch" }
 [lints.rust]
 unsafe_code = "forbid"
 
+# The worker is spawned once per tool call, so its startup dominates short
+# calls. Strip debug sections and optimize across crates to keep the executable
+# small; symbols stay in the binary for diagnostics. Measured on Windows x64:
+# 7.41 MiB / 49 ms -> 3.52 MiB / 34 ms per spawn-to-close call.
+[profile.release]
+strip = "debuginfo"
+lto = "fat"
+codegen-units = 1
+
 [workspace]
 members = ["windows-metadata", "darwin-metadata", "crates/*"]
 resolver = "3"

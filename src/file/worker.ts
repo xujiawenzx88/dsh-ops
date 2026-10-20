@@ -1,6 +1,6 @@
 /** Native file worker bridge. The host owns path resolution and DSH authority. */
 import type { Context } from '@deepseek-ai/cordis'
-import type { SubprocessRuntime } from '@deepseek-ai/dsh-subprocess'
+import type { SubprocessHandle, SubprocessOutcome, SubprocessRuntime } from '@deepseek-ai/dsh-subprocess'
 import type { SandboxPolicyService } from '@deepseek-ai/dsh-sandbox-policy'
 import type { ToolRunContext } from '@deepseek-ai/dsh-tools'
 import type { FileSystem, FsTarget, FsInfo, FsObservation } from '@deepseek-ai/dsh-fs'
@@ -19,8 +19,9 @@ import { FILE_MUTATIONS } from '../policy.js'
 import { normalizeArguments } from './contract.js'
 import { resolveReadMany } from './read-many.js'
 import { withCallBudget, CallBudgetError } from '../kernel/call-budget.js'
-import { withResultSession } from '../kernel/result-lifecycle.js'
+import { withResultSession, resultSessionNonce } from '../kernel/result-lifecycle.js'
 import { resultStorage } from '../kernel/result-storage.js'
+import type { WarmWorkerPool } from './warm-worker.js'
 
 export { resolveWorker }
 
@@ -75,13 +76,13 @@ async function observeReplaced(ctx: Context, fsService: FileSystem | undefined, 
   }
 }
 
-export async function invoke(ctx: Context, file: string, tool: string, args: unknown, exec: ToolRunContext, signal?: AbortSignal, config?: WorkerInvokeConfig): Promise<unknown> {
+export async function invoke(ctx: Context, file: string, tool: string, args: unknown, exec: ToolRunContext, signal?: AbortSignal, config?: WorkerInvokeConfig, warm?: WarmWorkerPool): Promise<unknown> {
   try {
     const session = exec?.agent?.session
     if (!session?.id) return failure('EXECUTOR_UNAVAILABLE', 'An authoritative session identity is required.')
     return await withResultSession(ctx, session, signal, currentSignal =>
       withCallBudget(ctx.root ?? ctx, String(session.id), currentSignal,
-        () => invokeTrusted(ctx, file, tool, args, exec, currentSignal, config)))
+        () => invokeTrusted(ctx, file, tool, args, exec, currentSignal, config, warm)))
   }
   catch (error) {
     if (error instanceof CallBudgetError) {
@@ -92,7 +93,7 @@ export async function invoke(ctx: Context, file: string, tool: string, args: unk
     return failure('EXECUTOR_UNAVAILABLE', 'DSH file authority or preparation is unavailable; no unrestricted fallback was attempted.')
   }
 }
-async function invokeTrusted(ctx: Context, file: string, tool: string, args: unknown, exec: ToolRunContext, signal: AbortSignal, config?: WorkerInvokeConfig): Promise<unknown> {
+async function invokeTrusted(ctx: Context, file: string, tool: string, args: unknown, exec: ToolRunContext, signal: AbortSignal, config?: WorkerInvokeConfig, warm?: WarmWorkerPool): Promise<unknown> {
   const session = exec?.agent?.session
   const cwd = session?.header?.cwd
   if (!session?.id || typeof cwd !== 'string' || !path.isAbsolute(cwd)) return failure('EXECUTOR_UNAVAILABLE', 'An authoritative session identity and cwd are required.')
@@ -172,6 +173,13 @@ async function invokeTrusted(ctx: Context, file: string, tool: string, args: unk
   const envelope = workerEnvelope('file', { root: trustedPath(cwd), scope: String(session.id), tool, args: workerArgs, read_only: policy.mode === 'read-only', deny_roots: denyRoots, deny_credential_names: (config?.denyCredentialReads ?? true) !== false, ...(policy.mode === 'workspace-write' ? { write_roots: writeRoots } : {}) }, config?.toolCallTimeoutMs, storage)
   const input = JSON.stringify(envelope)
   if (Buffer.byteLength(input) > 2 * 1024 * 1024) return failure('OUTPUT_LIMIT', 'Request exceeds the 2 MiB byte budget.')
+  // One idle worker per session lifetime/policy/worker identity. The key
+  // deliberately includes the policy snapshot and the result-session nonce:
+  // a warm process primed under one policy or lifetime is never claimed by a
+  // call resolved under another.
+  const warmKey = warm && config?.prewarmWorker === true
+    ? [resultSessionNonce(ctx, session), String(session.id), file, cwd, policy.mode, policy.workspaceRoot].join('\0') : undefined
+  const warmSpec = { argv: [file], cwd }
   let spawned = false
   try {
     // Trusted, fixed file operations follow DSH fs-sandbox's policy fence,
@@ -191,9 +199,42 @@ async function invokeTrusted(ctx: Context, file: string, tool: string, args: unk
       if (mutates && (current.mode === 'read-only' || (current.mode === 'workspace-write' && required === 'danger-full-access'))) return denied(current, tool, required, 'Authority changed during preparation; no files were changed.')
       return authorityChanged(current, tool)
     }
-    const handle = subprocess.spawn({ argv, cwd, stdio: { stdin: { data: input }, stdout: { maxBytes: envelope.budget.maxBytes }, stderr: { maxBytes: 16 * 1024 } }, graceMs: 1000, signal })
-    spawned = true
-    const outcome = await handle.done
+    let handle: SubprocessHandle
+    let outcome: SubprocessOutcome
+    const ready = warmKey ? warm?.take(warmKey, signal) : undefined
+    if (ready) {
+      // The process was primed before this call, so it starts consuming the
+      // envelope immediately. It is still a one-request process: the caller
+      // owns the single write, closes stdin, and never reuses the handle.
+      handle = ready
+      spawned = true
+      if (!handle.stdin) {
+        try { handle.terminate() } catch { /* best effort */ }
+        return failure('RESULT_UNKNOWN', 'Warm worker stdin is unavailable; inspect postconditions.', 'execute', 'unknown')
+      }
+      const terminate = () => { try { handle.terminate() } catch { /* best effort */ } }
+      if (signal.aborted) {
+        terminate()
+        return failure('RESULT_UNKNOWN', 'Warm worker was interrupted before input; inspect postconditions.', 'execute', 'unknown')
+      }
+      signal.addEventListener('abort', terminate, { once: true })
+      // The provider only installs this for its data-mode stdin. A pipe we own
+      // can emit EPIPE after the child exits; handle.done carries that failure.
+      handle.stdin.on('error', () => {})
+      try {
+        handle.stdin.end(input)
+        outcome = await handle.done
+      } catch (error) {
+        terminate()
+        return failure('RESULT_UNKNOWN', `Warm worker did not accept the request; inspect postconditions. ${errorText(error)}`, 'execute', 'unknown')
+      } finally {
+        signal.removeEventListener?.('abort', terminate)
+      }
+    } else {
+      handle = subprocess.spawn({ argv, cwd, stdio: { stdin: { data: input }, stdout: { maxBytes: envelope.budget.maxBytes }, stderr: { maxBytes: 16 * 1024 } }, graceMs: 1000, signal })
+      spawned = true
+      outcome = await handle.done
+    }
     if (!handle.collected.stdout || !handle.collected.stderr) return failure('RESULT_UNKNOWN', 'Worker output readers are unavailable; inspect postconditions.', 'verify', 'unknown')
     const stdout = handle.collected.stdout.readFrom(0)
     const stderr = handle.collected.stderr.readFrom(0)
@@ -215,5 +256,11 @@ async function invokeTrusted(ctx: Context, file: string, tool: string, args: unk
     return { ...normalized, sandbox: { mode: policy.mode, enforcement: 'policy', boundary: 'trusted-native-file-operations' } }
   } catch (error) {
     return failure(spawned ? 'RESULT_UNKNOWN' : 'EXECUTOR_UNAVAILABLE', `DSH trusted file executor failed; this is not a user authorization denial. ${errorText(error)}`, 'execute', spawned ? 'unknown' : 'none')
+  } finally {
+    // Replenish for the next call. A call that never reached a worker (denied
+    // or invalid) leaves no process behind; a consumed or cold-spawned call
+    // primes exactly one replacement. An aborted call must not re-prime after
+    // cancel(), timeout, session disposal or a sandbox-mode change.
+    if (spawned && warmKey && warm && !signal.aborted) warm.prime(warmKey, warmSpec, String(session.id))
   }
 }

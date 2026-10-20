@@ -18,6 +18,7 @@
       config:
         promptPolicy: true
         required: false
+        prewarmWorker: true
     - id: dsh-ops-ptc
       name: dsh-ops/ptc
       config:

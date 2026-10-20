@@ -3,6 +3,7 @@ export interface WorkerInvokeConfig {
   binaryPath?: string
   required?: boolean
   denyCredentialReads?: boolean
+  prewarmWorker?: boolean
   toolCallTimeoutMs?: number
 }
 export function record(value: unknown): value is Record<string, unknown> {

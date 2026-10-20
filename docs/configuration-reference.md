@@ -94,6 +94,7 @@ A `dsh-ops/background` row left over from an earlier version loads as a no-op st
 | `promptPolicy` | boolean | `true` | file / shell |
 | `extraGuidance` | string | empty | file / shell |
 | `required` | boolean | `false` | file / ptc / discovery |
+| `prewarmWorker` | boolean | `true` | file |
 | `shellPolicy` | `advise` \| `deny-host-shell` | `advise` | shell |
 | `deniedHostTools` | string array | `[pwsh, bash, pwsh_persistent]` | shell |
 | `allowSystemShellFallback` | boolean | `false` | shell |
@@ -103,6 +104,15 @@ A `dsh-ops/background` row left over from an earlier version loads as a no-op st
 | `maxSessionBytes` | integer | `8388608` | panel |
 
 PTC accepts exactly binaryPath, required, allowedTools and alwaysLoaded; its credential fence stays enabled. Its always-loaded list is independent of the dynamic allowed pool. Discovery additionally owns enabled, maxResults and denyCredentialReads, and requires alwaysLoaded to be a subset of allowedTools. See [PTC settings](ptc-sdk-loading.md) and [discovery settings](discovery.md) for defaults and exact names. Replacement owns replaceTools plus its inert legacy compatibility keys; panel and TUI have only their documented capture/display fields.
+
+### Worker prewarming (`prewarmWorker`)
+
+`prewarmWorker` defaults to `true`. After a call, the file component keeps at most four started but
+not-yet-used one-shot workers; each exits after five idle minutes, and all stop with the component.
+Prewarming reuses process startup only, never a request or an authority decision: every worker handles
+one request, and the current session authority is rechecked before input. Idle workers are discarded
+when their session is disposed or its sandbox mode changes. Set it to `false` in deployments that
+forbid any idle child process.
 
 ### The credential fence (`denyCredentialReads`)
 
@@ -140,6 +150,7 @@ The `dsh-ops/file` row:
 config:
   promptPolicy: true
   required: false
+  # prewarmWorker: false   # disable idle one-shot workers
   # binaryPath: 'C:\tools\dsh-ops-worker.exe'
   # Managed update metadata; do not remove after the first startup self-check
   # configUpdateVersion: 2

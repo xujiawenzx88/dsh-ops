@@ -4,7 +4,8 @@
 
 The one-shot `dsh-ops-worker` remains the only executable. Each call enters through DSH's
 subprocess and confinement services, rechecks authority, reads one bounded JSON request,
-and writes one JSON result. Splitting the kernel does not introduce a persistent process.
+and writes one JSON result. Splitting the kernel does not introduce a persistent request protocol;
+prewarming is enabled by default and may keep up to four idle one-shot workers with a five-minute TTL; `prewarmWorker: false` disables it.
 
 | Crate | Responsibility | Kernel dependencies |
 | --- | --- | --- |

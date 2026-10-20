@@ -25,6 +25,7 @@ await test('an absent config resolves to the documented defaults', () => {
     assert.equal(config.bashPath, undefined)
     assert.equal(config.publishBashTool, true)
     assert.equal(config.allowSystemShellFallback, false)
+    assert.equal(config.prewarmWorker, true)
   }
 })
 
@@ -39,6 +40,7 @@ await test('an explicit config overrides every default', () => {
     bashPath: 'C:\\Program Files\\Git\\bin\\bash.exe',
     publishBashTool: false,
     allowSystemShellFallback: true,
+    prewarmWorker: false,
   })
   assert.equal(config.binaryPath, 'C:\\tools\\dsh-ops-worker.exe')
   assert.equal(config.required, true)
@@ -49,6 +51,7 @@ await test('an explicit config overrides every default', () => {
   assert.equal(config.bashPath, 'C:\\Program Files\\Git\\bin\\bash.exe')
   assert.equal(config.publishBashTool, false)
   assert.equal(config.allowSystemShellFallback, true)
+  assert.equal(config.prewarmWorker, false)
 })
 
 await test('the dropped shell keys stay unknown keys, so a stale config fails loud', () => {
@@ -89,6 +92,7 @@ await test('a wrong-typed value is rejected with its own key', () => {
     [{ bashPath: 7 }, 'bashPath'],
     [{ publishBashTool: 'yes' }, 'publishBashTool'],
     [{ allowSystemShellFallback: 'no' }, 'allowSystemShellFallback'],
+    [{ prewarmWorker: 'yes' }, 'prewarmWorker'],
   ]) {
     assert.throws(
       () => resolveConfig(raw),
