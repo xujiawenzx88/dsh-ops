@@ -1,9 +1,13 @@
-# 0.4.0 release candidate
+# 0.4.0 release candidate (upstream document)
+
+> **Fork note:** This document preserves the upstream dsh-ops release-candidate gate.
+> The fork publishes the upstream 0.4.0 source as `dsh-ops-zx88@0.1.0`; the benchmarks below were
+> not re-run for the fork and do not automatically constitute independent validation.
 
 中文：[0.4.0 发布候选](0.4.0发布候选.md).
 
-**Not released.** Version fields identify this candidate; they do not authorize a tag, npm publication
-or a final merge. Functional CI and the five acceptance benchmarks are separate gates. The approved
+**Upstream status: not released.** Upstream version fields identify this candidate; they do not
+authorize an upstream tag, upstream npm publication or a final upstream merge. Functional CI and the five acceptance benchmarks are separate gates. The approved
 BM-01 threshold is at least 40% fewer output bytes than OPS 0.3.x; the official reader remains a
 separate comparison. BM-03 applies ≤400 tokens to file/discovery schemas while retaining Bash at
 startup and reporting its cost and the full startup total separately. Final measured evidence is required.

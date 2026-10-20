@@ -1,7 +1,7 @@
 /**
  * Platform scope and runtime integrity of the native worker, ported from the
  * corrected ad-hoc `D-platform` / `D2-platform` probes in
- * `dsh-ops-boundary-report.md`.
+ * `dsh-ops-zx88-boundary-report.md`.
  *
  * The suite drives this checkout's own resolver (`lib/ptc/runtime.js`) and the
  * declarations beside it, not an installed copy, so it describes the tree that
@@ -33,7 +33,7 @@
  * `test/release-scope.test.mjs`, which was added for that purpose, so this suite
  * deliberately does not duplicate them.
  *
- * @module dsh-ops/test/linux-scope
+ * @module dsh-ops-zx88/test/linux-scope
  */
 
 import { createHash } from 'node:crypto'
@@ -96,11 +96,11 @@ await test('every foreign target is refused by name, naming the supported set', 
       try { resolved = resolveWorker({}, { packageRoot: stagePackage(root), platform, arch, env: {} }) } catch (caught) { error = caught }
       assert.equal(resolved, null, `${target} resolved to ${resolved}`)
       assert.ok(error, `${target} was allowed`)
-      assert.match(error.message, /Windows x64, Linux x64 and macOS Apple Silicon/)
+      assert.match(error.message, /Windows x64 only/)
       assert.ok(error.message.includes(target), `the message must name ${target}: ${error.message}`)
     })
   }
-  assert.deepEqual([...PLATFORMS], ['win32-x64', 'linux-x64', 'darwin-arm64'])
+  assert.deepEqual([...PLATFORMS], ['win32-x64'])
   assert.equal(workerName('win32'), 'dsh-ops-worker.exe')
   assert.equal(workerName('linux'), 'dsh-ops-worker')
 })
@@ -148,12 +148,12 @@ await test('a foreign-only runtime directory is not a cross-platform substitute'
 await test('package.json, the resolver and the plugin manifest declare the same scope', async () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 'utf8'))
   const components = PLUGIN.contributes?.['x-components'] ?? []
-  const ptc = components.find(component => component.id === 'dsh-ops-ptc')
+  const ptc = components.find(component => component.id === 'dsh-ops-zx88-ptc')
   assert.ok(ptc, 'the PTC component row is missing from contributes.x-components')
-  assert.deepEqual([...PLATFORMS], ['win32-x64', 'linux-x64', 'darwin-arm64'], 'only the approved target pairs are supported')
-  assert.deepEqual(manifest.os, ['win32', 'linux', 'darwin'])
-  assert.deepEqual(ptc.platforms, ['win32', 'linux', 'darwin'])
-  assert.deepEqual(ptc.architectures, ['x64', 'arm64'])
+  assert.deepEqual([...PLATFORMS], ['win32-x64'], 'only the approved target pair is supported')
+  assert.deepEqual(manifest.os, ['win32'])
+  assert.deepEqual(ptc.platforms, ['win32'])
+  assert.deepEqual(ptc.architectures, ['x64'])
   assert.deepEqual(ptc.targets, [...PLATFORMS], 'exact targets, not the os/cpu Cartesian product, define support')
 })
 

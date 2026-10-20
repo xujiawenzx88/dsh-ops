@@ -7,7 +7,7 @@
  * Usage:
  *   node scripts/build-platform-packages.mjs [all|publish-dir|check] [--dist <directory>]
  *
- * @module dsh-ops/build/platform-packages
+ * @module dsh-ops-zx88/build/platform-packages
  */
 
 import fs from 'node:fs'
@@ -122,7 +122,7 @@ async function main() {
     proxy,
     packages: describePackages(options.platform, options.arch, options.dist),
   }
-  console.log(`dsh-ops platform packages: ${options.command} -> ${options.dist}`)
+  console.log(`dsh-ops-zx88 platform packages: ${options.command} -> ${options.dist}`)
   console.log(`target ${options.platform}-${options.arch}`
     + (proxy === undefined ? ' (no proxy)' : ` (proxy http://${proxy.host}:${proxy.port})`))
   console.log(`platform packages: ${context.packages.map((pkg) => `${pkg.name}@${pkg.version}`).join(', ')}`)

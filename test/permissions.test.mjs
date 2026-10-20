@@ -149,7 +149,7 @@ await test('preparation failures name their cause: execution policy vs folder pr
   const chinese='无法加载文件 C:\\x\\prepare-workspace.ps1，因为在此系统上禁止运行脚本。有关详细信息，请参阅 https:/go.microsoft.com/fwlink/?LinkID=135170 中的 about_Execution_Policies。\r\n    + FullyQualifiedErrorId : UnauthorizedAccess\r\n'
   for(const text of [english,chinese]) {
     const message=await failure(failing(text))
-    assert.match(message,/^DSH workspace preparation failed: PowerShell execution policy blocked dsh-ops's own preparation script/)
+    assert.match(message,/^DSH workspace preparation failed: PowerShell execution policy blocked dsh-ops-zx88's own preparation script/)
     assert.match(message,/even with -ExecutionPolicy Bypass, so the policy comes from Group Policy/)
     assert.match(message,/danger-full-access/)
     assert.doesNotMatch(message,/not a user permission denial/)

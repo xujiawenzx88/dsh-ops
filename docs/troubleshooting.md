@@ -15,7 +15,7 @@ Measured on 2026-10-12: on `registry.npmmirror.com`, `@dsh-ops/bash-win32-x64` r
 **Preferred remedy**: `provision-shells` bypasses the registry, fetches the pinned asset from the upstream GitHub Release, checks its sha256, unpacks it and writes a `.provisioned.json` receipt.
 
 ```console
-npx --yes dsh-ops@latest provision-shells --bash
+npx --yes dsh-ops-zx88@latest provision-shells --bash
 ```
 
 Behind a proxy (`HTTPS_PROXY` is handed to curl explicitly as `--proxy` and is inherited through the environment as well):
@@ -23,13 +23,13 @@ Behind a proxy (`HTTPS_PROXY` is handed to curl explicitly as `--proxy` and is i
 ```console
 :: cmd
 set HTTPS_PROXY=http://127.0.0.1:<clash-port>
-npx --yes dsh-ops@latest provision-shells --bash
+npx --yes dsh-ops-zx88@latest provision-shells --bash
 ```
 
 ```console
 # PowerShell
 $env:HTTPS_PROXY = 'http://127.0.0.1:<clash-port>'
-npx --yes dsh-ops@latest provision-shells --bash
+npx --yes dsh-ops-zx88@latest provision-shells --bash
 ```
 
 **To check the result, run the profile's own copy**: `ladder` reports the bundled rung of **the copy that runs it**, so `npx … ladder` inspects the npx cache copy and its answer has nothing to do with your profile.
@@ -70,7 +70,7 @@ Symptom, in a read-only or workspace-write session: `EXECUTOR_UNAVAILABLE: ops_b
 
 What to do:
 
-- Remove `bashPath` (and `allowSystemShellFallback`) from the `dsh-ops/shell` row so the bundled pinned bash is used; if that payload is missing, run `npx --yes dsh-ops@latest provision-shells --bash`.
+- Remove `bashPath` (and `allowSystemShellFallback`) from the `dsh-ops-zx88/shell` row so the bundled pinned bash is used; if that payload is missing, run `npx --yes dsh-ops-zx88@latest provision-shells --bash`.
 - Or switch the session to `danger-full-access`, where `bashPath` runs directly.
 - Check with the profile's own copy: `node "<profile>\node_modules\dsh-ops\bin\dsh-ops.mjs" ladder --config <file>` reports `restricted: yes/no` for the resolved bash.
 
@@ -166,7 +166,7 @@ It is state left by the removed background component and is kept by default; add
 
 ### Legacy provisioned files were not cleaned up
 
-Legacy explicitly provisioned `<DSH_HOME>/dsh-ops/` files must be cleaned separately with `npx --yes dsh-ops@latest uninstall --yes`.
+Legacy explicitly provisioned `<DSH_HOME>/dsh-ops/` files must be cleaned separately with `npx --yes dsh-ops-zx88@latest uninstall --yes`.
 
 ---
 
@@ -183,7 +183,7 @@ No. It is FastCtx's reusable shared process, started by earlier versions with th
 macOS ships no `@dsh-ops/bash-darwin-arm64` or `@dsh-ops/pwsh-darwin-arm64`
 package, and no portable upstream bash exists for macOS. Select the shell the
 plugin should use with `bashPath` (for example `/opt/homebrew/bin/bash`) on the
-`dsh-ops/shell` row. PowerShell 7 can be provisioned, but the host disables its `pwsh-sandbox` and
+`dsh-ops-zx88/shell` row. PowerShell 7 can be provisioned, but the host disables its `pwsh-sandbox` and
 `tool-pwsh` rows outside Windows, so no pwsh tool appears on macOS.
 
 ### The file tools reject a path under `/tmp`

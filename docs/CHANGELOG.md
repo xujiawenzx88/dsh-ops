@@ -5,8 +5,18 @@ All notable changes to this package are recorded here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2026-10-20 (dsh-ops-zx88 fork)
+
+- Publish the upstream dsh-ops 0.4.0 source as the unofficial Windows x64 fork `dsh-ops-zx88`:
+  rename the npm package, plugin/components, bin command and documentation identity,
+  and narrow the declared runtime matrix to Windows x64. Tool names, worker binary,
+  state paths and upstream shell-package scope are unchanged; the Windows Bash IPC
+  proxies are staged beside the worker. No functional changes.
+
 ## [Unreleased]
 
+- Open the result cache from its trusted parent instead of walking every ancestor from the volume root, so a Windows sandboxed worker can still store and page result references when its restricted token cannot open the profile's `AppData` directory; the no-follow check on the cache root is unchanged.
+- 在受信任的父目录直接打开结果缓存，不再从卷根逐级遍历，使 Windows 沙箱 worker 在受限令牌无法打开用户 `AppData` 目录时仍能写入和分页结果引用；缓存根节点的 no-follow 检查保持不变。
 - Slim the release worker so its per-call startup is cheaper: strip debug sections, enable fat LTO and build one codegen unit. The one-shot process model, per-call authority checks and the protocol are unchanged. Measured on Windows x64, `inspect_local_file` spawn-to-close fell from 7.41 MiB / 49 ms to 3.52 MiB / 34 ms (p50; 40 runs).
 - 精简发布版 worker，降低每次调用都支付的启动成本：移除调试段，启用 fat LTO 并只生成一个 codegen unit。一次性进程模型、逐调用权限检查和协议均不变。Windows x64 实测 `inspect_local_file` 的 spawn-to-close 从 7.41 MiB / 49 ms 降至 3.52 MiB / 34 ms（p50，40 次）。
 - Prewarm the Native one-shot worker after a file call: the file row keeps at most four idle workers for five minutes, and every worker still handles exactly one request with authority rechecked before input. `prewarmWorker: false` disables it; aborted calls never prime and session disposal or a sandbox-mode change discards idle workers. Through the real host subprocess provider on Windows x64, `stat` and `inspect_local_file` p50 fell from about 180 ms cold to 84 ms warm (25 runs); the provider's runner IPC imposes a floor that raw worker microbenchmarks do not show.

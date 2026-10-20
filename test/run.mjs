@@ -15,7 +15,7 @@
  * such a skip into a failure here as well as in the suite, so the integration
  * job cannot silently lose the thing it exists to test.
  *
- * @module dsh-ops/test/run
+ * @module dsh-ops-zx88/test/run
  */
 
 import { spawn, spawnSync } from 'node:child_process'
@@ -56,7 +56,7 @@ const bashFixture = process.platform === 'win32'
   ? (await import('../lib/shells/pinned.js')).pinnedBashExecutable({ file: process.env.DSH_OPS_TEST_BASH, required: false }) : undefined
 const selected = suites()
 if (selected.length === 0) {
-  console.error('dsh-ops test: no suites matched')
+  console.error('dsh-ops-zx88 test: no suites matched')
   process.exit(1)
 }
 
@@ -83,7 +83,7 @@ const SUITE_TIMEOUT_MS = (() => {
   if (raw === undefined || raw === '') return 120_000
   const value = Number(raw)
   if (!Number.isFinite(value) || value <= 0) {
-    console.error(`dsh-ops test: invalid DSH_OPS_SUITE_TIMEOUT_MS: ${raw}`)
+    console.error(`dsh-ops-zx88 test: invalid DSH_OPS_SUITE_TIMEOUT_MS: ${raw}`)
     process.exit(2)
   }
   return value
@@ -100,7 +100,7 @@ const started = Date.now()
 
 /** Run one suite in its own process, with a throwaway DSH_HOME and a bounded deadline. */
 async function runSuite(suite) {
-  const home = mkdtempSync(path.join(tmpdir(), 'dsh-ops-test-home-'))
+  const home = mkdtempSync(path.join(tmpdir(), 'dsh-ops-zx88-test-home-'))
   const label = path.basename(suite)
   console.log(`\n=== ${label}`)
   const child = spawn(process.execPath, [suite], {
@@ -155,8 +155,8 @@ const seconds = Math.round((Date.now() - started) / 1000)
 const passed = selected.length - failed - skipped
 const skipNote = skipped === 0 ? '' : `, ${skipped} skipped`
 if (failed === 0) {
-  console.log(`\ndsh-ops test: ${passed} suite(s) passed${skipNote} in ${seconds}s`)
+  console.log(`\ndsh-ops-zx88 test: ${passed} suite(s) passed${skipNote} in ${seconds}s`)
   process.exit(0)
 }
-console.error(`\ndsh-ops test: ${failed} of ${selected.length} suite(s) failed${skipNote} in ${seconds}s`)
+console.error(`\ndsh-ops-zx88 test: ${failed} of ${selected.length} suite(s) failed${skipNote} in ${seconds}s`)
 process.exit(1)

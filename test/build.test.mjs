@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { pathToFileURL } from 'node:url'
-import { assert, test, report, PACKAGE_ROOT, withTempDir } from './lib/harness.mjs'
+import { assert, copyTree, test, report, PACKAGE_ROOT, withTempDir } from './lib/harness.mjs'
 
 function write(root, name, content) {
   const file = path.join(root, name)
@@ -22,8 +22,8 @@ function fixture(root) {
   write(root, 'src/profiles/client/package.json', fs.readFileSync(path.join(PACKAGE_ROOT, 'src/profiles/client/package.json')))
   // Copies also work in Windows sandboxes where directory junctions are unavailable.
   for (const name of ['typescript', '@types/node', 'undici-types', 'yaml']) {
-    fs.cpSync(path.join(PACKAGE_ROOT, 'node_modules', name),
-      path.join(root, 'node_modules', name), { recursive: true })
+    copyTree(path.join(PACKAGE_ROOT, 'node_modules', name),
+      path.join(root, 'node_modules', name))
   }
   write(root, 'package.json', JSON.stringify({ name: 'build-fixture', private: true, type: 'module' }))
 }
@@ -65,7 +65,7 @@ await test('rebuild removes retired modules and assets while preserving every as
       'components/panel/package.json': Buffer.from('{"type":"module"}\n'),
       'components/panel/locale/en-US.json': Buffer.from('{"name":"Panel"}\r\n'),
       'components/panel/icon.png': Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0, 255]),
-      'components/tui/dsh-plugin.json': Buffer.from('{"id":"dsh-ops/tui"}\n'),
+      'components/tui/dsh-plugin.json': Buffer.from('{"id":"dsh-ops-zx88/tui"}\n'),
       'panel/panel.html': Buffer.from('<!doctype html>\r\n<p>面板</p>\r\n'),
     }
     for (const [name, bytes] of Object.entries(assets)) write(root, `src/${name}`, bytes)

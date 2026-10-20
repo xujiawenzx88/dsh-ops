@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * `dsh-ops` — operator commands for the dsh-ops plugin.
+ * `dsh-ops-zx88` — operator commands for the dsh-ops-zx88 plugin.
  *
  * The plugin resolves its native worker and shells automatically, so these
  * commands are not required for a normal install. They exist for what automatic
@@ -9,7 +9,7 @@
  * files older versions left outside the profile, and report what this
  * deployment resolves and which rungs the prompt ladder renders.
  *
- * @module dsh-ops/cli
+ * @module dsh-ops-zx88/cli
  */
 
 import { spawnSync } from 'node:child_process'
@@ -30,35 +30,35 @@ import { commandSettingsProfile } from '../lib/cli/settings-profile.js'
  * @returns {void}
  */
 function usage() {
-  console.log(`dsh-ops — operator commands for the dsh-ops plugin
+  console.log(`dsh-ops-zx88 — operator commands for the dsh-ops-zx88 plugin
 
 Usage:
-  dsh-ops install --profile <desktop|web|tui> [--dsh-cli <path>]
+  dsh-ops-zx88 install --profile <desktop|web|tui> [--dsh-cli <path>]
                                   Install this version using the official target-profile manager
-  dsh-ops uninstall --profile <desktop|web|tui> [--dsh-cli <path>]
+  dsh-ops-zx88 uninstall --profile <desktop|web|tui> [--dsh-cli <path>]
                                   Remove the profile plugin and its binary dependency references
-  dsh-ops status --profile <desktop|web|tui>
+  dsh-ops-zx88 status --profile <desktop|web|tui>
                                   Report target-profile installation (tui maps to dsh-tui)
-  dsh-ops settings-profile --profile-dir <dir> --host-anchor <host package.json> [--dsh-home <dir>] [--offline --yes]
+  dsh-ops-zx88 settings-profile --profile-dir <dir> --host-anchor <host package.json> [--dsh-home <dir>] [--offline --yes]
                                   Preview or explicitly enable the optional browser settings carrier
-  dsh-ops build-ptc              Build the independent native Rust worker (all platforms)
-  dsh-ops uninstall [--yes] [--purge-fastctx]
+  dsh-ops-zx88 build-ptc              Build and stage the native Rust worker for this host
+  dsh-ops-zx88 uninstall [--yes] [--purge-fastctx]
                                   Report files older versions left under <DSH_HOME>/dsh-ops and,
                                   with --yes, remove them; --purge-fastctx also removes leftover
                                   ~/.fastctx state from the removed background component
-  dsh-ops ladder [--json] [--config <file>]
+  dsh-ops-zx88 ladder [--json] [--config <file>]
                                   Report the native worker, both shells, and the rungs the
                                   prompt ladder actually renders; nothing is spawned
-  dsh-ops provision-shells [--bash] [--pwsh] [--force] [--dry-run] [--pin <file>]
+  dsh-ops-zx88 provision-shells [--bash] [--pwsh] [--force] [--dry-run] [--pin <file>]
                                   Download the pinned upstream bash and/or PowerShell 7, verify
                                   their digests, and install them under <DSH_HOME>/dsh-ops/shells
-  dsh-ops bash-runtime [status|install|remove|git|managed] [--yes] [--dry-run]
+  dsh-ops-zx88 bash-runtime [status|install|remove|git|managed] [--yes] [--dry-run]
                                   Manage optional Bash; git/managed prints a bashPath selection
                                   for the host config editor. remove previews unless --yes.
-  dsh-ops upgrade-host-pwsh [--yes] [--dry-run]
+  dsh-ops-zx88 upgrade-host-pwsh [--yes] [--dry-run]
                                   Preview/run standard Windows PowerShell 7 installation through
                                   WinGet. Restart DSH; custom host pwshPath remains authoritative.
-  dsh-ops help                    This text
+  dsh-ops-zx88 help                    This text
 
 Environment:
   DSH_OPS_WORKER_BIN   Explicit native worker executable
@@ -80,10 +80,10 @@ use --yes to confirm that separate cleanup. No system shell or shared npm cache 
  * or habit gets told where to go.
  */
 const REMOVED_COMMANDS = Object.freeze({
-  resolve: 'use `dsh-ops ladder` to see what this deployment resolves',
-  status: 'use `dsh-ops ladder` for this deployment, or `dsh-ops status --profile <desktop|web|tui>` for a profile install',
-  build: 'use `dsh-ops build-ptc` to build the native worker',
-  provision: 'the native worker ships in the package (or `dsh-ops build-ptc` from a checkout); use `dsh-ops provision-shells` for the shells',
+  resolve: 'use `dsh-ops-zx88 ladder` to see what this deployment resolves',
+  status: 'use `dsh-ops-zx88 ladder` for this deployment, or `dsh-ops-zx88 status --profile <desktop|web|tui>` for a profile install',
+  build: 'use `dsh-ops-zx88 build-ptc` to build the native worker',
+  provision: 'the native worker ships in the package (or `dsh-ops-zx88 build-ptc` from a checkout); use `dsh-ops-zx88 provision-shells` for the shells',
 })
 
 /**
@@ -118,7 +118,7 @@ async function main() {
     return profileCommand(command, { profile: values.profile, dshCli: values['dsh-cli'], dryRun: values['dry-run'] === true })
   }
   if (Object.hasOwn(REMOVED_COMMANDS, command)) {
-    console.error(`dsh-ops: \`${command}\` was removed together with the FastCtx background component; ${REMOVED_COMMANDS[command]}.`)
+    console.error(`dsh-ops-zx88: \`${command}\` was removed together with the FastCtx background component; ${REMOVED_COMMANDS[command]}.`)
     return 2
   }
   switch (command) {
@@ -165,11 +165,11 @@ async function main() {
       usage()
       return 0
     default:
-      console.error(`dsh-ops: unknown command ${JSON.stringify(command)}\n`)
+      console.error(`dsh-ops-zx88: unknown command ${JSON.stringify(command)}\n`)
       usage()
       return 2
   }
 }
 
 try { process.exitCode = await main() }
-catch (error) { console.error(`dsh-ops: ${error.message}`); process.exitCode = 1 }
+catch (error) { console.error(`dsh-ops-zx88: ${error.message}`); process.exitCode = 1 }

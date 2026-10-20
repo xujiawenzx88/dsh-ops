@@ -23,7 +23,7 @@
  * Every fixture passes a noise floor on purpose: without one the new rule makes every
  * cost conclusion `noise-floor-unknown`, which is the case the "no floor" check owns.
  *
- * @module dsh-ops/test/bench-compare
+ * @module dsh-ops-zx88/test/bench-compare
  */
 
 import fs from 'node:fs'

@@ -1,4 +1,4 @@
-name: Cross-platform validation
+name: Windows x64 validation
 on:
   # A merge must validate itself. Without this, a branch was only ever checked when someone
   # remembered to dispatch the workflow by hand — which is how a stale number shipped in #134.
@@ -32,7 +32,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: cross-platform-${{ github.ref }}
+  group: windows-x64-${{ github.ref }}
   # A pull request that gets a new push supersedes its own earlier run; `main` never cancels,
   # because a half-built release branch is worse than a queued one.
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -43,8 +43,6 @@ jobs:
       matrix:
         include:
           - { runner: windows-latest, target: win32-x64 }
-          - { runner: ubuntu-24.04, target: linux-x64 }
-          - { runner: macos-latest, target: darwin-arm64 }
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 35
     env:
@@ -77,14 +75,11 @@ jobs:
           key: ops-031-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('native/Cargo.lock') }}
           # A changed lockfile must not throw the whole cache away: fall back to the previous one.
           restore-keys: ops-031-${{ runner.os }}-${{ runner.arch }}-
-      - name: Linux ACL test dependencies
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y acl
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --registry=https://registry.npmjs.org
       # The gate, not `npm run verify`: it runs the same suites with `DSH_OPS_REQUIRE_RUNTIME=1`
-      # on POSIX (a runtime-absence skip is a failure, not a pass), refuses any skip outside this
-      # platform's known set, fails when a suite file on disk was never collected, and checks the
+      # DSH_OPS_REQUIRE_RUNTIME=1 (a runtime-absence skip is a failure, not a pass), refuses any
+      # skip outside this platform's known set, fails when a suite file was never collected, and checks the
       # packed artifact. It builds the plugin before its CLI, then builds/tests the worker and
       # Windows IPC proxies using an explicitly downloaded pinned Bash fixture (or DSH_OPS_TEST_BASH). Build success is not behaviour.
       - name: Functional gate (skips, suite inventory, packed artifact)
@@ -92,9 +87,6 @@ jobs:
         run: node scripts/verify-gate.mjs --skip-install
       - name: Verify native staged closure
         run: node bin/native-runtime.mjs check --platform ${{ matrix.target }}
-      - name: Check shell payload platform filtering
-        shell: bash
-        run: node -e "const fs=require('fs');if(process.platform!=='win32'){for(const n of ['bash','pwsh'])if(fs.existsSync('node_modules/@dsh-ops/'+n+'-win32-x64'))throw Error('Windows shell installed on POSIX')}"
       - uses: actions/upload-artifact@v7
         with:
           name: native-${{ matrix.target }}
@@ -102,12 +94,12 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  # The tools trial: one platform is enough, because it exercises the tool surface itself rather
+  # The tools trial: Windows x64 is enough, because it exercises the tool surface itself rather
   # than the platform. It is deliberately **not** required — `continue-on-error` keeps the run green
   # — so a tool that breaks shows up in its own job and in the uploaded report without blocking a
   # merge, while the `validate` matrix above stays the gate.
   tools-trial:
-    runs-on: ubuntu-24.04
+    runs-on: windows-latest
     continue-on-error: true
     timeout-minutes: 20
     env:
@@ -152,7 +144,7 @@ jobs:
 
   # The bench smoke: `workflow_dispatch` only, off by default, and informational (like `tools-trial`
   # above). One platform is enough, because it exercises the harness rather than the platform — the
-  # three-OS matrix in `validate` is the gate. Both sides are the *same* staged worker, so the run
+  # Windows x64 `validate` job is the gate. Both sides are the *same* staged worker, so the run
   # proves only what a harness self-check can prove: the corpus builds and is removed, the worker
   # answers identically twice, and every query lands on `MATCH` or a declared `EXPECTED_*`. It cannot
   # produce a performance verdict: `compare()` derives its state from output hashes, error codes and
@@ -160,7 +152,7 @@ jobs:
   # **never** run in CI.
   bench-smoke:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.bench }}
-    runs-on: ubuntu-24.04
+    runs-on: windows-latest
     continue-on-error: true
     timeout-minutes: 30
     env:
@@ -205,7 +197,7 @@ jobs:
       - name: Tool-level comparison, one binary on both sides
         shell: bash
         run: |
-          worker="runtime/linux-x64/dsh-ops-worker"
+          worker="runtime/win32-x64/dsh-ops-worker.exe"
           mkdir -p bench/runs/smoke/fixtures
           node bench/cli.mjs tools \
             --baseline "$worker" --candidate "$worker" \
@@ -260,10 +252,10 @@ jobs:
         run: node scripts/check-file-size.mjs
 
   # `package.json` promises `^22.19 || >=24`, but the matrix above only ever runs 24, so the lower
-  # bound was never exercised. One job on the declared floor keeps that promise honest without
-  # tripling the platform matrix.
+  # bound was never exercised. One Windows job on the declared floor keeps that promise honest
+  # without duplicating the full gate.
   node-floor:
-    runs-on: ubuntu-24.04
+    runs-on: windows-latest
     timeout-minutes: 35
     env:
       CARGO_BUILD_JOBS: '3'
@@ -287,8 +279,8 @@ jobs:
         run: node scripts/verify-gate.mjs --skip-install
 
   # One check for a maintainer to require. Branch protection names individual job results, and the
-  # matrix above expands into one check per platform, so requiring the gate means keeping three names
-  # in sync — and silently losing the gate when a runner label changes. This job collapses them, and
+  # matrix above expands into one Windows x64 check, so requiring the gate means keeping one name
+  # in sync — and silently losing the gate when a runner label changes. This job collapses it, and
   # it reports the deliberately non-blocking `tools-trial` and `bench-smoke` without letting either
   # fail the run. `bench-smoke` is listed in `needs` only so that this aggregate always accounts for
   # every job; it is deliberately absent from the loop below, which is the whole of its non-blocking

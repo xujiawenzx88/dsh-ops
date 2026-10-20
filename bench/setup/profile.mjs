@@ -55,7 +55,7 @@ import { BENCH_DIR, REPO_ROOT } from '../lib/env.mjs'
 
 /** The plugin under test — the only package this module ever installs, and the name every
  * install failure has to carry so "failed" never means "something, somewhere". */
-export const PLUGIN_NAME = 'dsh-ops'
+export const PLUGIN_NAME = 'dsh-ops-zx88'
 /** The patch entry the host's PowerShell executor reads: `dsh-pwsh-sandbox` inherits
  * `dsh-pwsh-local`'s config schema, whose only executable key is `pwshPath`. */
 export const SHELL_ENTRY_ID = 'pwsh-sandbox'
@@ -93,7 +93,7 @@ export const USAGE = `usage: node bench/cli.mjs setup [options]
   --plugin <spec>         what to install into the candidate: "local" (default) installs
                           this checkout, i.e. the local build — the profile links the repo
                           root, so edits are what the next run executes; an npm spec
-                          (dsh-ops@<version>, a tarball, a dist tag) installs that instead;
+                          (dsh-ops-zx88@<version>, a tarball, a dist tag) installs that instead;
                           "none" installs nothing
   --no-plugin             alias for --plugin none
   --reinstall             remove the plugin from the candidate before installing
@@ -504,7 +504,7 @@ export function installedPluginOrigin(home, profile) {
  * @returns {string|null} the version, or null when the spec does not name one.
  */
 export function specVersion(spec, root = REPO_ROOT) {
-  const named = spec === 'local' ? repoVersion(root) : /^dsh-ops@(.+)$/.exec(spec)?.[1]
+  const named = spec === 'local' ? repoVersion(root) : /^dsh-ops-zx88@(.+)$/.exec(spec)?.[1]
   return named && /^\d/.test(named) ? named : null
 }
 

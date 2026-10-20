@@ -138,7 +138,7 @@ export class WarmWorkerPool {
   async dispose(): Promise<void> {
     if (this.disposed) return
     this.disposed = true
-    this.lifecycle.abort(new Error('dsh-ops warm worker pool disposed'))
+    this.lifecycle.abort(new Error('dsh-ops-zx88 warm worker pool disposed'))
     const entries = [...this.entries.values()]
     for (const entry of entries) this.discard(entry)
     await Promise.allSettled(entries.map(entry => entry.handle.done))

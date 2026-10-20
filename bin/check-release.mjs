@@ -12,14 +12,14 @@ const root = path.resolve(values.root ?? path.resolve(path.dirname(fileURLToPath
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'))
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'dsh-plugin.json'), 'utf8'))
 const components = manifest.contributes?.['x-components'] ?? []
-const declared = components.find(component => component.id === 'dsh-ops-ptc')?.targets ?? []
+const declared = components.find(component => component.id === 'dsh-ops-zx88-ptc')?.targets ?? []
 const sameSet = (a, b) => JSON.stringify([...a].sort()) === JSON.stringify([...b].sort())
 if (!sameSet(declared, PLATFORMS)) throw Error(`Declared scope ${JSON.stringify(declared)} and resolver PLATFORMS ${JSON.stringify(PLATFORMS)} disagree`)
 // npm os/cpu filters cannot express paired targets. The component's exact targets
 // and runtime resolver are authoritative; Intel Mac and Windows/Linux arm64 stay rejected.
 if (!sameSet(pkg.os ?? [], PLATFORMS.map(target => target.split('-')[0]).filter((value, index, all) => all.indexOf(value) === index)) ||
     !sameSet(pkg.cpu ?? [], [...new Set(PLATFORMS.map(target => target.split('-')[1]))])) throw Error('Package os/cpu and exact target declarations disagree')
-for (const id of ['dsh-ops-file', 'dsh-ops-shell']) {
+for (const id of ['dsh-ops-zx88-file', 'dsh-ops-zx88-shell']) {
   if (!sameSet(components.find(component => component.id === id)?.targets ?? [], PLATFORMS)) throw Error(`${id} target declarations disagree`)
 }
 for (const kind of ['bash', 'pwsh']) {
@@ -44,4 +44,4 @@ if (receipt.version !== 1 || receipt.platform !== 'win32-x64') throw Error('Inva
 for (const name of ['opsipc.dll', 'opsnt.dll']) if (hash(path.join(ipc, name)) !== receipt.files[name]) throw Error(`IPC hash mismatch ${name}`)
 for (const name of ['security.h', 'opsipc.cpp', 'opsnt.cpp']) if (hash(path.join(root, 'native/bash-ipc', name)) !== receipt.sources[name]) throw Error(`IPC source mismatch ${name}; rebuild proxies`)
 if (!sameSet(fs.readdirSync(ipc), ['opsipc.dll', 'opsnt.dll', 'provenance.json'])) throw Error('Unexpected Bash IPC output files')
-console.log(`Release closure OK: dsh-ops@${pkg.version}, ${declared.join(' + ')} + Bash IPC proxies and matching source.`)
+console.log(`Release closure OK: dsh-ops-zx88@${pkg.version}, ${declared.join(' + ')} + Bash IPC proxies and matching source.`)

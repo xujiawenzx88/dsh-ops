@@ -39,7 +39,7 @@
  * Platform. Byte accounting in the native worker, so every case runs on win32 as
  * well.
  *
- * @module dsh-ops/test/output-budget
+ * @module dsh-ops-zx88/test/output-budget
  */
 
 import fs from 'node:fs'

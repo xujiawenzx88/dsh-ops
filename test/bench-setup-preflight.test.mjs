@@ -1,8 +1,8 @@
-/**
+﻿/**
  * Setup B: the preflight half.
  *
  * Every check runs against a temporary home, a temporary checkout and a temporary staged
- * runtime — the real `~/.dsh` is never read, let alone written — and every external command
+ * runtime 鈥?the real `~/.dsh` is never read, let alone written 鈥?and every external command
  * is a stand-in: `main` is given the resolved launcher, an `invoke` that records what dsh
  * would have been asked to do (and emulates profile creation, plugin installs and
  * `--dump-config`), and a `runGate` that answers the canonical native-runtime check without
@@ -54,7 +54,7 @@ function stageRuntime(root, target) {
 }
 
 /**
- * A temporary bench home, a temporary checkout (staged for linux-x64 unless `built: false`),
+ * A temporary bench home, a temporary checkout (staged for win32-x64 unless `built: false`),
  * an overlay template and the stand-in dsh.
  */
 function fixture(dir, { version = '0.3.1', built = true } = {}) {
@@ -63,8 +63,8 @@ function fixture(dir, { version = '0.3.1', built = true } = {}) {
   const overlay = path.join(dir, 'llm.patch.yml')
   const example = path.join(dir, 'llm.patch.example.yml')
   fs.mkdirSync(checkout, { recursive: true })
-  fs.writeFileSync(path.join(checkout, 'package.json'), JSON.stringify({ name: 'dsh-ops', version }), 'utf8')
-  if (built) stageRuntime(checkout, 'linux-x64')
+  fs.writeFileSync(path.join(checkout, 'package.json'), JSON.stringify({ name: 'dsh-ops-zx88', version }), 'utf8')
+  if (built) stageRuntime(checkout, 'win32-x64')
   fs.writeFileSync(example, EXAMPLE_TEMPLATE, 'utf8')
 
   const calls = []
@@ -72,13 +72,13 @@ function fixture(dir, { version = '0.3.1', built = true } = {}) {
   const out = []
   const err = []
   const profileDir = (name) => path.join(home, 'profiles', name)
-  const pluginDir = (name) => path.join(profileDir(name), 'node_modules', 'dsh-ops')
+  const pluginDir = (name) => path.join(profileDir(name), 'node_modules', 'dsh-ops-zx88')
   const install = (name, spec) => {
-    const resolved = /^dsh-ops@/.test(spec)
-      ? spec.slice('dsh-ops@'.length)
+    const resolved = /^dsh-ops-zx88@/.test(spec)
+      ? spec.slice('dsh-ops-zx88@'.length)
       : JSON.parse(fs.readFileSync(path.join(spec, 'package.json'), 'utf8')).version
     fs.mkdirSync(pluginDir(name), { recursive: true })
-    fs.writeFileSync(path.join(pluginDir(name), 'package.json'), JSON.stringify({ name: 'dsh-ops', version: resolved }), 'utf8')
+    fs.writeFileSync(path.join(pluginDir(name), 'package.json'), JSON.stringify({ name: 'dsh-ops-zx88', version: resolved }), 'utf8')
   }
   const invoke = (args) => {
     calls.push([...args])
@@ -104,7 +104,7 @@ function fixture(dir, { version = '0.3.1', built = true } = {}) {
     out: (line) => out.push(line),
     err: (line) => err.push(line),
     env: { SystemRoot: 'C:\\Windows' },
-    platform: 'linux', arch: 'x64',
+    platform: 'win32', arch: 'x64',
     repoRoot: checkout,
     entry: { file: path.join(dir, 'dsh', 'lib', 'bin.js'), kind: 'js', notes: ['fixture'] },
     invoke,
@@ -220,7 +220,7 @@ await test('the preflight reports the poisoned PSModulePath as a warning with th
     const isDirectory = (file) => file === path.win32.join(CORE, 'Microsoft.PowerShell.Security')
     const options = { baseProfile: 'bench-base', candProfile: 'bench-ops', permissionMode: 'danger-full-access', plugin: 'local', noBuildCheck: true }
     const lines = []
-    const dirty = preflight(options, { home: path.join(dir, 'home'), env: poisoned, platform: 'linux', arch: 'x64', log: (line) => lines.push(line), isDirectory })
+    const dirty = preflight(options, { home: path.join(dir, 'home'), env: poisoned, platform: 'win32', arch: 'x64', log: (line) => lines.push(line), isDirectory })
     assert.equal(dirty.ok, true, 'a poisoned module path is a warning, not a refusal')
     assert.equal(dirty.outcomes.modulePath, 'poisoned')
     assert.equal(dirty.warnings.length, 1)
@@ -228,7 +228,7 @@ await test('the preflight reports the poisoned PSModulePath as a warning with th
     assert.match(lines.join('\n'), /search order: 1\. C:\\Program Files\\PowerShell\\7\\Modules/)
     assert.match(lines.join('\n'), /preflight: PSModulePath/)
 
-    const clean = preflight(options, { home: path.join(dir, 'home'), env: { SystemRoot: 'C:\\Windows' }, platform: 'linux', arch: 'x64' })
+    const clean = preflight(options, { home: path.join(dir, 'home'), env: { SystemRoot: 'C:\\Windows' }, platform: 'win32', arch: 'x64' })
     assert.equal(clean.outcomes.modulePath, 'clean')
     assert.deepEqual(clean.warnings, [])
   })
@@ -236,21 +236,21 @@ await test('the preflight reports the poisoned PSModulePath as a warning with th
 
 await test('the local-build preflight names the one rebuild command and judges what is staged', async () => {
   await withTempDir('bench-pre-build-', async (dir) => {
-    const missing = inspectLocalBuild({ root: dir, platform: 'linux', arch: 'x64' })
+    const missing = inspectLocalBuild({ root: dir, platform: 'win32', arch: 'x64' })
     assert.equal(missing.problems.length, 1)
-    assert.match(missing.problems[0].what, /runtime[\\/]linux-x64/)
+    assert.match(missing.problems[0].what, /runtime[\\/]win32-x64/)
     assert.match(missing.problems[0].fix, /npm run build:ptc/)
 
-    stageRuntime(dir, 'linux-x64')
-    assert.deepEqual(inspectLocalBuild({ root: dir, platform: 'linux', arch: 'x64' }).problems, [])
+    stageRuntime(dir, 'win32-x64')
+    assert.deepEqual(inspectLocalBuild({ root: dir, platform: 'win32', arch: 'x64' }).problems, [])
 
     // A worker older than native/src is a warning: it may measure a stale build, but the
     // artifact is there and the fix is the same one command.
     fs.mkdirSync(path.join(dir, 'native', 'src'), { recursive: true })
     fs.writeFileSync(path.join(dir, 'native', 'src', 'lib.rs'), '// rust\n')
     const past = new Date('2000-01-01T00:00:00Z')
-    fs.utimesSync(path.join(dir, 'runtime', 'linux-x64', workerName('linux')), past, past)
-    const stale = inspectLocalBuild({ root: dir, platform: 'linux', arch: 'x64' })
+    fs.utimesSync(path.join(dir, 'runtime', 'win32-x64', workerName('win32')), past, past)
+    const stale = inspectLocalBuild({ root: dir, platform: 'win32', arch: 'x64' })
     assert.deepEqual(stale.problems, [])
     assert.match(stale.warnings[0], /native[\\/]src[\\/]lib\.rs/)
     assert.match(stale.warnings[0], /npm run build:ptc/)
@@ -262,7 +262,7 @@ await test('the local-build preflight names the one rebuild command and judges w
       fs.writeFileSync(file, '// workspace source\n')
       const future = new Date(Date.now() + 60000)
       fs.utimesSync(file, future, future)
-      const changed = inspectLocalBuild({ root: dir, platform: 'linux', arch: 'x64' })
+      const changed = inspectLocalBuild({ root: dir, platform: 'win32', arch: 'x64' })
       assert.ok(changed.warnings.some(warning => warning.includes(path.relative(dir, file))))
       fs.utimesSync(file, past, past)
     }
@@ -272,8 +272,8 @@ await test('the local-build preflight names the one rebuild command and judges w
     fs.mkdirSync(path.dirname(cache), { recursive: true })
     fs.writeFileSync(cache, 'build output')
     const staged = new Date('2020-01-01T00:00:00Z')
-    fs.utimesSync(path.join(dir, 'runtime', 'linux-x64', workerName('linux')), staged, staged)
-    assert.deepEqual(inspectLocalBuild({ root: dir, platform: 'linux', arch: 'x64' }).warnings, [])
+    fs.utimesSync(path.join(dir, 'runtime', 'win32-x64', workerName('win32')), staged, staged)
+    assert.deepEqual(inspectLocalBuild({ root: dir, platform: 'win32', arch: 'x64' }).warnings, [])
 
     // An unsupported target is named as unsupported, not reported as a missing build.
     assert.match(inspectLocalBuild({ root: dir, platform: 'win32', arch: 'arm64' }).problems[0].what, /support matrix/)
@@ -301,30 +301,30 @@ await test('the build check honors --plugin, --no-build-check and --dry-run and 
     const lines = []
     const log = (line) => lines.push(line)
     const bare = { plugin: 'local' }
-    const missing = checkLocalBuild(bare, { root: dir, platform: 'linux', arch: 'x64', log })
+    const missing = checkLocalBuild(bare, { root: dir, platform: 'win32', arch: 'x64', log })
     assert.equal(missing.status, 'problems')
     assert.match(missing.problems[0].fix, /npm run build:ptc/)
 
     // A published package means the checkout's build is not what runs; the operator's
     // --no-build-check is the other deliberate skip. Both say so.
-    assert.equal(checkLocalBuild({ plugin: 'dsh-ops@0.3.1' }, { root: dir, platform: 'linux', arch: 'x64', log }).status, 'skipped')
-    assert.equal(checkLocalBuild({ plugin: 'local', noBuildCheck: true }, { root: dir, platform: 'linux', arch: 'x64', log }).status, 'skipped')
+    assert.equal(checkLocalBuild({ plugin: 'dsh-ops-zx88@0.3.1' }, { root: dir, platform: 'win32', arch: 'x64', log }).status, 'skipped')
+    assert.equal(checkLocalBuild({ plugin: 'local', noBuildCheck: true }, { root: dir, platform: 'win32', arch: 'x64', log }).status, 'skipped')
     assert.match(lines.join('\n'), /--no-build-check: skipped/)
 
     // --dry-run plans the gate and demotes the missing artifact to a note.
-    const planned = checkLocalBuild({ plugin: 'local', dryRun: true }, { root: dir, platform: 'linux', arch: 'x64', log })
+    const planned = checkLocalBuild({ plugin: 'local', dryRun: true }, { root: dir, platform: 'win32', arch: 'x64', log })
     assert.equal(planned.status, 'planned')
     assert.deepEqual(planned.problems, [])
     assert.ok(planned.warnings.some((warning) => warning.includes('npm run build:ptc')), planned.warnings.join('; '))
     assert.match(lines.join('\n'), /\[dry-run\] would run the canonical gate/)
 
     // With the artifact staged, the gate is what decides; its failure names the same command.
-    stageRuntime(dir, 'linux-x64')
+    stageRuntime(dir, 'win32-x64')
     const gates = []
-    const ok = checkLocalBuild({ plugin: 'local' }, { root: dir, platform: 'linux', arch: 'x64', log, runGate: (target) => { gates.push(target); return { status: 0, stdout: '', stderr: '', errorCode: null } } })
+    const ok = checkLocalBuild({ plugin: 'local' }, { root: dir, platform: 'win32', arch: 'x64', log, runGate: (target) => { gates.push(target); return { status: 0, stdout: '', stderr: '', errorCode: null } } })
     assert.equal(ok.status, 'ok')
-    assert.deepEqual(gates, ['linux-x64'])
-    const failed = checkLocalBuild({ plugin: 'local' }, { root: dir, platform: 'linux', arch: 'x64', log, runGate: () => ({ status: 1, stdout: '', stderr: 'hash mismatch', errorCode: null }) })
+    assert.deepEqual(gates, ['win32-x64'])
+    const failed = checkLocalBuild({ plugin: 'local' }, { root: dir, platform: 'win32', arch: 'x64', log, runGate: () => ({ status: 1, stdout: '', stderr: 'hash mismatch', errorCode: null }) })
     assert.equal(failed.status, 'problems')
     assert.match(failed.problems[0].what, /hash mismatch/)
     assert.match(failed.problems[0].fix, /npm run build:ptc/)
@@ -363,7 +363,7 @@ await test('main prepares the pair, prints one sweep command and exits 0', async
       assert.match(patch, /- id: sandbox-policy\n  config:\n    mode: danger-full-access/, `${profile} pin`)
       assert.match(patch, /- id: approval\n  config:\n    policy: never/, `${profile} approval`)
     }
-    assert.deepEqual(fx.gates, ['linux-x64'], 'the canonical gate ran once')
+    assert.deepEqual(fx.gates, ['win32-x64'], 'the canonical gate ran once')
     assert.equal(fx.out().split('\n').filter((line) => line.includes('node bench/cli.mjs ab')).length, 1)
     assert.match(fx.out(), /setup complete\./)
   })
@@ -400,7 +400,7 @@ await test('a failed preflight exits non-zero, names the fix and prepares nothin
     const skipped = fixture(path.join(dir, 'skipped'), { built: false })
     assert.equal(await main(['--dsh-home', skipped.home, '--no-pin', '--no-build-check'], skipped.io()), 0)
     const published = fixture(path.join(dir, 'published'), { built: false })
-    assert.equal(await main(['--dsh-home', published.home, '--no-pin', '--plugin', 'dsh-ops@0.3.1'], published.io()), 0)
+    assert.equal(await main(['--dsh-home', published.home, '--no-pin', '--plugin', 'dsh-ops-zx88@0.3.1'], published.io()), 0)
   })
 })
 

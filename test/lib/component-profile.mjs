@@ -8,17 +8,17 @@ import { bootHost } from './host.mjs'
 import { TEST_HOME, PACKAGE_ROOT, assert } from './harness.mjs'
 export function componentProfile(label, bundleText, patches = []) {
   const home = path.join(TEST_HOME, label), dir = path.join(home, 'profiles/fixture')
-  const packageDir = path.join(dir, 'node_modules/dsh-ops'), install = path.join(home, 'installation')
+  const packageDir = path.join(dir, 'node_modules/dsh-ops-zx88'), install = path.join(home, 'installation')
   fs.mkdirSync(packageDir, { recursive: true }); fs.mkdirSync(install, { recursive: true })
   fs.copyFileSync(path.join(PACKAGE_ROOT, 'package.json'), path.join(packageDir, 'package.json'))
   fs.symlinkSync(path.join(PACKAGE_ROOT, 'lib'), path.join(packageDir, 'lib'), process.platform === 'win32' ? 'junction' : 'dir')
   const bundlePath = path.join(packageDir, 'cordis.patch.yml')
   fs.writeFileSync(bundlePath, bundleText)
-  fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'fixture-profile', private: true, dsh: { profile: { bundles: ['dsh-ops'] } } }))
+  fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'fixture-profile', private: true, dsh: { profile: { bundles: ['dsh-ops-zx88'] } } }))
   const patchPath = path.join(dir, 'cordis.patch.yml'), baseFile = path.join(dir, 'cordis.yml')
   fs.writeFileSync(patchPath, JSON.stringify(patches)); fs.writeFileSync(baseFile, '[]\n')
   const installAnchor = path.join(install, 'package.json'); fs.writeFileSync(installAnchor, '{"name":"fixture-installation"}')
-  const profile = { home, dir, patchPath, installAnchor, overlays: [], startedBundles: ['dsh-ops'] }
+  const profile = { home, dir, patchPath, installAnchor, overlays: [], startedBundles: ['dsh-ops-zx88'] }
   return { profile, bundlePath, baseFile, async boot(platform = process.platform) {
     const { ctx } = await bootHost()
     // A public Context value lets the real Loader evaluate the platform expression
@@ -31,7 +31,7 @@ export function componentProfile(label, bundleText, patches = []) {
     assert.deepEqual(loaded.skippedBundles, [])
     await mountRootInclude(ctx, baseFile, readProfilePatches('dsh', profile))
     await ctx.loader.await()
-    return { ctx, entries: () => [...ctx.loader.entries()].filter(entry => entry.options.id.startsWith('dsh-ops-')),
+    return { ctx, entries: () => [...ctx.loader.entries()].filter(entry => entry.options.id.startsWith('dsh-ops-zx88-')),
       async refresh() { await reconcileProfilePatches(ctx, readProfilePatches('dsh', profile), 'dsh'); await ctx.loader.await() } }
   } }
 }

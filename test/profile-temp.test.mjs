@@ -16,7 +16,7 @@ async function profileFixture(body) {
     const directory = path.join(root, 'profiles', 'dsh-tui'), receipt = path.join(root, 'invoked.json')
     fs.mkdirSync(directory, { recursive: true })
     const manifest = path.join(directory, 'package.json')
-    fs.writeFileSync(manifest, JSON.stringify({ dependencies: { 'dsh-ops': '^0.3.1' }, dsh: { profile: { bundles: ['dsh-ops'] } } }))
+    fs.writeFileSync(manifest, JSON.stringify({ dependencies: { 'dsh-ops-zx88': '^0.3.1' }, dsh: { profile: { bundles: ['dsh-ops-zx88'] } } }))
     const cli = path.join(directory, 'node_modules', '@deepseek-ai', 'dsh'); fs.mkdirSync(cli, { recursive: true })
     fs.writeFileSync(path.join(cli, 'package.json'), JSON.stringify({ name: '@deepseek-ai/dsh', type: 'module', bin: { dsh: './cli.mjs' } }))
     fs.writeFileSync(path.join(cli, 'cli.mjs'), `import fs from 'node:fs';fs.writeFileSync(${JSON.stringify(receipt)},JSON.stringify(process.argv.slice(2)));process.exit(Number(process.env.PROFILE_TEST_EXIT ?? 0))`)
@@ -39,12 +39,12 @@ await test('profile status and dry-run preserve the tui alias and never execute 
 })
 await test('profile mutations delegate exact arguments and propagate official CLI failure without local rollback logic', async () => {
   await profileFixture(({ receipt, manifest }) => {
-    const before = fs.readFileSync(manifest, 'utf8'); process.env.DSH_OPS_INSTALL_SPEC = 'dsh-ops@0.4.0-test'
+    const before = fs.readFileSync(manifest, 'utf8'); process.env.DSH_OPS_INSTALL_SPEC = 'dsh-ops-zx88@0.4.0-test'
     assert.equal(capture(() => profileCommand('install', { profile: 'tui' })).status, 0)
-    assert.deepEqual(JSON.parse(fs.readFileSync(receipt, 'utf8')), ['plugin', '--profile', 'dsh-tui', 'add', 'dsh-ops@0.4.0-test'])
+    assert.deepEqual(JSON.parse(fs.readFileSync(receipt, 'utf8')), ['plugin', '--profile', 'dsh-tui', 'add', 'dsh-ops-zx88@0.4.0-test'])
     process.env.PROFILE_TEST_EXIT = '17'
     assert.equal(capture(() => profileCommand('uninstall', { profile: 'dsh-tui' })).status, 17)
-    assert.deepEqual(JSON.parse(fs.readFileSync(receipt, 'utf8')), ['plugin', '--profile', 'dsh-tui', 'remove', 'dsh-ops'])
+    assert.deepEqual(JSON.parse(fs.readFileSync(receipt, 'utf8')), ['plugin', '--profile', 'dsh-tui', 'remove', 'dsh-ops-zx88'])
     assert.equal(fs.readFileSync(manifest, 'utf8'), before)
   })
 })

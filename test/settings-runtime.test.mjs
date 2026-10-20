@@ -118,7 +118,7 @@ await test('real gateway validates exact named inputs before action and withdraw
     const service = new RuntimeActions(options('gateway', { run: async () => { calls++; return success() } }))
     const fiber = await ctx.plugin({ inject: ['typert'], apply(inner) {
       inner.provide('opsSettings', service)
-      inner.typert.register({ package: 'dsh-ops', face: 'host', schemas: [], model: { services: [], events: [], objects: [] }, invocations: RUNTIME_DESCRIPTORS })
+      inner.typert.register({ package: 'dsh-ops-zx88', face: 'host', schemas: [], model: { services: [], events: [], objects: [] }, invocations: RUNTIME_DESCRIPTORS })
       inner.effect(() => () => service.dispose())
     } })
     const invoke = (method, args) => ctx.typertGateway.invoke({ namespace: 'opsSettings', method, args })

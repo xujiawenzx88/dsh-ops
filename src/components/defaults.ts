@@ -5,4 +5,4 @@ export const SHELL_DISABLED_EXPRESSION = "process.platform !== 'win32'"
 export function componentEnabled(component: Component, platform: string): boolean {
   return component === 'shell' ? platform === 'win32' : ['file', 'ptc', 'discovery'].includes(component)
 }
-export function componentEntry(component: Component): string { return `dsh-ops/${component}` }
+export function componentEntry(component: Component): string { return `dsh-ops-zx88/${component}` }

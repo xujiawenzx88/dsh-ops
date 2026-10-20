@@ -1,11 +1,11 @@
 /**
  * The shell component on a POSIX host: the machine's own bash, and nothing unrestricted.
  *
- * This is the POSIX rung of `dsh-ops/shell`. Windows keeps its pinned, digest-checked payload and
+ * This is the POSIX rung of `dsh-ops-zx88/shell`. Windows keeps its pinned, digest-checked payload and
  * the `allowSystemShellFallback` gate around it; a Linux host has a distribution-maintained bash
  * whose ABI is tied to that distribution, so the plugin resolves that one instead of provisioning a
  * second copy (`lib/shells.js`, `POSIX_BASH_WELL_KNOWN`). The route was designed in WTStarMark's PR
- * #40 as its own `dsh-ops-linux` component; this suite covers the same capability merged into the
+ * #40 as its own `dsh-ops-zx88-linux` component; this suite covers the same capability merged into the
  * existing component, so what is asserted is the code that ships here.
  *
  * What this locks in:
@@ -22,14 +22,14 @@
  *
  * Intentional omissions, both stated rather than papered over:
  *
- * - `dsh-ops provision-shells` provisioning the pinned payload is a Windows action, so this suite
+ * - `dsh-ops-zx88 provision-shells` provisioning the pinned payload is a Windows action, so this suite
  *   asserts the CLI *refuses* it here instead of exercising the download.
  * - The POSIX "no bash anywhere" branch cannot be reached on a host that has one: its candidates are
  *   real absolute paths, and `/bin/bash` exists on this machine, so no `PATH`/`bundleRoot` fixture can
  *   empty the ladder. The wording an operator would see is asserted directly against the exported
  *   `POSIX_BASH_REMEDY` constant the branch concatenates (code-read-only branch, not a faked run).
  *
- * @module dsh-ops/test/linux-shell
+ * @module dsh-ops-zx88/test/linux-shell
  */
 
 import { spawnSync } from 'node:child_process'
@@ -146,9 +146,9 @@ await test('ops_bash runs a real command through the host bash', async () => {
         definition = ctx.get('tools').get(BASH_TOOL, agent)
       }
       assert.ok(definition, `ops_bash must be published to the session on Linux, got ${publicToolNames(ctx).join(', ')}`)
-      const value = await definition.execute({ description: 'Check confined Bash execution', command: 'echo dsh-ops-linux-bash' }, { agent, signal: new AbortController().signal })
+      const value = await definition.execute({ description: 'Check confined Bash execution', command: 'echo dsh-ops-zx88-linux-bash' }, { agent, signal: new AbortController().signal })
       assert.equal(value.sandbox?.mode, 'danger-full-access', JSON.stringify(value.sandbox))
-      assert.match(String(value.stdout?.text ?? ''), /dsh-ops-linux-bash/, `the host bash must have run: ${JSON.stringify(value)}`)
+      assert.match(String(value.stdout?.text ?? ''), /dsh-ops-zx88-linux-bash/, `the host bash must have run: ${JSON.stringify(value)}`)
       // The resolved executable is the machine's own bash, not a plugin-owned copy.
       const resolved = resolveShells({}).bash
       assert.equal(resolved.source, 'path', JSON.stringify(resolved))

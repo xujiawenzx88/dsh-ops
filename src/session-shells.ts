@@ -108,7 +108,7 @@ export function mountSessionBash(ctx: Context, config: Pick<ResolvedConfig, 'pub
   if (!config.publishBashTool) return
   const bash = shells.bash
   if (!bash.available) {
-    ctx.logger?.warn?.(`dsh-ops: bash unavailable: ${bash.detail}`)
+    ctx.logger?.warn?.(`dsh-ops-zx88: bash unavailable: ${bash.detail}`)
     return
   }
   const entries = new Map<Agent, Entry>()
@@ -130,7 +130,7 @@ export function mountSessionBash(ctx: Context, config: Pick<ResolvedConfig, 'pub
     try {
       entry.dispose?.()
     } catch (error) {
-      ctx.logger?.warn?.(`dsh-ops: bash tool teardown failed; continuing with the remaining sessions: ${errorMessage(error)}`)
+      ctx.logger?.warn?.(`dsh-ops-zx88: bash tool teardown failed; continuing with the remaining sessions: ${errorMessage(error)}`)
     } finally {
       entry.dispose = undefined
     }
@@ -144,10 +144,10 @@ export function mountSessionBash(ctx: Context, config: Pick<ResolvedConfig, 'pub
       entry.dispose = entry.ctx.tools.register(definition)
       entry.definition = definition
     } catch (error) {
-      ctx.logger?.warn?.(`dsh-ops: bash publication failed: ${errorMessage(error)}`)
+      ctx.logger?.warn?.(`dsh-ops-zx88: bash publication failed: ${errorMessage(error)}`)
       if (entry.definition === undefined) return
       try { entry.dispose = entry.ctx.tools.register(entry.definition) }
-      catch (restoreError) { ctx.logger?.warn?.(`dsh-ops: bash restoration failed: ${errorMessage(restoreError)}`) }
+      catch (restoreError) { ctx.logger?.warn?.(`dsh-ops-zx88: bash restoration failed: ${errorMessage(restoreError)}`) }
     }
   }
   const reconcile = () => {
@@ -165,7 +165,7 @@ export function mountSessionBash(ctx: Context, config: Pick<ResolvedConfig, 'pub
       if (!entry.ctx || allowed(agent) || stopped) continue
       if ((ctx.get('tools')!.schemas(agent) ?? []).some(tool => tool.name === BASH_TOOL)) {
         try { entry.dispose = entry.ctx.tools.restrict({ deny: [BASH_TOOL] }) }
-        catch (error) { ctx.logger?.warn?.(`dsh-ops: inherited bash restriction failed: ${errorMessage(error)}`) }
+        catch (error) { ctx.logger?.warn?.(`dsh-ops-zx88: inherited bash restriction failed: ${errorMessage(error)}`) }
       }
     }
   }
@@ -192,7 +192,7 @@ export function mountSessionBash(ctx: Context, config: Pick<ResolvedConfig, 'pub
     stopped = true
     // allSettled: one failing detach must not leave the remaining sessions' bash layers published.
     await Promise.allSettled([...entries.keys()].map(detach))
-  }, 'dsh-ops: session bash layers')
+  }, 'dsh-ops-zx88: session bash layers')
   ctx.on('agent/created', ({ agent }) => { attach(agent) })
   ctx.on('agent/disposed', ({ agent }) => detach(agent))
   ctx.on('session/event', (_session, event) => { if (event.type === 'sandbox/mode') reconcile() })
@@ -201,7 +201,7 @@ export function mountSessionBash(ctx: Context, config: Pick<ResolvedConfig, 'pub
   ctx.inject(['sandboxPolicy', 'subprocess'], authorityCtx => {
     ready = true
     reconcile()
-    authorityCtx.effect(() => () => { ready = false; reconcile() }, 'dsh-ops: bash authority and executor')
+    authorityCtx.effect(() => () => { ready = false; reconcile() }, 'dsh-ops-zx88: bash authority and executor')
   })
   for (const agent of ctx.get('agents')?.list?.() ?? []) attach(agent)
 }

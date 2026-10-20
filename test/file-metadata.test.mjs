@@ -38,7 +38,7 @@
  *   unprivileged or unsupported-filesystem context, so the field's *absence* on a
  *   clean replace is asserted and its presence is not.
  *
- * @module dsh-ops/test/file-metadata
+ * @module dsh-ops-zx88/test/file-metadata
  */
 
 import { execFileSync } from 'node:child_process'

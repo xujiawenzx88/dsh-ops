@@ -7,7 +7,7 @@
  * What the fake child would have done to its workspace is scripted, and the assertions
  * read the archives the driver left on disk — the files a sealed `run.json` consumes.
  *
- * @module dsh-ops/test/bench-run-session
+ * @module dsh-ops-zx88/test/bench-run-session
  */
 
 import fs from 'node:fs'

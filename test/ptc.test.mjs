@@ -1,7 +1,7 @@
 /** Three end-to-end scenarios: real Rust worker + real Cordis/tools/prompt;
  * simulated workspace and confinement provider, no business code in tests.
  */
-import { ownWindowsFixture, skipSuite } from './lib/harness.mjs'
+import { copyTree, ownWindowsFixture, skipSuite } from './lib/harness.mjs'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import os from 'node:os'
@@ -248,7 +248,7 @@ try {
     const assembled = await ctx.get('systemPrompt').assemble({scope:pure})
     assert.deepEqual(assembled.tools.map(t => t.name), ['run_code'])
     assert.ok(assembled.sections.some(s => s.text.includes('ops_batch')))
-    assert.ok(assembled.sections.some(s => s.name === 'dsh-ops:repository-tooling:ptc' && s.text.includes('typed Outcome')))
+    assert.ok(assembled.sections.some(s => s.name === 'dsh-ops-zx88:repository-tooling:ptc' && s.text.includes('typed Outcome')))
     assert.equal((await ctx.get('systemPrompt').assemble({scope:native})).sections.some(s => s.text.includes('ops_batch')), false)
     const def = ctx.get('tools').get('ops_batch', pure)
     const wrongOwner = await def.execute({ action: 'plan', operations: [] }, { agent: ptcChild, signal: new AbortController().signal })
@@ -384,7 +384,7 @@ try {
   fs.mkdirSync(isolatedPackage)
   fs.copyFileSync('package.json',path.join(isolatedPackage,'package.json'))
   const runtimeDir = path.resolve('runtime',`${process.platform}-${process.arch}`)
-  fs.cpSync(runtimeDir,path.join(isolatedPackage,'runtime',`${process.platform}-${process.arch}`),{recursive:true})
+  copyTree(runtimeDir,path.join(isolatedPackage,'runtime',`${process.platform}-${process.arch}`))
   assert.throws(() => resolveWorker({}, {platform:'linux',arch:'arm64'}), /unsupported runtime target/)
   assert.throws(() => resolveWorker({}, {platform:'win32',arch:'arm64'}), /unsupported runtime target/)
   assert.throws(() => resolveWorker({}, {platform:'darwin',arch:'x64'}), /unsupported runtime target/)
@@ -491,7 +491,7 @@ try {
     const staged = path.join(dir,'installed-package'); fs.mkdirSync(staged)
     fs.copyFileSync('package.json',path.join(staged,'package.json'))
     const runtime = path.dirname(resolveWorker({}, {packageRoot:path.resolve('.')}))
-    fs.cpSync(runtime,path.join(staged,'runtime',`${process.platform}-${process.arch}`),{recursive:true})
+    copyTree(runtime,path.join(staged,'runtime',`${process.platform}-${process.arch}`))
     assert.ok(resolveWorker({}, {packageRoot:staged}).startsWith(staged))
 
     // L12: a worker that exists but cannot be executed is refused here, by name and

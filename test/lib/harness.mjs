@@ -16,7 +16,7 @@
 
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, realpathSync, rmSync } from 'node:fs'
+import { cpSync, mkdirSync, mkdtempSync, realpathSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -27,7 +27,7 @@ export const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.
 const home = process.env.DSH_HOME ?? ''
 if (home === '' || !path.resolve(home).startsWith(path.resolve(tmpdir()))) {
   console.error(
-    'dsh-ops test: refusing to run with DSH_HOME pointing outside the temporary directory '
+    'dsh-ops-zx88 test: refusing to run with DSH_HOME pointing outside the temporary directory '
     + `(${home === '' ? 'unset' : home}). Run the suites through \`node test/run.mjs\`, which `
     + 'creates a throwaway DSH_HOME per file.',
   )
@@ -105,6 +105,20 @@ export function ownWindowsFixture(directory) {
   const result = spawnSync(path.join(system32, 'icacls.exe'), [directory, '/setowner', `*${fixtureOwner}`], { encoding: 'utf8' })
   if (result.status !== 0) throw new Error(`Cannot set fixture owner: ${result.stdout}${result.stderr}`)
 }
+/**
+ * Copy a tree for a fixture. The no-op filter is load-bearing: without it
+ * `fs.cpSync` takes a native fast path that aborts the process (0xC0000409)
+ * when the source path contains non-ASCII characters, as this repository's
+ * Windows checkout often does. See nodejs/node#61878 and nodejs/node#63970.
+ *
+ * @param {string} source - existing file or directory.
+ * @param {string} destination - new path to create.
+ * @returns {void}
+ */
+export function copyTree(source, destination) {
+  cpSync(source, destination, { recursive: true, filter: () => true })
+}
+
 export async function withTempDir(prefix, body) {
   const dir = canonical(mkdtempSync(path.join(TEST_HOME, `${prefix}-`)))
   ownWindowsFixture(dir)
@@ -180,7 +194,7 @@ export const SUITE_SKIPPED_EXIT = 77
  * @returns {never} does not return.
  */
 export function skipSuite(label, reason) {
-  console.log(`\ndsh-ops ${label}: skipped (${reason})`)
+  console.log(`\ndsh-ops-zx88 ${label}: skipped (${reason})`)
   process.exit(SUITE_SKIPPED_EXIT)
 }
 
@@ -197,13 +211,13 @@ export function skipSuite(label, reason) {
 export function report(label) {
   console.log(
     failures === 0
-      ? `\ndsh-ops ${label}: all ${names.length} checks passed`
-      : `\ndsh-ops ${label}: ${failures} of ${names.length} check(s) failed`,
+      ? `\ndsh-ops-zx88 ${label}: all ${names.length} checks passed`
+      : `\ndsh-ops-zx88 ${label}: ${failures} of ${names.length} check(s) failed`,
   )
   process.exitCode = failures === 0 ? 0 : 1
   process.once('beforeExit', () => process.exit(failures === 0 ? 0 : 1))
   REAL_TIMERS.setTimeout(() => {
-    console.error(`dsh-ops ${label}: did not terminate after report(); forcing exit (leaked handle?)`)
+    console.error(`dsh-ops-zx88 ${label}: did not terminate after report(); forcing exit (leaked handle?)`)
     process.exit(1)
   }, 5_000).unref?.()
 }

@@ -1,12 +1,12 @@
 /**
- * `dsh-ops uninstall`: report and remove what this plugin (and older versions
+ * `dsh-ops-zx88 uninstall`: report and remove what this plugin (and older versions
  * of it) installed outside the profile, without touching the profile install
  * itself.
  *
  * Split out of `bin/dsh-ops.mjs`; the command's argv surface, output and exit
  * codes are unchanged.
  *
- * @module dsh-ops/cli/uninstall
+ * @module dsh-ops-zx88/cli/uninstall
  */
 
 import fs from 'node:fs'
@@ -97,7 +97,7 @@ export function reportDirectory(label: string, dir: string) {
  * outside the profile, and report the state it does not own.
  *
  * Removing the plugin itself is a profile operation — `dsh plugin --profile
- * <profile> remove dsh-ops`, or the `plugin_manager` `remove_bundle` tool — and
+ * <profile> remove dsh-ops-zx88`, or the `plugin_manager` `remove_bundle` tool — and
  * stays outside this command. What is inside: `<DSH_HOME>/dsh-ops` (provisioned
  * shells, and the FastCtx runtime older versions provisioned), and, only on
  * request, the leftover `~/.fastctx` state of the removed background component.
@@ -112,7 +112,7 @@ export function reportDirectory(label: string, dir: string) {
  */
 export function commandUninstall({ yes, purgeFastctx, dryRun }: { yes: boolean; purgeFastctx: boolean; dryRun: boolean }) {
   const removing = yes && !dryRun
-  console.log(`dsh-ops uninstall — ${removing ? 'removing' : 'report only (dry run; pass --yes to delete)'}`)
+  console.log(`dsh-ops-zx88 uninstall — ${removing ? 'removing' : 'report only (dry run; pass --yes to delete)'}`)
 
   const managed = managedDir()
   const managedReport = reportDirectory(`managed files (<DSH_HOME>/dsh-ops)`, managed)
@@ -149,7 +149,7 @@ export function commandUninstall({ yes, purgeFastctx, dryRun }: { yes: boolean; 
   }
 
   console.log('\nplugin installation (not handled by this command)')
-  console.log('  action:    remove the plugin itself with `dsh plugin --profile <profile> remove dsh-ops`,')
+  console.log('  action:    remove the plugin itself with `dsh plugin --profile <profile> remove dsh-ops-zx88`,')
   console.log('             or the plugin_manager `remove_bundle` tool; this command only removes the')
   console.log('             runtime and state the plugin wrote outside the profile.')
 

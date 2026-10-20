@@ -6,7 +6,7 @@ Every configuration key, and **which component row owns it**.
 
 Active rows expose validated settings through the host Settings/ConfigEditor. Accepted changes persist through the profile writer and reload the owning row; stale or invalid changes preserve saved values. Disabled rows must first be re-enabled with the host row switch, and pending services must become available before editing.
 
-The default bundle retains `dsh-ops/file` and stable ID `dsh-ops-file`, so saved name-qualified overrides continue to match. It does not activate custom browser pages on the pinned host.
+The default bundle retains `dsh-ops-zx88/file` and stable ID `dsh-ops-zx88-file`, so saved name-qualified overrides continue to match. It does not activate custom browser pages on the pinned host.
 
 ## Optional browser settings pages
 
@@ -29,8 +29,8 @@ Bash removal only deletes receipt-owned installations. Stop Bash jobs first. Pow
 WinGet for the standard host PowerShell 7 installation, preserve Windows PowerShell 5.1, and require
 a DSH restart. Check a custom host `pwshPath` separately. No installer runs when opening a page.
 
-A client carrier uses the stable `dsh-ops-file` row with the bare package name `dsh-ops` to load these browser pages. Its
-server behavior remains the file component; the `dsh-ops/file` export remains compatible. Disabling
+A client carrier uses the stable `dsh-ops-zx88-file` row with the bare package name `dsh-ops-zx88` to load these browser pages. Its
+server behavior remains the file component; the `dsh-ops-zx88/file` export remains compatible. Disabling
 this carrier unloads all custom settings pages. Use the host's **built-in row switch** to re-enable
 it. There is no automatic form fallback. A disabled target row must also be re-enabled before its
 settings can be edited. The discovery page is available once its component row is installed.
@@ -46,7 +46,7 @@ dsh-ops settings-profile --profile-dir <profile-directory> --host-anchor <DSH-in
 
 `--host-anchor` identifies the host installation whose public profile APIs the command uses.
 After reviewing the preview, repeat it with `--offline --yes`. The command selects
-`dsh-ops/lib/profiles/client` **instead of** `dsh-ops`, removes only verified legacy file-name
+`dsh-ops-zx88/lib/profiles/client` **instead of** `dsh-ops`, removes only verified legacy file-name
 matchers in that profile's patch, and preserves all seven IDs, switches, and effective configuration.
 It refuses skipped bundles, duplicate OPS rows, external name-qualified file overrides,
 incompatible higher-priority patches, or stale previews. Home patches are included; launch-time command-line overlays are outside this preview.
@@ -65,17 +65,17 @@ expecting custom pages. The default legacy bundle remains supported without this
 
 ## Where configuration lives
 
-In DSH's configuration editor, find the corresponding `dsh-ops/shell`, `dsh-ops/file` (`dsh-ops-file`), `dsh-ops/ptc` or `dsh-ops/panel` row, adjust `config`, then save; unknown configuration keys cause errors naming the key.
+In DSH's configuration editor, find the corresponding `dsh-ops-zx88/shell`, `dsh-ops-zx88/file` (`dsh-ops-zx88-file`), `dsh-ops-zx88/ptc` or `dsh-ops-zx88/panel` row, adjust `config`, then save; unknown configuration keys cause errors naming the key.
 The bundle declares seven independently toggled components. Fresh defaults follow the table. Saved profile switches and raw configuration override bundle defaults; adding discovery does not rewrite them. Profiles without explicit switch overrides inherit updated defaults.
 | Row `name` | Component | Default |
 | --- | --- | --- |
-| `dsh-ops/shell` | Terminal and shell | Windows on; Linux/macOS off |
-| `dsh-ops/file` (`dsh-ops-file`) | Rust file tools | On |
-| `dsh-ops/ptc` | Native PTC batches | On |
-| `dsh-ops/discovery` | Advanced Native tool discovery | On |
-| `dsh-ops/panel` | Capture subsequent events | Row off; enabling starts capture |
-| `dsh-ops/tui` | Read-only sidebar, separate config | Off |
-| `dsh-ops/hide-official` | Per-tool official replacements, separate config | Off |
+| `dsh-ops-zx88/shell` | Terminal and shell | Windows on; this fork is Windows-only |
+| `dsh-ops-zx88/file` (`dsh-ops-zx88-file`) | Rust file tools | On |
+| `dsh-ops-zx88/ptc` | Native PTC batches | On |
+| `dsh-ops-zx88/discovery` | Advanced Native tool discovery | On |
+| `dsh-ops-zx88/panel` | Capture subsequent events | Row off; enabling starts capture |
+| `dsh-ops-zx88/tui` | Read-only sidebar, separate config | Off |
+| `dsh-ops-zx88/hide-official` | Per-tool official replacements, separate config | Off |
 
 A `dsh-ops/background` row left over from an earlier version loads as a no-op stub (the FastCtx background component was removed); it ignores its config and can be deleted.
 
@@ -83,7 +83,7 @@ A `dsh-ops/background` row left over from an earlier version loads as a no-op st
 
 ## 🔴 Which key belongs to which component
 
-`dsh-ops/tui` uses only `maxSessions`, `maxActive` and `recentLimit`; see [sidebar limits](tui-panel.md#limits). The table lists where each setting is used. File/root and shell retain their shared legacy validator, so some compatibility keys may be accepted without affecting that row. PTC, discovery, panel, TUI and replacement use their own strict key sets; do not copy general file/shell settings into them. The Loader row switch is disabled, outside config.
+`dsh-ops-zx88/tui` uses only `maxSessions`, `maxActive` and `recentLimit`; see [sidebar limits](tui-panel.md#limits). The table lists where each setting is used. File/root and shell retain their shared legacy validator, so some compatibility keys may be accepted without affecting that row. PTC, discovery, panel, TUI and replacement use their own strict key sets; do not copy general file/shell settings into them. The Loader row switch is disabled, outside config.
 
 | Key | Type | Default | Owning component |
 | --- | --- | --- | --- |
@@ -133,7 +133,7 @@ cannot be **created** through these tools either; see [troubleshooting](troubles
 
 ## Examples
 
-The `dsh-ops/shell` row:
+The `dsh-ops-zx88/shell` row:
 
 ```yaml
 config:
@@ -144,7 +144,7 @@ config:
   # bashPath: 'C:\tools\bash.exe'   # restricted Windows execution requires matching MSYS/IPC; see below
 ```
 
-The `dsh-ops/file` row:
+The `dsh-ops-zx88/file` row:
 
 ```yaml
 config:
@@ -156,7 +156,7 @@ config:
   # configUpdateVersion: 2
 ```
 
-The `dsh-ops/panel` row is **disabled by default**. Enabling a fresh row starts capture; explicit legacy `capture: false` remains off until the operator changes it:
+The `dsh-ops-zx88/panel` row is **disabled by default**. Enabling a fresh row starts capture; explicit legacy `capture: false` remains off until the operator changes it:
 
 ```yaml
 config:
@@ -176,9 +176,9 @@ config:
 - `shellPolicy`: defaults to `advise`; `deny-host-shell` rejects host shells in `deniedHostTools` (default `[pwsh, bash, pwsh_persistent]`). This also disables third-layer pwsh; enable cautiously.
 - `allowSystemShellFallback`: defaults to `false`. Without a bundled/provisioned bash, do not discover system PATH or well-known installations (**on a POSIX host this key has no effect**: the shell component already resolves the host bash and there is no pinned payload to fall back from). Explicit `true` opts into an unpinned system bash that the operator must trust and maintain. Explicit `bashPath` is a separate operator selection, not an automatic fallback. See the update configuration modification area in the [usage guide](usage.md) for the first-start migration.
 - `shellPolicy` is independent: `deny-host-shell` masks/refuses host tools; disabling fallback constrains the plugin's bash resolver, not the host's own `pwsh`, and is not a filesystem sandbox.
-- `binaryPath` (the native worker executable) / `bashPath`: optional explicit absolute paths; unavailable paths cause an error rather than silently switching executors. Use `dsh-ops bash-runtime git` or `managed` to print a Bash selection.
+- `binaryPath` (the native worker executable) / `bashPath`: optional explicit absolute paths; unavailable paths cause an error rather than silently switching executors. Use `dsh-ops-zx88 bash-runtime git` or `managed` to print a Bash selection.
 - **On a POSIX host `ops_bash` already runs the distribution's own bash**: `bashPath` → `PATH` → `/bin/bash`, `/usr/bin/bash`, `/usr/local/bin/bash`, with no second shell shipped, so there is no payload to "fall back" from and `allowSystemShellFallback` does not affect it. In a confined mode (`workspace-write` / `read-only`) `bashPath` still takes effect, with the constraint enforced by a host sandbox (bwrap / Landlock); when no sandbox can confine the call it is **refused** rather than run unrestricted.
-- `bashPath` **(Windows) must match the pinned MSYS for restricted execution.** In read-only and workspace-write, `ops_bash` runs only the pinned MSYS whose IPC compatibility proxies were verified (`dsh-ops bash-runtime install`, or a compatible existing copy); any other `msys-2.0.dll`, including your own Git for Windows, returns `EXECUTOR_UNAVAILABLE` by design and is never run unconfined. Do not point `bashPath` at your own Git Bash to work around a restricted-mode problem. Check a selection with `dsh-ops ladder --config <file>`, which reports `restricted: yes/no` for the resolved bash. See [Troubleshooting](troubleshooting.md#ops_bash-cannot-run-a-custom-bashpath-or-git-for-windows-in-restricted-modes).
+- `bashPath` **(Windows) must match the pinned MSYS for restricted execution.** In read-only and workspace-write, `ops_bash` runs only the pinned MSYS whose IPC compatibility proxies were verified (`dsh-ops-zx88 bash-runtime install`, or a compatible existing copy); any other `msys-2.0.dll`, including your own Git for Windows, returns `EXECUTOR_UNAVAILABLE` by design and is never run unconfined. Do not point `bashPath` at your own Git Bash to work around a restricted-mode problem. Check a selection with `dsh-ops-zx88 ladder --config <file>`, which reports `restricted: yes/no` for the resolved bash. See [Troubleshooting](troubleshooting.md#ops_bash-cannot-run-a-custom-bashpath-or-git-for-windows-in-restricted-modes).
 - `deniedHostTools`: the host tool names refused by the `deny-host-shell` policy.
 - `configUpdateVersion`: completion marker for the configuration migrations (currently `2`: update 1 retires the old implicit system-bash opt-in, update 2 removes the deprecated FastCtx keys). Do not remove it, or the self-check runs again.
 Disabling the row or saving `capture: false` stops event collection immediately, cancels queued filesystem work, and waits for already-started I/O before the host finishes the change. It does not start a final fold: existing NDJSON remains recoverable, and a temporary file from an interrupted fold may remain. Re-enabling captures only subsequent events; disabled events are not replayed.
@@ -193,7 +193,7 @@ Disabling the row or saving `capture: false` stops event collection immediately,
 
 ---
 
-## Per-tool official replacements (`dsh-ops/hide-official`)
+## Per-tool official replacements (`dsh-ops-zx88/hide-official`)
 
 The row is **disabled by default** and `replaceTools` defaults to `[]`. Enabling an untouched row hides nothing. Choose any subset of the reviewed official names `read`, `glob`, and `grep`; unselected tools stay visible without warnings. These are deliberate alternative workflows: read the [mapping and coverage differences](component-reference.md#dsh-opshide-official--per-tool-replacements) before selecting them.
 
@@ -204,7 +204,7 @@ The row is **disabled by default** and `replaceTools` defaults to `[]`. Enabling
 For example, replace only host read and grep while retaining host glob:
 
 ```yaml
-- name: dsh-ops/hide-official
+- name: dsh-ops-zx88/hide-official
   config:
     replaceTools: [read, grep]
 ```

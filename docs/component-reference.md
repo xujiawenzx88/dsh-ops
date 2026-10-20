@@ -6,13 +6,13 @@ What each of the seven components publishes, with parameters and permission requ
 
 | Row `name` | Description | Default | Published tools |
 | --- | --- | --- | --- |
-| `dsh-ops/shell` | Prefer bash as the terminal, with host PowerShell for operations bash cannot cover | Windows on; Linux/macOS off | `ops_bash`; host `pwsh` keeps its own executor |
-| `dsh-ops/file` | Bounded Rust file retrieval and text output for the model | On | `ops_read_many`; advanced tools load through discovery |
-| `dsh-ops/ptc` | Typed file APIs and progressive SDK in PTC sessions | On | `ops_inspect_local_file`, `ops_result`, `ops_sdk`; advanced APIs load through the SDK |
-| `dsh-ops/discovery` | Advanced Native tools on demand | On | `ops_discover` |
-| `dsh-ops/panel` | Data capture, off at the switch: new conversations write `<cwd>/.dsh-ops/panel/<sessionId>.json` plus the viewer `panel.html` | Row off; capture defaults true | None; see the [configuration reference](configuration-reference.md) |
-| `dsh-ops/tui` | Read-only current-session OPS sidebar | Off | None; see [sidebar guide](tui-panel.md) |
-| `dsh-ops/hide-official` | Select read/glob/grep alternatives; unselected official tools remain visible | Off | None |
+| `dsh-ops-zx88/shell` | Prefer bash as the terminal, with host PowerShell for operations bash cannot cover | Windows on; this fork is Windows-only | `ops_bash`; host `pwsh` keeps its own executor |
+| `dsh-ops-zx88/file` | Bounded Rust file retrieval and text output for the model | On | `ops_read_many`; advanced tools load through discovery |
+| `dsh-ops-zx88/ptc` | Typed file APIs and progressive SDK in PTC sessions | On | `ops_inspect_local_file`, `ops_result`, `ops_sdk`; advanced APIs load through the SDK |
+| `dsh-ops-zx88/discovery` | Advanced Native tools on demand | On | `ops_discover` |
+| `dsh-ops-zx88/panel` | Data capture, off at the switch: new conversations write `<cwd>/.dsh-ops/panel/<sessionId>.json` plus the viewer `panel.html` | Row off; capture defaults true | None; see the [configuration reference](configuration-reference.md) |
+| `dsh-ops-zx88/tui` | Read-only current-session OPS sidebar | Off | None; see [sidebar guide](tui-panel.md) |
+| `dsh-ops-zx88/hide-official` | Select read/glob/grep alternatives; unselected official tools remain visible | Off | None |
 
 The former `dsh-ops/background` component (FastCtx background jobs: `ops_run`, `ops_run_background`, `ops_job_output`, `ops_job_list`, `ops_job_kill`) has been removed. A profile row that still names it loads as a no-op: it accepts any config, publishes nothing, and logs one warning that the row can be deleted.
 
@@ -42,7 +42,7 @@ The shared catalogue has 21 entries. The generated PTC SDK contains 19 APIs: 16 
 
 ---
 
-## `dsh-ops/file` — file tools
+## `dsh-ops-zx88/file` — file tools
 
 Only the bounded multi-file reader `ops_read_many` is resident; `ops_inspect_local_file`, including hex reading, is discoverable. The advanced contracts below are activated through [tool discovery](discovery.md) or explicit always-loaded choices. Routing lists only the tools currently published.
 
@@ -126,7 +126,7 @@ Each reader separates scan, page, display and reference-capture completeness. A 
 
 ---
 
-## `dsh-ops/ptc` — native batches and result references
+## `dsh-ops-zx88/ptc` — native batches and result references
 
 Available by default, with tools published only in pure PTC sessions. Explicit profile disablement is preserved.
 
@@ -163,7 +163,7 @@ Bounded session-owned result references: PTC can put object rows; Native file to
 
 ---
 
-## `dsh-ops/shell` — terminal and shells
+## `dsh-ops-zx88/shell` — terminal and shells
 
 Routing: **toolkit → bash → host PowerShell**.
 
@@ -179,7 +179,7 @@ Routing: **toolkit → bash → host PowerShell**.
 
 `script_path` (instead of `command`), `graceMs`, and `includeDiagnostics` remain explicit OPS compatibility extensions. They do not change the host command contract or its timeout limits.
 
-"Prefer bash as the terminal" means prompting the model to use `ops_bash` first; it **does not change the system default terminal, PATH or existing host shell tool names**. OPS never overlays the host PowerShell executor configuration. Use `dsh-ops upgrade-host-pwsh` to preview an explicit standard PowerShell 7 installation; `--yes` executes it. Restart DSH afterwards, and review any custom host `pwshPath` in host settings. Existing running commands and old provisioned copies are not removed.
+"Prefer bash as the terminal" means prompting the model to use `ops_bash` first; it **does not change the system default terminal, PATH or existing host shell tool names**. OPS never overlays the host PowerShell executor configuration. Use `dsh-ops-zx88 upgrade-host-pwsh` to preview an explicit standard PowerShell 7 installation; `--yes` executes it. Restart DSH afterwards, and review any custom host `pwshPath` in host settings. Existing running commands and old provisioned copies are not removed.
 
 The routing table the model sees is rendered by the plugin from what it actually published:
 
@@ -199,7 +199,7 @@ The routing table the model sees is rendered by the plugin from what it actually
 
 ---
 
-## `dsh-ops/hide-official` — per-tool replacements
+## `dsh-ops-zx88/hide-official` — per-tool replacements
 
 Disabled by default, with `replaceTools: []`. Explicit selections switch the model to these reviewed read/search workflows. Their names, arguments and results differ from the host tools; calls are never translated or forwarded under an official name.
 

@@ -1,4 +1,4 @@
-/** dsh-ops host half. Own registrations only; no @deepseek-ai value imports. */
+/** dsh-ops-zx88 host half. Own registrations only; no @deepseek-ai value imports. */
 import type { Context } from '@deepseek-ai/cordis'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 import type {} from '@deepseek-ai/dsh-tools'
@@ -16,7 +16,7 @@ import { safeDispose, safeDisposeAll } from './teardown.js'
 import { mountResultLifecycle } from './kernel/result-lifecycle.js'
 
 export { Config } from './settings/file-config.js'
-export const name = 'dsh-ops'
+export const name = 'dsh-ops-zx88'
 type ResolvedConfig = ReturnType<typeof resolveConfig>
 type Component = 'shell' | 'file'
 function errorText(error: unknown): string {
@@ -49,7 +49,7 @@ function installHostShellDenial(ctx: Context, config: ResolvedConfig): void {
     } catch (error) {
       if (!warned) {
         warned = true
-        report(ctx, `dsh-ops: host shell visibility restriction unavailable: ${errorText(error)}; calls remain denied.`, 'warn')
+        report(ctx, `dsh-ops-zx88: host shell visibility restriction unavailable: ${errorText(error)}; calls remain denied.`, 'warn')
       }
     }
   }
@@ -57,22 +57,22 @@ function installHostShellDenial(ctx: Context, config: ResolvedConfig): void {
   // Same isolation as the bulk teardown below: a throwing lift must not stop `lifts.delete`, nor
   // leave this agent's shell visibility permanently restricted.
   ctx.on('agent/disposed', ({ agent }) => {
-    safeDispose(lifts.get(agent), (error) => report(ctx, `dsh-ops: host shell restriction lift failed: ${errorText(error)}`, 'warn'), 'host shell lift (agent disposed)')
+    safeDispose(lifts.get(agent), (error) => report(ctx, `dsh-ops-zx88: host shell restriction lift failed: ${errorText(error)}`, 'warn'), 'host shell lift (agent disposed)')
     lifts.delete(agent)
   })
   for (const agent of ctx.get('agents')?.list?.() ?? []) hide(agent)
   ctx.effect(() => () => {
     // Isolate each lift: these restore the host's shell visibility, so one throwing callback
     // must not leave the remaining agents' tools hidden (nor skip the map cleanup).
-    safeDisposeAll(lifts.values(), (error) => report(ctx, `dsh-ops: host shell restriction lift failed: ${errorText(error)}`, 'warn'), 'host shell lift')
+    safeDisposeAll(lifts.values(), (error) => report(ctx, `dsh-ops-zx88: host shell restriction lift failed: ${errorText(error)}`, 'warn'), 'host shell lift')
     lifts.clear()
-  }, 'dsh-ops: host shell restrictions')
+  }, 'dsh-ops-zx88: host shell restrictions')
   ctx.on('tools/pre-execute', async (exec, next) => {
     const refusal = hostShellRefusal({ toolName: String(exec?.name ?? ''), denied })
     return refusal ? { kind: 'deny', reason: refusal.reason } : next()
   })
   if (typeof ctx.tools.guard === 'function') {
-    ctx.effect(() => ctx.tools.guard(exec => hostShellRefusal({ toolName: String(exec?.name ?? ''), denied })?.reason), 'dsh-ops: host shell guard')
+    ctx.effect(() => ctx.tools.guard(exec => hostShellRefusal({ toolName: String(exec?.name ?? ''), denied })?.reason), 'dsh-ops-zx88: host shell guard')
   }
 }
 
@@ -83,17 +83,17 @@ async function mountNativeFile(ctx: Context, config: ResolvedConfig, file: strin
   // `safeDispose` isolates synchronous teardown callbacks; a *rejecting promise* needs its own
   // catch, or the rejection is dropped and the worker's shutdown failure stays invisible (#30).
   ctx.effect(() => () => {
-    return surface.stop().catch(error => report(ctx, `dsh-ops: native file worker shutdown failed: ${errorText(error)}`, 'warn'))
-  }, 'dsh-ops: native file worker')
+    return surface.stop().catch(error => report(ctx, `dsh-ops-zx88: native file worker shutdown failed: ${errorText(error)}`, 'warn'))
+  }, 'dsh-ops-zx88: native file worker')
   const tools = await surface.start(NATIVE_RESIDENT_FILE_TOOLS)
-  if (tools.length) report(ctx, `dsh-ops: native Rust file worker ready; ${tools.length} tools.`, 'info')
+  if (tools.length) report(ctx, `dsh-ops-zx88: native Rust file worker ready; ${tools.length} tools.`, 'info')
 }
 
-/** The components this host half mounts; `dsh-ops/background` is a separate no-op stub. */
+/** The components this host half mounts; `dsh-ops-zx88/background` is a separate no-op stub. */
 const COMPONENTS = Object.freeze(['shell', 'file'])
 
 export function applyComponent(root: Context, rawConfig: unknown, component: Component): void {
-  if (!COMPONENTS.includes(component)) throw new Error(`dsh-ops: unknown component ${JSON.stringify(component)}`)
+  if (!COMPONENTS.includes(component)) throw new Error(`dsh-ops-zx88: unknown component ${JSON.stringify(component)}`)
   // Validate before migrating: malformed/unknown keys still fail loud.
   resolveConfig(rawConfig)
   const config = resolveConfig(updatedConfig(rawConfig ?? {}))
@@ -101,7 +101,7 @@ export function applyComponent(root: Context, rawConfig: unknown, component: Com
   const nativeWorker = component === 'file' ? (() => {
     try { return resolveWorker(config) }
     catch (error) {
-      report(root, `dsh-ops: native file worker unavailable: ${errorText(error)}`)
+      report(root, `dsh-ops-zx88: native file worker unavailable: ${errorText(error)}`)
       if (config.required) throw new Error(`Native file worker unavailable for binaryPath ${config.binaryPath ?? '(automatic resolution)'}: ${errorText(error)}`)
       return undefined
     }
@@ -118,7 +118,7 @@ export function applyComponent(root: Context, rawConfig: unknown, component: Com
         shellComponent: component === 'shell',
         extraGuidance: config.extraGuidance,
       }),
-    }), `dsh-ops: ${component} tooling`)
+    }), `dsh-ops-zx88: ${component} tooling`)
   })
   if (component === 'shell') {
     // Workspace preparation is Windows-specific; the host owns its PowerShell executor.

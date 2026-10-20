@@ -1,5 +1,14 @@
-dsh-ops
+dsh-ops-zx88
 Copyright (c) 2026 T-Auto and the dsh-ops contributors
+Modifications for the dsh-ops-zx88 fork Copyright (c) 2026 xujiawenzx88
+
+This package is an unofficial renamed fork of dsh-ops
+(https://github.com/T-Auto/dsh-ops), published under the npm name
+`dsh-ops-zx88`. The fork changes the published package/component identity,
+package metadata and documentation; it does not relicense the original work.
+The original copyright notices and both licenses below remain in force.
+This fork is not endorsed by, supported by, or attributable to the upstream
+maintainers, who accept no liability for it.
 
 ================================================================
 COMPOSITE LICENSE

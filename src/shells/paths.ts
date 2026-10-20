@@ -2,7 +2,7 @@
  * Where each shell rung can come from, and in what order.
  *
  * This module is pure and read-only: it probes configured paths, the
- * provisioned copies `dsh-ops provision-shells` installed under
+ * provisioned copies `dsh-ops-zx88 provision-shells` installed under
  * `<DSH_HOME>/dsh-ops/shells`, the copies a plugin package carries, and the
  * conventional install locations, and it NEVER mutates ambient state (no PATH
  * writes, no profile writes, no `process.chdir`).
@@ -215,7 +215,7 @@ export function bundledShell({ kind, bundleRoot, platform, arch }: BundleProbe) 
  * The provisioned copy of one shell, out of the plugin-managed store.
  *
  * Layout: `<DSH_HOME>/dsh-ops/shells/<kind>/<version>/<executableRelativePath>`
- * — the directory `dsh-ops provision-shells` installs the pinned upstream
+ * — the directory `dsh-ops-zx88 provision-shells` installs the pinned upstream
  * release into. Every version directory that actually holds the executable is a
  * candidate, and the greatest version name wins.
  *
@@ -368,12 +368,12 @@ export function executableNames(kind: ShellKind, platform: string) {
  * because it is one decision — the spawn wording only adds the sentence's
  * closing period.
  */
-export const GENERIC_BASH_REMEDY = 'run `dsh-ops provision-shells --bash` to install the pinned upstream copy'
+export const GENERIC_BASH_REMEDY = 'run `dsh-ops-zx88 provision-shells --bash` to install the pinned upstream copy'
 
 /**
  * The remedy for a POSIX host that has no bash at all.
  *
- * `dsh-ops provision-shells` provisions the *pinned Windows* payload and is
+ * `dsh-ops-zx88 provision-shells` provisions the *pinned Windows* payload and is
  * Windows-only, so pointing a Linux operator at it would be wrong: the one
  * action that helps is naming the executable explicitly.
  */
@@ -410,7 +410,7 @@ export const POSIX_BASH_WELL_KNOWN = Object.freeze([
  *   package, the registry the profile installed from did not carry it, and the
  *   package manager skipped it in silence (exit code 0, no warning). Nothing on
  *   this machine can repair a package that was never published there, so this
- *   line names that possibility and points at `dsh-ops provision-shells`, which
+ *   line names that possibility and points at `dsh-ops-zx88 provision-shells`, which
  *   bypasses the registry entirely. It deliberately does not say `repair`: that
  *   is the word issue #20 kept following into a dead end.
  * - `incomplete-tree` is the opposite: the package IS here and only its
@@ -428,11 +428,11 @@ export const POSIX_BASH_WELL_KNOWN = Object.freeze([
 export function bashRemedy(cause: BundledCause | undefined) {
   if (cause === 'not-installed') {
     return 'the registry this profile installed from may not carry that platform package, '
-      + 'so run `dsh-ops provision-shells --bash` to fetch the pinned copy from upstream releases instead'
+      + 'so run `dsh-ops-zx88 provision-shells --bash` to fetch the pinned copy from upstream releases instead'
   }
   if (cause === 'incomplete-tree') {
     return "reinstalling the profile's dependencies repairs that, or run "
-      + '`dsh-ops provision-shells --bash` to fetch the pinned copy from upstream releases instead'
+      + '`dsh-ops-zx88 provision-shells --bash` to fetch the pinned copy from upstream releases instead'
   }
   return GENERIC_BASH_REMEDY
 }

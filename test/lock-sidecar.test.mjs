@@ -25,7 +25,7 @@
  * safety property asserted there is that no file content changes, not that the directory stays
  * identical.
  *
- * @module dsh-ops/test/lock-sidecar
+ * @module dsh-ops-zx88/test/lock-sidecar
  */
 
 import fs from 'node:fs'

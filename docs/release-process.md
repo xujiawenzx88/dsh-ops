@@ -31,6 +31,8 @@ Sync master with main | active
 
 ## 流水线三段与失败语义
 
+> **Fork 说明**：本分支只发布 `win32-x64`。以下上游三目标矩阵、artifact 名称和验收描述保留作历史参考；当前工作流只构建一个目标。
+
 1. **`native`（矩阵：`windows-latest`/`win32-x64`、`ubuntu-24.04`/`linux-x64`、`macos-latest`/`darwin-arm64`）**
    - 只构建 [lib/ptc/runtime.js](../lib/ptc/runtime.js) 里声明的那三个目标；Intel macOS 与两种 arm64 变体不在矩阵内。
    - 固定 Rust 1.97.1 与已锁定的 `Cargo.lock`；npm 平台名和 Rust triple 分列（例如 `win32-x64` 对应 `x86_64-pc-windows-msvc`），`cargo build --release --locked --target <triple>` 失败即整次发布失败。

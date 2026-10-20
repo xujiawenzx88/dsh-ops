@@ -17,7 +17,7 @@ await test('the manifest declares the plugin\'s own shell tools as their own nam
   // switch state, so `bash` is declared even while a profile ships no bash.
   // Index 1, directly after the native file namespace (the FastCtx namespace is gone).
   assert.deepEqual(namespaces[1], {
-    serverName: 'dsh-ops',
+    serverName: 'dsh-ops-zx88',
     transport: 'in-process',
     source: "the plugin's bash layer via host subprocess",
     publicPrefix: 'ops_',
@@ -31,16 +31,16 @@ await test('the manifest declares the plugin\'s own shell tools as their own nam
 await test('the bundle patch declares independent components, with no persistent pwsh override', () => {
   const entries = patchEntries()
   assert.equal(entries.length, 1)
-  assert.deepEqual(entries[0].insert.map(row => row.id), ['dsh-ops-shell', 'dsh-ops-file', 'dsh-ops-ptc', 'dsh-ops-discovery', 'dsh-ops-panel', 'dsh-ops-tui', 'dsh-ops-hide-official'])
-  const row = id => entries[0].insert.find(item => item.id === `dsh-ops-${id}`)
+  assert.deepEqual(entries[0].insert.map(row => row.id), ['dsh-ops-zx88-shell', 'dsh-ops-zx88-file', 'dsh-ops-zx88-ptc', 'dsh-ops-zx88-discovery', 'dsh-ops-zx88-panel', 'dsh-ops-zx88-tui', 'dsh-ops-zx88-hide-official'])
+  const row = id => entries[0].insert.find(item => item.id === `dsh-ops-zx88-${id}`)
   assert.deepEqual(row('shell').disabled, { __jsExpr: "process.platform !== 'win32'" })
   for (const name of ['file', 'ptc', 'discovery']) assert.equal(row(name).disabled, undefined)
   for (const name of ['panel', 'tui', 'hide-official']) assert.equal(row(name).disabled, true)
   assert.equal(row('panel').config.capture, true, 'a fresh enabled row starts capture')
 })
 
-await test('the shipped dsh-ops row states the documented shell defaults', () => {
-  const row = patchEntries()[0].insert.find((candidate) => candidate.id === 'dsh-ops-shell')
+await test('the shipped dsh-ops-zx88 row states the documented shell defaults', () => {
+  const row = patchEntries()[0].insert.find((candidate) => candidate.id === 'dsh-ops-zx88-shell')
   const resolved = resolveConfig(row.config)
   assert.equal(resolved.bashPath, undefined)
   assert.equal(resolved.publishBashTool, true)

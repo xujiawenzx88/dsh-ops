@@ -8,7 +8,7 @@
  * reported "returned invalid output" because a folded argument refusal failed
  * the registered output schema (#235).
  *
- * @module dsh-ops/test/shells-session
+ * @module dsh-ops-zx88/test/shells-session
  */
 
 import fs from 'node:fs'

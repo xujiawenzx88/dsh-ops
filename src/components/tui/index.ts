@@ -7,7 +7,7 @@ import { createOpsPanel } from '../../tui/panel.js'
 import { createAttentionStore } from '../../tui/attention.js'
 
 export { Config } from '../../settings/tui-config.js'
-export const name = 'dsh-ops-tui'
+export const name = 'dsh-ops-zx88-tui'
 export const inject = ['tuiPanels']
 export { resolveActivityConfig as resolveTuiConfig }
 
@@ -26,7 +26,7 @@ export function apply(ctx: Context, rawConfig?: unknown): void {
     component: createOpsPanel(store, attention) })
   if (typeof dispose !== 'function') {
     attention.dispose(); store.dispose()
-    ctx.logger?.warn?.('dsh-ops: TUI panel API v1 registration was declined; OPS tools are unchanged.')
+    ctx.logger?.warn?.('dsh-ops-zx88: TUI panel API v1 registration was declined; OPS tools are unchanged.')
     return
   }
   // list() returns this activation's host-prefixed IDs, unlike register()'s disposer.

@@ -9,7 +9,7 @@ import type { PatchOptions } from '@deepseek-ai/cordis-plugin-include'
 import type { EntryOptions } from '@deepseek-ai/cordis-plugin-loader'
 import { COMPONENTS } from '../components/defaults.js'
 
-export const CLIENT_BUNDLE = 'dsh-ops/lib/profiles/client'
+export const CLIENT_BUNDLE = 'dsh-ops-zx88/lib/profiles/client'
 export interface CarrierHost { boot: typeof Boot; yaml: typeof Yaml; atomic: typeof Atomic }
 export interface CarrierLocation { dir: string; home: string; installAnchor: string }
 export interface FileChange { path: string; before?: string; after: string; mode: number }
@@ -41,21 +41,21 @@ export function prepareCarrier(host: CarrierHost, location: CarrierLocation): Ca
   const manifest = object(JSON.parse(manifestFile.text!)), dsh = object(manifest.dsh), profile = object(dsh.profile)
   const bundles = profile.bundles
   if (!Array.isArray(bundles) || bundles.some(name => typeof name !== 'string')) throw new Error('Profile bundles must be a string array.')
-  if (bundles.filter(name => name === 'dsh-ops').length !== 1 || bundles.includes(CLIENT_BUNDLE)) throw new Error('Select exactly one default dsh-ops bundle before this one-time migration.')
+  if (bundles.filter(name => name === 'dsh-ops-zx88').length !== 1 || bundles.includes(CLIENT_BUNDLE)) throw new Error('Select exactly one default dsh-ops-zx88 bundle before this one-time migration.')
   const context = profileContext(location), loaded = host.boot.loadProfileDirectory('dsh', location.dir, location.installAnchor)
   if (loaded.skippedBundles.length) throw new Error('Resolve skipped profile bundles before enabling custom settings.')
   // Equal values today do not erase a saved override's intent when defaults change later.
   const external = host.boot.readProfilePatches('dsh', context, { ...loaded, patches: [],
-    layers: loaded.layers.filter(layer => layer.packageName !== 'dsh-ops') })
-  if (external.some(patch => !patch.insert && patch.id === 'dsh-ops-file' && patch.name === 'dsh-ops/file')) throw new Error('External name-qualified file overrides require manual review; nothing was written.')
+    layers: loaded.layers.filter(layer => layer.packageName !== 'dsh-ops-zx88') })
+  if (external.some(patch => !patch.insert && patch.id === 'dsh-ops-zx88-file' && patch.name === 'dsh-ops-zx88/file')) throw new Error('External name-qualified file overrides require manual review; nothing was written.')
   const original = host.boot.composeEntries([host.boot.readProfilePatches('dsh', context, loaded)])
-  const own = flatten(original).filter(row => row.id?.startsWith('dsh-ops-'))
-  if (own.length !== 7 || COMPONENTS.some(name => own.filter(row => row.id === `dsh-ops-${name}` && row.name === `dsh-ops/${name}`).length !== 1)) throw new Error('Expected the seven unique legacy-named OPS rows; custom insertions or shadowing require manual review.')
+  const own = flatten(original).filter(row => row.id?.startsWith('dsh-ops-zx88-'))
+  if (own.length !== 7 || COMPONENTS.some(name => own.filter(row => row.id === `dsh-ops-zx88-${name}` && row.name === `dsh-ops-zx88/${name}`).length !== 1)) throw new Error('Expected the seven unique legacy-named OPS rows; custom insertions or shadowing require manual review.')
   const document = host.yaml.parseDocument(patchFile.text ?? '[]\n', { customTags: [{ tag: 'tag:yaml.org,2002:js', resolve: (value: string) => value }] })
   if (document.errors.length || !host.yaml.isSeq(document.contents)) throw new Error('Profile patch must be a valid YAML sequence.')
   let changedQualifiers = 0
   for (const node of document.contents.items) {
-    if (host.yaml.isMap(node) && node.get('id', true)?.toJSON() === 'dsh-ops-file' && !node.has('insert') && node.get('name', true)?.toJSON() === 'dsh-ops/file') {
+    if (host.yaml.isMap(node) && node.get('id', true)?.toJSON() === 'dsh-ops-zx88-file' && !node.has('insert') && node.get('name', true)?.toJSON() === 'dsh-ops-zx88/file') {
       node.delete('name'); changedQualifiers++
     }
   }
@@ -63,7 +63,7 @@ export function prepareCarrier(host: CarrierHost, location: CarrierLocation): Ca
   const parsed = host.yaml.parseDocument(patchAfter, { customTags: [{ tag: 'tag:yaml.org,2002:js', resolve: (value: string) => ({ __jsExpr: value }) }] }).toJS() as PatchOptions[]
   const neutral = { ...loaded, patches: parsed }
   if (!isDeepStrictEqual(host.boot.composeEntries([host.boot.readProfilePatches('dsh', context, neutral)]), original)) throw new Error('Removing a file-row matcher would change effective configuration; nothing was written.')
-  const parent = loaded.layers.find(layer => layer.packageName === 'dsh-ops')!
+  const parent = loaded.layers.find(layer => layer.packageName === 'dsh-ops-zx88')!
   const directory = host.boot.resolveBundleDir('dsh', CLIENT_BUNDLE, location.installAnchor, location.dir)
   if (fs.realpathSync(directory) !== fs.realpathSync(path.join(parent.packageDir, 'lib/profiles/client'))) throw new Error('The optional layer must belong to the selected OPS installation.')
   const patch = path.join(directory, 'cordis.patch.yml')
@@ -71,9 +71,9 @@ export function prepareCarrier(host: CarrierHost, location: CarrierLocation): Ca
   const candidate = { ...neutral, layers: loaded.layers.map(layer => layer === parent ? alternate : layer) }
   const afterRows = host.boot.composeEntries([host.boot.readProfilePatches('dsh', context, candidate)])
   const expected = structuredClone(original)
-  flatten(expected).find(row => row.id === 'dsh-ops-file')!.name = 'dsh-ops'
+  flatten(expected).find(row => row.id === 'dsh-ops-zx88-file')!.name = 'dsh-ops-zx88'
   if (!isDeepStrictEqual(afterRows, expected)) throw new Error('The optional layer or a higher-priority patch changes more than the carrier name; nothing was written.')
-  profile.bundles = bundles.map(name => name === 'dsh-ops' ? CLIENT_BUNDLE : name)
+  profile.bundles = bundles.map(name => name === 'dsh-ops-zx88' ? CLIENT_BUNDLE : name)
   return { location, changedQualifiers, beforeRows: original, afterRows,
     files: [...(patchFile.text === undefined ? [] : [{ path: patchPath, before: patchFile.text, after: patchAfter, mode: patchFile.mode }]),
       { path: manifestPath, before: manifestFile.text, after: JSON.stringify(manifest, null, 2) + '\n', mode: manifestFile.mode }] }

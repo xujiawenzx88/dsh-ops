@@ -1,6 +1,6 @@
 /**
  * Protocol robustness, interruption and concurrency, ported from the ad-hoc
- * `E-protocol` probes in `dsh-ops-boundary-report.md`, which drove the worker
+ * `E-protocol` probes in `dsh-ops-zx88-boundary-report.md`, which drove the worker
  * with raw bytes rather than through the host bridge.
  *
  * What this suite locks in:
@@ -30,7 +30,7 @@
  * effect to assert). The concurrency case keeps a small replacement count
  * instead of the report's 12 processes so the suite holds its runtime budget.
  *
- * @module dsh-ops/test/linux-protocol
+ * @module dsh-ops-zx88/test/linux-protocol
  */
 
 import fs from 'node:fs'

@@ -26,7 +26,7 @@
  * Platform. The subject is byte slicing in the native worker, so every case runs
  * on win32 as well.
  *
- * @module dsh-ops/test/inspect-hex
+ * @module dsh-ops-zx88/test/inspect-hex
  */
 
 import fs from 'node:fs'

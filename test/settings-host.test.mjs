@@ -113,7 +113,7 @@ await test('the actual shell component starts and reloads through the profile ad
 
 await test('host descriptor projections cannot remove metadata from later descriptions', () => {
   for (const Config of [Hiding.Config, DiscoveryConfig, ShellConfig]) {
-    assert.equal(Config['~standard'].vendor, 'dsh-ops')
+    assert.equal(Config['~standard'].vendor, 'dsh-ops-zx88')
     const copy = Config.toJSON()
     for (const key of Object.keys(copy.dict)) {
       delete copy.dict[key].meta.volatile

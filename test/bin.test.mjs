@@ -1,7 +1,7 @@
 /**
- * `dsh-ops uninstall`: what this plugin (and older versions of it) installed
+ * `dsh-ops-zx88 uninstall`: what this plugin (and older versions of it) installed
  * outside the profile, and the leftover FastCtx state it does not own. Plus
- * `dsh-ops ladder`, the same CLI read back through its report, and the commands
+ * `dsh-ops-zx88 ladder`, the same CLI read back through its report, and the commands
  * removed with the FastCtx background component.
  *
  * The suite runs the real CLI as a child process against a throwaway `DSH_HOME`
@@ -174,7 +174,7 @@ await test('the report keeps plugin removal separate from runtime removal', asyn
     assert.equal(run.status, 0, run.stderr)
     assert.match(run.stdout, /not handled by this command/u)
     assert.match(run.stdout, /remove_bundle/u, 'the profile-side tool is named')
-    assert.match(run.stdout, /dsh plugin --profile <profile> remove dsh-ops/u, 'the profile-side command is named')
+    assert.match(run.stdout, /dsh plugin --profile <profile> remove dsh-ops-zx88/u, 'the profile-side command is named')
   })
 })
 
@@ -185,7 +185,7 @@ await test('an unknown command still exits 2', () => {
 })
 
 await test('the commands removed with the FastCtx background component say what replaces them', () => {
-  for (const [command, replacement] of [['resolve', /dsh-ops ladder/u], ['status', /status --profile/u], ['build', /build-ptc/u], ['provision', /provision-shells/u]]) {
+  for (const [command, replacement] of [['resolve', /dsh-ops-zx88 ladder/u], ['status', /status --profile/u], ['build', /build-ptc/u], ['provision', /provision-shells/u]]) {
     const run = runCli({ home: TEST_HOME, user: TEST_HOME, args: [], command })
     assert.equal(run.status, 2, `${command}: ${run.stderr}`)
     assert.match(run.stderr, /was removed together with the FastCtx background component/u)
@@ -195,16 +195,16 @@ await test('the commands removed with the FastCtx background component say what 
   // The profile form of `status` is a different command and keeps working through the profile manager.
   const help = runCli({ home: TEST_HOME, user: TEST_HOME, args: [], command: 'help' })
   assert.equal(help.status, 0)
-  for (const removed of ['dsh-ops resolve', 'dsh-ops build [', 'dsh-ops provision [']) assert.equal(help.stdout.includes(removed), false, `help no longer lists ${removed}`)
-  assert.match(help.stdout, /dsh-ops status --profile/u)
+  for (const removed of ['dsh-ops-zx88 resolve', 'dsh-ops-zx88 build [', 'dsh-ops-zx88 provision [']) assert.equal(help.stdout.includes(removed), false, `help no longer lists ${removed}`)
+  assert.match(help.stdout, /dsh-ops-zx88 status --profile/u)
 })
 
 // ---------------------------------------------------------------------------
-// `dsh-ops ladder`: the resolution report and the rungs the prompt renders
+// `dsh-ops-zx88 ladder`: the resolution report and the rungs the prompt renders
 // ---------------------------------------------------------------------------
 
 /**
- * Write one `--config` file holding a `dsh-ops` row config.
+ * Write one `--config` file holding a `dsh-ops-zx88` row config.
  * @param {string} dir - the directory to write into.
  * @param {Record<string, unknown>} config - the row config.
  * @returns {string} the file's path.
@@ -468,7 +468,7 @@ await test('ladder fails loud on a config the plugin would refuse', async () => 
 })
 
 // ---------------------------------------------------------------------------
-// `dsh-ops provision-shells`: the pinned upstream copies, with no download
+// `dsh-ops-zx88 provision-shells`: the pinned upstream copies, with no download
 // ---------------------------------------------------------------------------
 
 /** Windows' own bsdtar: it writes and reads the zip shape the pwsh pin names. */
@@ -753,7 +753,7 @@ await test('on POSIX the profile CLI fallback launches dsh, not the Windows cmd 
     })
     assert.match(run.stdout, /Official CLI: dsh;/, `${run.stdout}${run.stderr}`)
     assert.equal(fs.existsSync(marker), true, `the POSIX CLI must have been launched: ${run.stdout}${run.stderr}`)
-    assert.equal(fs.readFileSync(marker, 'utf8').trim(), `plugin --profile web add dsh-ops@${PACKAGE_VERSION}`)
+    assert.equal(fs.readFileSync(marker, 'utf8').trim(), `plugin --profile web add dsh-ops-zx88@${PACKAGE_VERSION}`)
     assert.equal(run.status, 0, `${run.stdout}${run.stderr}`)
   })
 })

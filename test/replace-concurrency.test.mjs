@@ -28,7 +28,7 @@
  * and `LockFileEx` on Windows — see `docs/windows-verification.md` for what the
  * Windows behaviour still needs to answer.
  *
- * @module dsh-ops/test/replace-concurrency
+ * @module dsh-ops-zx88/test/replace-concurrency
  */
 
 import fs from 'node:fs'

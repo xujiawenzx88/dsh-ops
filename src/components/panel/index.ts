@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs'
 import { createPanelCollector, resolvePanelConfig } from '../../panel/collect.js'
 import { configObject, editable, settingsConfig } from '../../settings/schema.js'
 
-export const name = 'dsh-ops-panel'
+export const name = 'dsh-ops-zx88-panel'
 export { resolvePanelConfig }
 export const Config = settingsConfig(value => resolvePanelConfig(configObject(value)), {
   capture: editable('boolean', 'Capture when this row is enabled. Legacy false remains off until explicitly changed to true.'),
@@ -21,7 +21,7 @@ function pluginVersion(): string | undefined {
 export function apply(ctx: Context, rawConfig: unknown): void {
   const config = resolvePanelConfig(configObject(rawConfig))
   if (!config.capture) {
-    ctx.logger.info('dsh-ops: legacy panel capture:false remains off. Set capture:true only when collection is wanted; the row switch stops collection.')
+    ctx.logger.info('dsh-ops-zx88: legacy panel capture:false remains off. Set capture:true only when collection is wanted; the row switch stops collection.')
     return
   }
   const collector = createPanelCollector({
@@ -31,5 +31,5 @@ export function apply(ctx: Context, rawConfig: unknown): void {
   })
   ctx.on('session/event', (session, event) => { collector.observe(session, event) })
   ctx.on('session/disposed', session => { void collector.close(session?.id) })
-  ctx.effect(() => () => collector.stop(), 'dsh-ops: panel capture')
+  ctx.effect(() => () => collector.stop(), 'dsh-ops-zx88: panel capture')
 }

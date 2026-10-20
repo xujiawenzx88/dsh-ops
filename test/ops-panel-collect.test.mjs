@@ -6,7 +6,7 @@
  * so the "never write the harness home" guard is exercised without naming the
  * developer's own. Nothing here calls a model, opens a socket, or measures time.
  *
- * @module dsh-ops/test/ops-panel-collect
+ * @module dsh-ops-zx88/test/ops-panel-collect
  */
 
 import fs from 'node:fs'
@@ -21,7 +21,7 @@ import { apply } from '../lib/components/panel/index.js'
 import { assert, PACKAGE_ROOT, report, test, waitFor, withTempDir } from './lib/harness.mjs'
 
 /** A DSH home outside every fixture, so a fixture workspace is never "inside the home". */
-const SYNTHETIC_HOME = Object.freeze({ DSH_HOME: path.join(tmpdir(), 'dsh-ops-panel-suite-home') })
+const SYNTHETIC_HOME = Object.freeze({ DSH_HOME: path.join(tmpdir(), 'dsh-ops-zx88-panel-suite-home') })
 
 /** A context stub that records what the component registered. */
 function fakeContext() {
@@ -418,11 +418,11 @@ await test('a real Cordis host mounts the row and the events reach the sink', as
   // bootHost() gives the production Context and fiber lifecycle, so this proves
   // the wiring (ctx.on / ctx.effect / ctx.logger) and not just the module.
   const { bootHost } = await import('./lib/host.mjs')
-  const directory = fs.mkdtempSync(path.join(tmpdir(), 'dsh-ops-panel-host-'))
+  const directory = fs.mkdtempSync(path.join(tmpdir(), 'dsh-ops-zx88-panel-host-'))
   try {
     const { ctx } = await bootHost({ withTools: false, withSystemPrompt: false })
     const module = await import('../lib/components/panel/index.js')
-    assert.equal(module.name, 'dsh-ops-panel')
+    assert.equal(module.name, 'dsh-ops-zx88-panel')
     const silent = await ctx.plugin(module, { capture: false })
     const session = sessionFixture(directory, 'host-silent')
     ctx.emit('session/event', session, event('turn/end', { turn: 1 }, 0))

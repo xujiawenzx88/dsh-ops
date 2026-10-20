@@ -1,6 +1,6 @@
 /**
  * Path and filename boundaries, ported from the ad-hoc `A-paths` probes in
- * `dsh-ops-boundary-report.md`.
+ * `dsh-ops-zx88-boundary-report.md`.
  *
  * What this suite locks in (all documented behaviour, not accidents):
  *
@@ -30,7 +30,7 @@
  * `test/inspect-hex.test.mjs`, and `limit`-bounds-lines (L4) by
  * `test/output-budget.test.mjs`.
  *
- * @module dsh-ops/test/linux-paths
+ * @module dsh-ops-zx88/test/linux-paths
  */
 
 import fs from 'node:fs'

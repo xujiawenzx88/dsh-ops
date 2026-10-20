@@ -1,27 +1,24 @@
 {
-  "name": "dsh-ops",
-  "version": "0.4.0",
+  "name": "dsh-ops-zx88",
+  "version": "0.1.0",
   "publishConfig": {
     "access": "public"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/T-Auto/dsh-ops.git"
+    "url": "git+https://github.com/xujiawenzx88/dsh-ops.git"
   },
-  "homepage": "https://github.com/T-Auto/dsh-ops#readme",
+  "homepage": "https://github.com/xujiawenzx88/dsh-ops#readme",
   "bugs": {
-    "url": "https://github.com/T-Auto/dsh-ops/issues"
+    "url": "https://github.com/xujiawenzx88/dsh-ops/issues"
   },
   "os": [
-    "win32",
-    "linux",
-    "darwin"
+    "win32"
   ],
   "cpu": [
-    "x64",
-    "arm64"
+    "x64"
   ],
-  "description": "Native file and PTC tools for DSH on Windows x64, Linux x64 and macOS Apple Silicon; optional managed Bash and host PowerShell integration",
+  "description": "Native file and PTC tools for DSH on Windows x64; optional managed Bash and host PowerShell integration",
   "icon": "./docs/assets/icon.png",
   "keywords": [
     "dsh",
@@ -90,7 +87,7 @@
     }
   },
   "bin": {
-    "dsh-ops": "bin/dsh-ops.mjs"
+    "dsh-ops-zx88": "bin/dsh-ops.mjs"
   },
   "dsh": {
     "bundle": {

@@ -15,7 +15,7 @@
  *    the geometric mean rides along, `median`/`min` change which number is compared,
  *    and both input shapes (`summary` and sealed `run.json`) pair the same way.
  *
- * @module dsh-ops/test/bench-compare-core
+ * @module dsh-ops-zx88/test/bench-compare-core
  */
 
 import { assert, report, test } from './lib/harness.mjs'

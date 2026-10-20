@@ -102,7 +102,7 @@ await test('the declared namespace documents the upstream names and the public p
   const namespace = raw.contributes['x-tool-namespaces'][0]
   // `serverName` stays the bridge's own namespace: it is what the bridge
   // reserves and what this plugin intercepts, not what the model sees.
-  assert.equal(namespace.serverName, 'dsh-ops')
+  assert.equal(namespace.serverName, 'dsh-ops-zx88')
   assert.equal(namespace.publicPrefix, TOOL_PREFIX)
   for (const tool of namespace.tools) {
     assert.ok(publicToolName(tool).startsWith(namespace.publicPrefix))
@@ -114,7 +114,7 @@ await test('the declared prompt sections are the registered ones', () => {
   const declared = raw.contributes['x-prompt-sections'].map((section) => section.name)
   assert.deepEqual([...declared].sort(), ['file', 'shell', 'ptc'].map(name => `${TOOLING_SECTION}:${name}`).sort())
   // The background stub still loads for existing rows but is no longer a declared component.
-  assert.equal(raw.contributes['x-components'].some((component) => component.entry === 'dsh-ops/background'), false)
+  assert.equal(raw.contributes['x-components'].some((component) => component.entry === 'dsh-ops-zx88/background'), false)
 })
 
 await test('the manifest license states the composite this repository ships', () => {
@@ -133,7 +133,7 @@ await test('the bundle patch inserts no background row and writes no removed Fas
   const { LEGACY_FASTCTX_KEYS } = await import('../lib/config.js')
   const patch = parse(fs.readFileSync(path.join(PACKAGE_ROOT, pkg.dsh.bundle.patch), 'utf8'))
   const rows = patch.flatMap((entry) => entry.insert ?? [])
-  assert.deepEqual(rows.map((row) => row.name), ['dsh-ops/shell', 'dsh-ops/file', 'dsh-ops/ptc', 'dsh-ops/discovery', 'dsh-ops/panel', 'dsh-ops/tui', 'dsh-ops/hide-official'])
+  assert.deepEqual(rows.map((row) => row.name), ['dsh-ops-zx88/shell', 'dsh-ops-zx88/file', 'dsh-ops-zx88/ptc', 'dsh-ops-zx88/discovery', 'dsh-ops-zx88/panel', 'dsh-ops-zx88/tui', 'dsh-ops-zx88/hide-official'])
   for (const row of rows) {
     for (const key of LEGACY_FASTCTX_KEYS) assert.equal(Object.hasOwn(row.config ?? {}, key), false, `${row.name} still writes ${key}`)
   }
@@ -187,7 +187,7 @@ await test('the icon and all component entries are shipped in the package whitel
 await test('hiding, panel and TUI are opt-in while file/PTC/discovery rows default enabled', () => {
   const components = raw.contributes['x-components']
   for (const [id, enabled] of [['file', true], ['ptc', true], ['discovery', true], ['panel', false], ['tui', false], ['hide-official', false]]) {
-    assert.equal(components.find(component => component.id === `dsh-ops-${id}`).defaultEnabled, enabled)
+    assert.equal(components.find(component => component.id === `dsh-ops-zx88-${id}`).defaultEnabled, enabled)
   }
 })
 

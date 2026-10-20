@@ -20,7 +20,7 @@ export async function commandSettingsProfile(options: { profileDir?: string; hos
   if (!options.profileDir || !options.hostAnchor) throw new Error('Use --profile-dir <absolute directory> and --host-anchor <absolute host package.json>.')
   const host = await loadCarrierHost(options.hostAnchor)
   const plan = await carrierPreview(host, { dir: options.profileDir, installAnchor: options.hostAnchor, home: options.home ?? dshHome() })
-  console.log(`Select ${CLIENT_BUNDLE} instead of dsh-ops; retain seven row IDs, switches and effective configuration.`)
+  console.log(`Select ${CLIENT_BUNDLE} instead of dsh-ops-zx88; retain seven row IDs, switches and effective configuration.`)
   console.log(`Normalize ${plan.changedQualifiers} verified file-row name matcher(s). Files: ${plan.files.map(file => file.path).join(', ')}`)
   console.log('Stop all DSH processes using this profile before applying. Launch-time command-line overlays are outside this persistent profile preview.')
   if (!options.yes || options.dryRun) { console.log('Preview only. Apply with --offline --yes after stopping DSH.'); return 0 }

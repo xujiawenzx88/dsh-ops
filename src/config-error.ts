@@ -1,7 +1,7 @@
 /** Preserve the public configuration error identity across typed validators. */
 export class ConfigError extends Error {
   constructor(message: string) {
-    super(`dsh-ops config: ${message}`)
+    super(`dsh-ops-zx88 config: ${message}`)
     this.name = 'ConfigError'
   }
 }

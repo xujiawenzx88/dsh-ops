@@ -54,7 +54,7 @@ await test('the disabled component patch also defaults to an empty selection', (
   const document = parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'cordis.patch.yml'), 'utf8'), {
     customTags: [{ tag: 'tag:yaml.org,2002:js', resolve: value => value }],
   })
-  const hiding = document.flatMap(item => item.insert).find(row => row.name === 'dsh-ops/hide-official')
+  const hiding = document.flatMap(item => item.insert).find(row => row.name === 'dsh-ops-zx88/hide-official')
   assert.equal(hiding.disabled, true)
   assert.deepEqual(hiding.config, { replaceTools: [] })
   assert.deepEqual(resolveHidingConfig(hiding.config), { replaceTools: [] })

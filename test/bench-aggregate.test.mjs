@@ -19,7 +19,7 @@
  *    add back up to the run's own bucket totals, exactly, even when a step calls an
  *    odd number of tools.
  *
- * @module dsh-ops/test/bench-aggregate
+ * @module dsh-ops-zx88/test/bench-aggregate
  */
 
 import { assert, report, test } from './lib/harness.mjs'

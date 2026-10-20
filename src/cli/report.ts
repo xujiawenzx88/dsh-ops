@@ -1,5 +1,5 @@
 /**
- * Operator reporting for the `dsh-ops` CLI: the managed directories the
+ * Operator reporting for the `dsh-ops-zx88` CLI: the managed directories the
  * commands share, the `--config` row reader, and the read-only `ladder`
  * report of what this deployment resolves and which rungs the prompt ladder
  * actually renders.
@@ -7,7 +7,7 @@
  * Split out of `bin/dsh-ops.mjs`; the command's argv surface, output and exit
  * codes are unchanged.
  *
- * @module dsh-ops/cli/report
+ * @module dsh-ops-zx88/cli/report
  */
 
 import fs from 'node:fs'
@@ -58,7 +58,7 @@ export function fastctxDataDir() {
   return path.join(os.homedir(), '.fastctx')
 }
 /**
- * Read the `dsh-ops` row config a report should describe.
+ * Read the `dsh-ops-zx88` row config a report should describe.
  *
  * The commands here are run outside a profile, so there is no loader to ask:
  * `--config` names a JSON file holding the row's own `config` object, and the
@@ -82,10 +82,10 @@ export function readRowConfig(file: string | undefined): Record<string, unknown>
   try {
     value = JSON.parse(text)
   } catch (error) {
-    throw new Error(`--config must hold one JSON object (the \`dsh-ops\` row's config): ${errorMessage(error)}`)
+    throw new Error(`--config must hold one JSON object (the \`dsh-ops-zx88\` row's config): ${errorMessage(error)}`)
   }
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
-    throw new Error(`--config must hold one JSON object (the \`dsh-ops\` row's config), got ${typeof value}`)
+    throw new Error(`--config must hold one JSON object (the \`dsh-ops-zx88\` row's config), got ${typeof value}`)
   }
   return value as Record<string, unknown>
 }

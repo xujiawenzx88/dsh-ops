@@ -14,7 +14,7 @@
  * What it runs is the deterministic, model-free comparison: `bench/cli.mjs tools` with the **same**
  * worker binary on both sides. A model-driven sweep asserts a cost direction and must stay out of CI.
  *
- * @module dsh-ops/test/bench-ci
+ * @module dsh-ops-zx88/test/bench-ci
  */
 
 import fs from 'node:fs'
@@ -64,7 +64,7 @@ await test('"CI required" reports the smoke without letting it block', () => {
 await test('the smoke drives the one CLI entry point with the same binary on both sides', () => {
   assert.match(benchRuns, /node bench\/cli\.mjs tools\b/u, 'the smoke goes through the single cross-platform entry')
   assert.match(benchRuns, /--baseline "\$worker" --candidate "\$worker"/u, 'both sides are the same staged worker')
-  assert.match(benchRuns, /runtime\/linux-x64\/dsh-ops-worker/u, 'it uses the worker this job just built and staged')
+  assert.match(benchRuns, /runtime\/win32-x64\/dsh-ops-worker\.exe/u, 'it uses the worker this job just built and staged')
   assert.doesNotMatch(benchRuns, /bench\/cli\.mjs ab\b/u, 'the model-driven sweep is never run in CI')
   for (const flag of ['--max-ms', '--budget', '--threshold']) {
     assert.equal(benchRuns.includes(flag), false, `no timing gate in the smoke (${flag})`)

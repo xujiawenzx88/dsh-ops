@@ -33,7 +33,7 @@ await test('measure PTC enhancement separately from the existing file/shell decl
       for (const [mode, agent] of agents) {
         const assembly = await ctx.get('systemPrompt').assemble({ scope: agent })
         const sections = assembly.sections.map(({ name, text }) => ({ name, chars: text.length, bytes: Buffer.byteLength(text) }))
-        const text = assembly.sections.filter(section => section.text.length > 0 && (section.name === 'tools:sdk' || section.name === 'tools:ptc-only' || section.name.startsWith('dsh-ops:repository-tooling'))).map(section => section.text).join('\n\n')
+        const text = assembly.sections.filter(section => section.text.length > 0 && (section.name === 'tools:sdk' || section.name === 'tools:ptc-only' || section.name.startsWith('dsh-ops-zx88:repository-tooling'))).map(section => section.text).join('\n\n')
         const wire = JSON.stringify(assembly.tools)
         samples.push({ stage, mode, promptChars: text.length, promptBytes: Buffer.byteLength(text), wireBytes: Buffer.byteLength(wire),
           promptSha256: createHash('sha256').update(text).digest('hex'), wireSha256: createHash('sha256').update(wire).digest('hex'), sections })

@@ -41,12 +41,13 @@ function run(root, name='check-release.mjs', args=[]) {
   const result=spawnSync(process.execPath,[path.join(root,'bin',name),...(name==='native-runtime.mjs'?['check']:[]),'--root',root,...args],{encoding:'utf8'})
   return {status:result.status,out:`${result.stdout}${result.stderr}`}
 }
-await test('all three paired targets and Windows IPC close successfully',async()=>withTempDir('release-all',root=>{
+await test('the supported target and Windows IPC close successfully',async()=>withTempDir('release-all',root=>{
   fixture(root); const result=run(root); assert.equal(result.status,0,result.out); assert.match(result.out,/Release closure OK/)
 }))
-await test('each missing target fails strict release while staged source checks remain local',async()=>withTempDir('release-missing',root=>{
-  fixture(root,['linux-x64']); assert.equal(run(root,'native-runtime.mjs',['--staged']).status,0)
-  const result=run(root); assert.notEqual(result.status,0); assert.match(result.out,/missing win32-x64, darwin-arm64/)
+await test('a missing target fails strict release and no staged target is reported as available',async()=>withTempDir('release-missing',root=>{
+  fixture(root,[])
+  assert.match(run(root,'native-runtime.mjs',['--staged']).out,/No staged native runtime/)
+  const result=run(root); assert.notEqual(result.status,0); assert.match(result.out,/missing win32-x64/)
 }))
 await test('every foreign target is rejected including Intel Mac',async()=>withTempDir('release-foreign',root=>{
   fixture(root); for(const target of ['darwin-x64','win32-arm64','linux-arm64']) {
@@ -54,7 +55,7 @@ await test('every foreign target is rejected including Intel Mac',async()=>withT
   }
 }))
 await test('non-host worker tampering is checked',async()=>withTempDir('release-tamper',root=>{
-  fixture(root); fs.appendFileSync(path.join(root,'runtime/darwin-arm64/dsh-ops-worker'),'changed')
+  fixture(root); fs.appendFileSync(path.join(root,'runtime/win32-x64/dsh-ops-worker.exe'),'changed')
   const result=run(root); assert.notEqual(result.status,0); assert.match(result.out,/provenance mismatch|Native runtime gate failed/)
 }))
 await test('Windows worker without IPC cannot pass',async()=>withTempDir('release-no-ipc',root=>{
@@ -63,12 +64,12 @@ await test('Windows worker without IPC cannot pass',async()=>withTempDir('releas
 }))
 await test('half-staged and unexpected targets are never silently skipped',async()=>withTempDir('release-stray',root=>{
   fixture(root); fs.mkdirSync(path.join(root,'runtime/darwin-x64')); assert.match(run(root).out,/Unexpected runtime targets/)
-  fs.rmSync(path.join(root,'runtime/darwin-x64'),{recursive:true}); fs.unlinkSync(path.join(root,'runtime/darwin-arm64/provenance.json'))
+  fs.rmSync(path.join(root,'runtime/darwin-x64'),{recursive:true}); fs.unlinkSync(path.join(root,'runtime/win32-x64/provenance.json'))
   assert.match(run(root,'native-runtime.mjs',['--staged']).out,/Half-staged runtime/)
 }))
 await test('manifest exact targets, npm platform filters and shell pins must agree',async()=>withTempDir('release-drift',root=>{
   fixture(root); const file=path.join(root,'dsh-plugin.json'), manifest=JSON.parse(fs.readFileSync(file,'utf8'))
-  manifest.contributes['x-components'].find(c=>c.id==='dsh-ops-ptc').targets.push('darwin-x64')
+  manifest.contributes['x-components'].find(c=>c.id==='dsh-ops-zx88-ptc').targets.push('darwin-x64')
   fs.writeFileSync(file,JSON.stringify(manifest)); assert.match(run(root).out,/disagree/)
 }))
 await test('release closure refuses either shell payload as a direct or optional dependency', async () => withTempDir('release-shell-dep', root => {

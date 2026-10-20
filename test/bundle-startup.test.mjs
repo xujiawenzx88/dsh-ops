@@ -19,8 +19,8 @@ resolveWorker({})
 // The shipped data-only bundle uses the public serialized Loader expression for platform defaults.
 const rows = parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'cordis.patch.yml'), 'utf8'))[0].insert
 const enabled = row => !(isJsExpr(row.disabled) ? evaluate({ process }, row.disabled.__jsExpr) : row.disabled)
-assert.equal(rows.find(row => row.id === 'dsh-ops-hide-official').disabled, true)
-assert.equal(rows.find(row => row.id === 'dsh-ops-tui').disabled, true)
+assert.equal(rows.find(row => row.id === 'dsh-ops-zx88-hide-official').disabled, true)
+assert.equal(rows.find(row => row.id === 'dsh-ops-zx88-tui').disabled, true)
 
 for (const mode of ['read-only', 'workspace-write', 'danger-full-access']) {
   await test(`default bundle starts with standard fs/search in native/PTC/both under ${mode}`, async () => {
@@ -33,7 +33,7 @@ for (const mode of ['read-only', 'workspace-write', 'danger-full-access']) {
         await ctx.plugin(inner => inner.provide('sandboxPolicy', { resolve: ({ session }) => ({ mode: session.mode, workspaceRoot: root, sessionId: session.id }) }))
         await ctx.plugin(NodePtc, {})
         for (const row of rows.filter(enabled)) {
-          const component = row.name === 'dsh-ops' ? 'file' : row.name.split('/')[1]
+          const component = row.name === 'dsh-ops-zx88' ? 'file' : row.name.split('/')[1]
           const module = await import(`../lib/components/${component}/index.js`)
           const config = component === 'shell' && process.env.DSH_OPS_TEST_BASH
             ? { ...row.config, bashPath: process.env.DSH_OPS_TEST_BASH } : row.config
@@ -75,7 +75,7 @@ await test('a missing optional Bash leaves the file bundle available', async () 
       await ctx.plugin(Sandbox, {})
       await ctx.plugin(inner => inner.provide('sandboxPolicy', { resolve: ({ session }) => ({ mode: session.mode, workspaceRoot: root, sessionId: session.id }) }))
       for (const row of rows.filter(enabled)) {
-        const component = row.name === 'dsh-ops' ? 'file' : row.name.split('/')[1]
+        const component = row.name === 'dsh-ops-zx88' ? 'file' : row.name.split('/')[1]
         const module = await import('../lib/components/' + component + '/index.js')
         await ctx.plugin(module, component === 'shell' ? { ...row.config, bashPath: path.join(root, 'absent-bash.exe') } : row.config)
       }

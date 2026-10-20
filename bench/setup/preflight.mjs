@@ -276,8 +276,11 @@ function bashIpcProblems(root) {
  * @param {string} arch - the host architecture.
  * @returns {string[]} one line per unusable shell; empty when both are the plugin's own. */
 function shellPayloadWarnings(root, arch) {
+  let manifest = {}
+  try { manifest = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')) } catch {}
+  const declared = kind => manifest.optionalDependencies?.[`@dsh-ops/${kind}-win32-x64`] ?? manifest.dependencies?.[`@dsh-ops/${kind}-win32-x64`]
   const warnings = []
-  for (const kind of ['bash', 'pwsh']) {
+  for (const kind of ['bash', 'pwsh'].filter(kind => declared(kind))) {
     const bundled = bundledShell({ kind, bundleRoot: root, platform: 'win32', arch })
     if (!bundled.file) {
       warnings.push(`the plugin's own ${kind} is unusable (${bundled.cause ?? 'unknown cause'}): ${bundled.detail ?? ''} — the candidate falls back to the machine's shell while the baseline keeps its own, which is not the same experiment; run npm install so the optionalDependencies come back`)
@@ -306,7 +309,7 @@ export function inspectLocalBuild({ root = REPO_ROOT, platform = process.platfor
   if (!PLATFORMS.includes(target)) {
     problems.push({
       what: `this host is ${target}, outside the plugin's native support matrix (${PLATFORMS.join(' / ')}): the candidate has no worker, so PTC and run_code cannot start`,
-      fix: 'run the sweep on a supported target, or build one per docs/linux-build.md',
+      fix: 'run the sweep on Windows x64, or build the win32-x64 worker with npm run build:ptc on Windows x64',
     })
     return { problems, warnings }
   }

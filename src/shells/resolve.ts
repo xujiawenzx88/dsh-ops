@@ -155,7 +155,7 @@ function resolveBash({
 /** The host owns PowerShell selection. Legacy OPS copies are never automatically activated. */
 function resolvePwsh(): ShellResolution {
   return { available: false, file: undefined, source: 'host',
-    detail: 'PowerShell is managed by the host; OPS does not supply or override its executable. Use dsh-ops upgrade-host-pwsh on Windows, then restart DSH. An explicit host pwshPath remains authoritative.' }
+    detail: 'PowerShell is managed by the host; OPS does not supply or override its executable. Use dsh-ops-zx88 upgrade-host-pwsh on Windows, then restart DSH. An explicit host pwshPath remains authoritative.' }
 }
 
 /**
@@ -180,7 +180,7 @@ export function resolveShells(config: ShellConfig | undefined, options: ShellRes
   const arch = options.arch ?? process.arch
   const allowSystemFallback = config?.allowSystemShellFallback === true
   // A POSIX host answers with its own bash: that is the deployment truth for the shell component
-  // and for `dsh-ops ladder`.
+  // and for `dsh-ops-zx88 ladder`.
   const posix = platform !== 'win32'
   const probe = { bundleRoot, env, platform, arch }
   const pwsh = resolvePwsh()

@@ -2,7 +2,7 @@
  * The shell ladder's resolution order: the configured path, the plugin's own
  * copies, PATH, and the well-known installs — plus the two phase-C layouts the
  * resolver must see (`@dsh-ops/<shell>-<platform>-<arch>` packages and the
- * `dsh-ops provision-shells` store).
+ * `dsh-ops-zx88 provision-shells` store).
  *
  * Every case is a fake by construction — temp directories, a synthetic PATH,
  * and a staged store or package tree — because a suite that asserted "Git for
@@ -255,7 +255,7 @@ await test('a plugin with no manifest reports the package as not installed, and 
 
     const undeclared = path.join(dir, 'undeclared')
     fs.mkdirSync(undeclared, { recursive: true })
-    fs.writeFileSync(path.join(undeclared, 'package.json'), JSON.stringify({ name: 'dsh-ops', version: '0.1.0' }))
+    fs.writeFileSync(path.join(undeclared, 'package.json'), JSON.stringify({ name: 'dsh-ops-zx88', version: '0.1.0' }))
     const other = bundledShell({ kind: 'pwsh', bundleRoot: undeclared, platform: process.platform, arch: process.arch })
     assert.equal(other.file, undefined)
     assert.match(other.detail, /is not installed$/)
@@ -337,7 +337,7 @@ await test('bundledShell names the machine-readable cause of every miss', async 
   })
 
   await withTempDir('shells-cause-undeclared', async (dir) => {
-    fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'dsh-ops', version: '0.1.0' }))
+    fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'dsh-ops-zx88', version: '0.1.0' }))
     assert.equal(causeOf(dir).cause, 'not-declared')
   })
 
@@ -402,7 +402,7 @@ await test('the pin table names one upstream release per shell, and nothing is s
   assert.equal(pwshArm64?.executableRelativePath, 'bin/pwsh')
   // The one published layout each archive has, and the store path both sides of
   // the L3 contract compute.
-  const shellHome = process.platform === 'win32' ? 'C:\\home' : '/home/dsh-ops'
+  const shellHome = process.platform === 'win32' ? 'C:\\home' : '/home/dsh-ops-test'
   assert.equal(provisionedShellVersionDir({ kind: 'pwsh', version: '7.6.6', env: { DSH_HOME: shellHome } }),
     path.join(shellHome, 'dsh-ops', 'shells', 'pwsh', '7.6.6'))
 })
@@ -412,7 +412,7 @@ await test('a platform the pins do not cover has no pin, and the store still res
   assert.equal(shellUpstreamPin({ kind: 'bash', platform: 'darwin', arch: 'arm64' }), undefined)
 })
 
-// --- the provisioned copies (`dsh-ops provision-shells`)
+// --- the provisioned copies (`dsh-ops-zx88 provision-shells`)
 
 await test('provisioned Bash outranks other copies while legacy PowerShell remains host-owned', async () => {
   await withTempDir('shells-provisioned', async (dir) => {

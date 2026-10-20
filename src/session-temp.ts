@@ -14,7 +14,7 @@
  * created lazily, on the first write the fence allows, and never deleted by the
  * plugin: a later call in the same session may still expect it.
  *
- * @module dsh-ops/session-temp
+ * @module dsh-ops-zx88/session-temp
  */
 import { createHash } from 'node:crypto'
 import fs from 'node:fs'

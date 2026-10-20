@@ -4,13 +4,13 @@
 
 ## Enable
 
-In the dsh-TUI profile, enable the existing `dsh-ops/tui` bundle row and restart dsh-TUI. It is disabled by default. This uses experimental `tuiPanels` API v1 and needs a TUI build that admits exported subcomponents using their own nearest package manifest. Older builds that inspect only the outer manifest cannot provide reliable component identity.
+In the dsh-TUI profile, enable the existing `dsh-ops-zx88/tui` bundle row and restart dsh-TUI. It is disabled by default. This uses experimental `tuiPanels` API v1 and needs a TUI build that admits exported subcomponents using their own nearest package manifest. Older builds that inspect only the outer manifest cannot provide reliable component identity.
 
 Edit the existing row rather than adding a duplicate:
 
 ```yaml
 id: dsh-ops-tui
-name: dsh-ops/tui
+name: dsh-ops-zx88/tui
 disabled: false
 config:
   maxSessions: 32
@@ -87,4 +87,4 @@ DSH_OPS_TUI_ROOT=/path/to/dsh-TUI DSH_OPS_TUI_WORKER=/absolute/path/to/dsh-ops/n
 
 This uses the real Rust worker, OPS file runtime, DSH tool runtime, AgentLoop and Session post-commit notifications, plus the real admitted sidebar and renderer. Model responses and policy selection are scripted fixtures; no online model is called. It covers native file reads, bounded listings, dry-run replacement and read-only refusal. PTC batch/result execution, production PTC-only publication, run_code execution, disk-persistence durability, Windows confinement and manual PTY acceptance are **not** covered. Only owned temporary fixtures are mutated; HOME/USERPROFILE/DSH_HOME stay isolated. The suite neither builds/downloads a worker nor changes the release platform resolver. Missing opt-in prerequisites are counted as skipped; the required flag makes them fail.
 
-The sidebar does not change the package's declared targets: Windows x64, Linux x64 and macOS arm64. UI tests alone do not establish native execution or OS sandbox acceptance.
+The sidebar does not change the package's declared target: Windows x64 only in this fork. UI tests alone do not establish native execution or OS sandbox acceptance.

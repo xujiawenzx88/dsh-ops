@@ -56,6 +56,8 @@ that breaks is visible without blocking a merge.
 
 ## Expected numbers
 
+> This fork is Windows x64 only. The POSIX row below is upstream history, not a supported target.
+
 | Host | Suites | Skipped, and why |
 | --- | --- | --- |
 | `linux-x64`, `darwin-arm64` | all of `test/*.test.mjs` | `tui-host` and `tui-native` unless an optional DSH-TUI checkout is present (`DSH_OPS_TUI_ROOT`, plus `DSH_OPS_TUI_WORKER` for the native one); `mount` only when no native worker can be resolved there |

@@ -16,7 +16,7 @@
  * `command` check spawns `process.execPath`, never a shell, so the suite does not
  * depend on the host's login shell either.
  *
- * @module dsh-ops/test/bench-verify
+ * @module dsh-ops-zx88/test/bench-verify
  */
 
 import fs from 'node:fs'

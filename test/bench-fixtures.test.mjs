@@ -9,7 +9,7 @@
  * The parameters are small on purpose — the deadline is 120s, and a 20000-row CSV
  * proves nothing about determinism that a 200-row one does not.
  *
- * @module dsh-ops/test/bench-fixtures
+ * @module dsh-ops-zx88/test/bench-fixtures
  */
 
 import fs from 'node:fs'

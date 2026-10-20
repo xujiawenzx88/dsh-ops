@@ -66,14 +66,14 @@ export function publishShellTools(ctx: Context, config: Pick<ResolvedConfig, 'pu
   const bash = shells?.bash
   if (bash === undefined || bash.available !== true || typeof bash.file !== 'string') {
     const reason = bash?.detail ?? 'the bash rung was not resolved'
-    reportShellProblem(ctx, `dsh-ops: the plugin's own bash is unavailable (${reason}); `
+    reportShellProblem(ctx, `dsh-ops-zx88: the plugin's own bash is unavailable (${reason}); `
       + `${BASH_TOOL_NAME} is not published.`)
     return () => {}
   }
 
   const registry = ctx?.get?.('tools')
   if (registry === undefined || typeof registry.register !== 'function') {
-    reportShellProblem(ctx, `dsh-ops: no tool registry (ctx.tools) is mounted; `
+    reportShellProblem(ctx, `dsh-ops-zx88: no tool registry (ctx.tools) is mounted; `
       + `${BASH_TOOL_NAME} was not published.`)
     return () => {}
   }
@@ -87,7 +87,7 @@ export function publishShellTools(ctx: Context, config: Pick<ResolvedConfig, 'pu
   // that cannot run is worse than one that admits the rung is missing.
   const subprocess = ctx?.get?.('subprocess')
   if (subprocess === undefined || typeof subprocess.spawn !== 'function') {
-    reportShellProblem(ctx, `dsh-ops: no subprocess service (ctx.subprocess) is mounted, so the `
+    reportShellProblem(ctx, `dsh-ops-zx88: no subprocess service (ctx.subprocess) is mounted, so the `
       + `resolved bash (${bash.source}) cannot be run; ${BASH_TOOL_NAME} is not published.`)
     return () => {}
   }
@@ -98,7 +98,7 @@ export function publishShellTools(ctx: Context, config: Pick<ResolvedConfig, 'pu
   } catch (error) {
     // A registry conflict (a foreign `ops_bash`) or a schema rejection is
     // reported and skipped: it must not fail plugin activation.
-    reportShellProblem(ctx, `dsh-ops: ${BASH_TOOL_NAME} could not be registered `
+    reportShellProblem(ctx, `dsh-ops-zx88: ${BASH_TOOL_NAME} could not be registered `
       + `(${errorMessage(error)}).`)
     return () => {}
   }

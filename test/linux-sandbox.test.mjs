@@ -1,6 +1,6 @@
 /**
  * Sandbox authority and special-object boundaries, ported from the ad-hoc
- * `C-sandbox` probes in `dsh-ops-boundary-report.md`.
+ * `C-sandbox` probes in `dsh-ops-zx88-boundary-report.md`.
  *
  * What this suite locks in (all documented refusals):
  *
@@ -32,7 +32,7 @@
  * component that decides read confinement), so there is nothing here to
  * assert on either side of the gap.
  *
- * @module dsh-ops/test/linux-sandbox
+ * @module dsh-ops-zx88/test/linux-sandbox
  */
 
 import fs from 'node:fs'

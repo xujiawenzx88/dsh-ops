@@ -197,7 +197,7 @@ await test('the file component renders its live tools and retires both legacy se
     const { fiber } = await fileMount(ctx)
     const rendered = await sections(ctx)
     for (const name of EXPECTED) assert.ok(rendered.get(FILE_SECTION).includes(name))
-    for (const name of ['dsh-ops:host-shell-policy', 'mcp:fastctx', SHELL_SECTION, BG_SECTION]) assert.equal(rendered.has(name), false)
+    for (const name of ['dsh-ops-zx88:host-shell-policy', 'mcp:fastctx', SHELL_SECTION, BG_SECTION]) assert.equal(rendered.has(name), false)
     await fiber.dispose()
     assert.deepEqual(publicToolNames(ctx), [])
     assert.equal((await sections(ctx)).has(FILE_SECTION), false)
@@ -322,7 +322,7 @@ await test('an old background row loads as a no-op: no tools, no section, one wa
   try {
     const url = pathToFileURL(path.join(PACKAGE_ROOT, 'lib', 'components', 'background', 'index.js')).href
     const stub = await import(`${url}?tag=${Date.now()}`)
-    assert.equal(stub.name, 'dsh-ops-background')
+    assert.equal(stub.name, 'dsh-ops-zx88-background')
     // Any config is accepted, including keys no component has ever validated.
     const fiber = await ctx.plugin(stub, { ...LEGACY_ROWS.background, serverName: 'fastctx', bashPath: '/x', unknownKey: 1 })
     await new Promise(resolve => setImmediate(resolve))
@@ -333,7 +333,7 @@ await test('an old background row loads as a no-op: no tools, no section, one wa
       assert.equal(scopedToolNames(ctx, shown).includes(name), false, `${name} is not published`)
     }
     assert.equal((await sections(ctx, shown)).has(BG_SECTION), false)
-    const removed = warnings.filter(message => message.includes('dsh-ops/background component (FastCtx background jobs) was removed'))
+    const removed = warnings.filter(message => message.includes('dsh-ops-zx88/background component (FastCtx background jobs) was removed'))
     assert.equal(removed.length, 1, `exactly one removal warning: ${JSON.stringify(warnings)}`)
     assert.match(removed[0], /Delete this row/)
     await fiber.dispose()

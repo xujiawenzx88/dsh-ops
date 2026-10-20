@@ -21,8 +21,16 @@ impl Cache {
         let context = request.storage.as_ref().ok_or_else(|| Failure::new("POLICY_DENIED", "Trusted storage context is required for this reference"))?;
         context.validate()?;
         request.authorize_path(std::path::Path::new(&context.root))?;
-        let checked = file_path::checked(&context.root)?;
-        let root = checked.parent.open_dir_nofollow(&checked.name)?;
+        // The sandbox grants the worker the storage root itself, not every ancestor
+        // between it and the volume root: a restricted token cannot open the profile's
+        // AppData directory, so walking from C: denies a root the host just created.
+        // Open the trusted parent directly and keep the no-follow check on the leaf.
+        let root_path = std::path::Path::new(&context.root);
+        let parent_path = root_path.parent().ok_or_else(|| Failure::new("INVALID_ARGUMENT", "Storage root must have a parent"))?;
+        let name = root_path.file_name().and_then(|value| value.to_str()).ok_or_else(|| Failure::new("INVALID_ARGUMENT", "Storage root must end in a UTF-8 name"))?;
+        let parent = Dir::open_ambient_dir(parent_path, cap_std::ambient_authority())?;
+        file_path::regular(&parent.symlink_metadata(name)?, false)?;
+        let root = parent.open_dir_nofollow(name)?;
         // Trusted storage.root grants cache-only access independently of business write roots.
         // Never widen request.write_roots: business publication still checks its own authority.
         let name = format!("s-{:x}", Sha256::digest(request.scope.as_bytes()));

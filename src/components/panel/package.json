@@ -1,5 +1,5 @@
 {
-  "name": "dsh-ops-panel",
+  "name": "dsh-ops-zx88-panel",
   "version": "0.4.0",
   "description": "Opt-in capture of new conversations into <cwd>/.dsh-ops/panel: one JSON data document per session plus a static viewer that reads it.",
   "icon": "./icon.png",

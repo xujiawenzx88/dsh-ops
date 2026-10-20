@@ -7,7 +7,7 @@
  * caller's to report — never a reason to stop writing the JSON, which is the only
  * data source.
  *
- * @module dsh-ops/panel/render
+ * @module dsh-ops-zx88/panel/render
  */
 
 import { readFileSync } from 'node:fs'

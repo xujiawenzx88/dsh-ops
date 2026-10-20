@@ -85,7 +85,7 @@ await test('the component admission manifest is separate and grants no operation
   const { readFile } = await import('node:fs/promises')
   const { parseManifest } = await import('@dsh-std/manifest')
   const manifest = parseManifest(await readFile(new URL('../lib/components/tui/dsh-plugin.json', import.meta.url), 'utf8'))
-  assert.equal(manifest.id, 'dsh-ops-tui')
+  assert.equal(manifest.id, 'dsh-ops-zx88-tui')
   assert.deepEqual(manifest.requires.contracts, [])
   assert.deepEqual(manifest.permissions, [])
   assert.deepEqual(manifest.subscriptions, [])

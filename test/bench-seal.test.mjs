@@ -9,7 +9,7 @@
  * old-shaped usage document (reasoning always present, no `grandTotal`) that the
  * contract now normalizes instead of refusing.
  *
- * @module dsh-ops/test/bench-seal
+ * @module dsh-ops-zx88/test/bench-seal
  */
 
 import fs from 'node:fs'

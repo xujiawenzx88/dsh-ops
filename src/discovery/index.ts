@@ -30,7 +30,7 @@ interface Entry {
 }
 const DISCOVER = publicToolName('discover')
 const advanced = DISCOVERABLE_TOOLS.map(publicToolName)
-export const name = 'dsh-ops-discovery'
+export const name = 'dsh-ops-zx88-discovery'
 
 export function apply(root: Context, raw: unknown): void {
   const config = resolveDiscoveryConfig(raw)
@@ -38,7 +38,7 @@ export function apply(root: Context, raw: unknown): void {
   try { worker = resolveWorker(config) }
   catch (error) {
     if (config.required) throw error
-    root.logger.warn('dsh-ops: discovery worker unavailable; no tools published.')
+    root.logger.warn('dsh-ops-zx88: discovery worker unavailable; no tools published.')
     return
   }
   root.inject(['tools', 'systemPrompt', 'sandboxPolicy', 'subprocess'], async ctx => {
@@ -57,7 +57,7 @@ export function apply(root: Context, raw: unknown): void {
     const clear = (entry: Entry) => {
       entry.owned.clear()
       for (const dispose of entry.disposers.splice(0)) {
-        try { dispose() } catch { ctx.logger.warn('dsh-ops: discovery registration cleanup failed.') }
+        try { dispose() } catch { ctx.logger.warn('dsh-ops-zx88: discovery registration cleanup failed.') }
       }
     }
     const permitted = (agent: Agent, rawName?: DiscoverableName): boolean => {
@@ -135,7 +135,7 @@ export function apply(root: Context, raw: unknown): void {
       }).catch(() => {
         mutating = true
         try { for (const entry of entries.values()) clear(entry) } finally { mutating = false }
-        ctx.logger.warn('dsh-ops: discovery publication unavailable; tools remain withdrawn.')
+        ctx.logger.warn('dsh-ops-zx88: discovery publication unavailable; tools remain withdrawn.')
       })
       return chain
     }
@@ -218,18 +218,18 @@ export function apply(root: Context, raw: unknown): void {
       void reconcile()
     })
     ctx.effect(() => prompt.section({
-      name: ownership.sectionName('dsh-ops:discovery-tools'), order: 3253, interpolate: false,
+      name: ownership.sectionName('dsh-ops-zx88:discovery-tools'), order: 3253, interpolate: false,
       text: context => {
         const entry = entries.get(context.scope as Agent)
         return entry ? renderToolingPolicy({ published: entry.owned, shellComponent: false }) : ''
       },
-    }), 'dsh-ops: discovered capability guidance')
+    }), 'dsh-ops-zx88: discovered capability guidance')
     ctx.effect(() => async () => {
       stopped = true; ++epoch; mutating = true
       for (const entry of entries.values()) { clear(entry); entry.releaseSelection?.() }
       await Promise.allSettled([...entries.values()].map(async entry => { await entry.runtime.stop(); await entry.fiber?.dispose() }))
       entries.clear(); ownership?.dispose(); await chain
-    }, 'dsh-ops: discovery lifecycle')
+    }, 'dsh-ops-zx88: discovery lifecycle')
     for (const agent of entries.keys()) ownership.track(agent)
     ownership.refresh()
     for (const agent of new Set([...(ctx.get('agents')?.list() ?? []), ...ownership.agents()])) void attach(agent)

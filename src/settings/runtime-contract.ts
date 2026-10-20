@@ -27,7 +27,7 @@ declare module '@deepseek-ai/dsh-typert-protocol' {
   interface TypertRemoteNamespaceMap { opsSettings: RuntimeRemote }
 }
 const codec = (name: string, parse: (value: unknown) => unknown): TypertCodec => ({
-  mode: 'strict', typeSymbol: `dsh-ops#${name}`, create: () => ({ parse }),
+  mode: 'strict', typeSymbol: `dsh-ops-zx88#${name}`, create: () => ({ parse }),
 })
 function enumValue<const T extends readonly string[]>(value: unknown, choices: T): T[number] {
   if (typeof value !== 'string' || !choices.includes(value)) throw new Error(`Expected one of: ${choices.join(', ')}`)
@@ -41,7 +41,7 @@ function planId(value: unknown): string {
 }
 const jsonResult = codec('RuntimeResult', value => value)
 function method(name: string, parameter?: { wire: string; codec: TypertCodec }, cancellable = false): InvocationDescriptor {
-  return { id: `dsh-ops#opsSettings/${name}`, service: 'opsSettings', namespace: 'opsSettings', method: name,
+  return { id: `dsh-ops-zx88#opsSettings/${name}`, service: 'opsSettings', namespace: 'opsSettings', method: name,
     invocation: { kind: 'direct' }, result: jsonResult,
     parameters: parameter ? [{ name: parameter.wire, wire: parameter.wire, source: 'json', codec: parameter.codec }] : [],
     ...(cancellable ? { cancellation: { parameter: 'signal' as const } } : {}),
@@ -52,4 +52,4 @@ export const RUNTIME_DESCRIPTORS: readonly InvocationDescriptor[] = Object.freez
   method('select', { wire: 'source', codec: codec('BashSource', parseSource) }),
   method('execute', { wire: 'id', codec: codec('RuntimePlanId', planId) }, true),
 ])
-export const RUNTIME_REMOTE = Object.freeze({ package: 'dsh-ops', descriptors: RUNTIME_DESCRIPTORS })
+export const RUNTIME_REMOTE = Object.freeze({ package: 'dsh-ops-zx88', descriptors: RUNTIME_DESCRIPTORS })

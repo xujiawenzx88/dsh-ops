@@ -107,7 +107,7 @@ export async function officialToolHidingMountChecks() {
       }
       assert.equal(names.includes('read'), false)
       assert.equal((await execute(ctx, agent, 'read')).isError, true)
-      assert.deepEqual(warnings.filter(message => message.includes('dsh-ops hide-official')), [])
+      assert.deepEqual(warnings.filter(message => message.includes('dsh-ops-zx88 hide-official')), [])
     } finally { await shutdown(ctx) }
   })
   await test('each selected tool needs only its own reviewed counterpart', async () => {
@@ -184,7 +184,7 @@ export async function officialToolHidingMountChecks() {
       const lift = agent.ctx.tools.presentAs('both')
       const assembly = await assemble(ctx, agent)
       assert.ok(assembly.tools.some(schema => schema.name === 'run_code'))
-      assert.deepEqual(warnings.filter(message => message.includes('dsh-ops hide-official')), [])
+      assert.deepEqual(warnings.filter(message => message.includes('dsh-ops-zx88 hide-official')), [])
       assert.equal((await execute(ctx, agent, publicToolName('glob'))).isError, false)
       lift()
       await assemble(ctx, agent)
@@ -203,7 +203,7 @@ export async function officialToolHidingMountChecks() {
           assert.ok(names.includes(name), name)
           assert.equal((await execute(ctx, agent, name)).isError, false, name)
         }
-        assert.deepEqual(warnings.filter(message => message.includes('dsh-ops hide-official')), [])
+        assert.deepEqual(warnings.filter(message => message.includes('dsh-ops-zx88 hide-official')), [])
       } finally { await shutdown(ctx) }
     }
   })
@@ -411,7 +411,7 @@ export async function officialToolHidingMountChecks() {
           assert.ok(names.includes(name), `${name} stays visible with scope off`)
         }
         assert.deepEqual([...scopedToolNames(ctx, agent)].sort(), [...names].sort())
-        assert.equal(warnings.filter(message => message.includes('dsh-ops hide-official')).length, 0)
+        assert.equal(warnings.filter(message => message.includes('dsh-ops-zx88 hide-official')).length, 0)
         assert.equal((await execute(ctx, agent, 'read')).isError, false)
         assert.equal((await execute(ctx, agent, 'subagent')).isError, false)
       } finally { await shutdown(ctx) }
@@ -425,7 +425,7 @@ export async function officialToolHidingMountChecks() {
         await mount(ctx, { replaceTools: [] })
         const agent = await mint(ctx, 'scope-off-no-host-api')
         await assemble(ctx, agent)
-        assert.equal(warnings.filter(message => message.includes('dsh-ops hide-official')).length, 0)
+        assert.equal(warnings.filter(message => message.includes('dsh-ops-zx88 hide-official')).length, 0)
       } finally { await shutdown(ctx) }
     }
   })

@@ -64,11 +64,11 @@ export function profileCommand(operation: ProfileOperation, { profile, dshCli, d
     const profileManifest = record(dsh?.profile) ? dsh.profile : undefined
     const bundles = profileManifest?.bundles ?? []
     if (!Array.isArray(bundles) && typeof bundles !== 'string') throw new Error('Invalid profile bundles: expected an array.')
-    console.log(JSON.stringify({ profile: target, directory, dependency: dependencies?.['dsh-ops'] ?? null, enabled: bundles.includes('dsh-ops') }, null, 2))
+    console.log(JSON.stringify({ profile: target, directory, dependency: dependencies?.['dsh-ops-zx88'] ?? null, enabled: bundles.includes('dsh-ops-zx88') }, null, 2))
     return 0
   }
   const args = ['plugin', '--profile', target, operation === 'install' ? 'add' : 'remove',
-    operation === 'install' ? (process.env.DSH_OPS_INSTALL_SPEC ?? `dsh-ops@${version}`) : 'dsh-ops']
+    operation === 'install' ? (process.env.DSH_OPS_INSTALL_SPEC ?? `dsh-ops-zx88@${version}`) : 'dsh-ops-zx88']
   let command = dshCli ?? process.env.DSH_OPS_DSH_CLI
   let prefix: string[] = []
   if (!command && target === 'desktop') {
@@ -111,7 +111,7 @@ export function profileCommand(operation: ProfileOperation, { profile, dshCli, d
   if (result.error) throw result.error
   if (result.status !== 0) return result.status ?? 1
   console.log(operation === 'install'
-    ? 'Installed through the official profile manager. Reload/restart the target application if needed. Bash is an explicit optional download: dsh-ops bash-runtime install. No postinstall downloads.'
+    ? 'Installed through the official profile manager. Reload/restart the target application if needed. Bash is an explicit optional download: dsh-ops-zx88 bash-runtime install. No postinstall downloads.'
     : 'Removed through the official profile manager, including its runtime dependency references. Package-manager shared caches are not deleted.')
   return 0
 }

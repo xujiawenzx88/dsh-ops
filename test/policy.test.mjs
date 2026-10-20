@@ -105,7 +105,7 @@ await test('explicit deny refuses only configured names even without ops command
 })
 await test('legacy second section is retired; component section prefix stays stable', () => {
   assert.equal(renderHostShellPolicy(), '')
-  assert.equal(HOST_SHELL_SECTION, 'dsh-ops:host-shell-policy')
-  assert.equal(TOOLING_SECTION, 'dsh-ops:repository-tooling')
+  assert.equal(HOST_SHELL_SECTION, 'dsh-ops-zx88:host-shell-policy')
+  assert.equal(TOOLING_SECTION, 'dsh-ops-zx88:repository-tooling')
 })
 report('policy')

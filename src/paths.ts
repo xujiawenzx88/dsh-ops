@@ -1,7 +1,7 @@
 /**
  * Package-wide locations: the installed package root and the DSH home.
  *
- * @module dsh-ops/paths
+ * @module dsh-ops-zx88/paths
  */
 
 import os from 'node:os'

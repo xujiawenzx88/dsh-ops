@@ -4,13 +4,13 @@
 
 ## 启用
 
-在 dsh-TUI profile 中启用已有的 `dsh-ops/tui` bundle 行并重启；默认关闭。使用实验性 `tuiPanels` API v1，需要包含「按导出子组件入口最近的包清单准入」修复的 TUI 构建。只识别外层包清单的旧构建不能保证正确的组件身份。
+在 dsh-TUI profile 中启用已有的 `dsh-ops-zx88/tui` bundle 行并重启；默认关闭。使用实验性 `tuiPanels` API v1，需要包含「按导出子组件入口最近的包清单准入」修复的 TUI 构建。只识别外层包清单的旧构建不能保证正确的组件身份。
 
 修改已有行，不要添加重复行：
 
 ```yaml
 id: dsh-ops-tui
-name: dsh-ops/tui
+name: dsh-ops-zx88/tui
 disabled: false
 config:
   maxSessions: 32

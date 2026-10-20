@@ -9,7 +9,7 @@
  * the ones `run.json` carries (bench/run.schema.json `$defs/result`); a shape this
  * module does not know must still narrate itself rather than vanish.
  *
- * @module dsh-ops/test/bench-observe
+ * @module dsh-ops-zx88/test/bench-observe
  */
 
 import { assert, report, test } from './lib/harness.mjs'

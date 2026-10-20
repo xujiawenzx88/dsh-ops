@@ -1,5 +1,5 @@
 {
-  "name": "dsh-ops-background",
+  "name": "dsh-ops-zx88-background",
   "description": "Removed: FastCtx background jobs are no longer provided. This row loads as a no-op; delete it from the profile.",
   "icon": "./icon.png",
   "type": "module"

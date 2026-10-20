@@ -7,7 +7,7 @@
  * runs against a scripted fake that returns synthetic rows and records the call order.
  * The clock and the sleep are injected too, so no check waits on real time.
  *
- * @module dsh-ops/test/bench-schedule
+ * @module dsh-ops-zx88/test/bench-schedule
  */
 
 import fs from 'node:fs'

@@ -13,7 +13,7 @@ import { assert, report, test, tick, waitFor } from './lib/harness.mjs'
  * Build a fixture row plus the two persistence surfaces the code may reach.
  * `tree.write` is a tripwire: the suite fails loudly if anything calls it.
  */
-function fixture(config, { name = 'dsh-ops/shell', failEdit = false, noEditor = false, noEntry = false, logger = null, authoritative = null, mutateThenThrow = false, failWith = null } = {}) {
+function fixture(config, { name = 'dsh-ops-zx88/shell', failEdit = false, noEditor = false, noEntry = false, logger = null, authoritative = null, mutateThenThrow = false, failWith = null } = {}) {
   const edits = [], updates = [], logs = [], infos = [], warns = [], cleanup = [], treeWrites = []
   let editCalls = 0
   const entry = { options: { name, config },
@@ -121,7 +121,7 @@ await test('an unmigrated row carrying the legacy keys still validates, and they
   assert.throws(() => resolveConfig({ toolCallTimeoutMs: -1 }), /toolCallTimeoutMs/)
 })
 await test('a version-1 file row is persisted once with the legacy keys removed', async () => {
-  const f = fixture({ configUpdateVersion: 1, promptPolicy: true, enableShellTools: false, required: false, toolCallTimeoutMs: 300000 }, { name: 'dsh-ops/file' })
+  const f = fixture({ configUpdateVersion: 1, promptPolicy: true, enableShellTools: false, required: false, toolCallTimeoutMs: 300000 }, { name: 'dsh-ops-zx88/file' })
   mountConfigUpdates(f.ctx, f.entry.options.config)
   await tick(); await tick()
   assert.equal(f.edits.length, 1)
@@ -182,7 +182,7 @@ await test('the owning loader tree is never written, even when it is available (
   assert.ok(f.logs.every(message => !message.includes('owning loader for persistence')))
 })
 await test('each component owns its marker, and concurrent config edits are preserved', async () => {
-  for (const name of ['dsh-ops', 'dsh-ops/shell', 'dsh-ops/file']) {
+  for (const name of ['dsh-ops-zx88', 'dsh-ops-zx88/shell', 'dsh-ops-zx88/file']) {
     const f = fixture({ allowSystemShellFallback: true }, { name })
     mountConfigUpdates(f.ctx, f.entry.options.config)
     f.entry.options.config = { allowSystemShellFallback: false, extraGuidance: 'new edit' }
@@ -192,7 +192,7 @@ await test('each component owns its marker, and concurrent config edits are pres
     assert.equal(f.edits[0].configUpdateVersion, CONFIG_UPDATE_VERSION)
   }
   // The removed background row is a no-op stub; its saved config is never rewritten.
-  const background = fixture({ enableShellTools: true }, { name: 'dsh-ops/background' })
+  const background = fixture({ enableShellTools: true }, { name: 'dsh-ops-zx88/background' })
   mountConfigUpdates(background.ctx, background.entry.options.config)
   await tick(); await tick()
   assert.equal(background.edits.length, 0)
@@ -204,7 +204,7 @@ await test('real component mount migrates before publication and preserves manua
   const { ctx } = await bootHost()
   const snapshots = [], effective = []
   let fiber
-  const entry = { options: { name: 'dsh-ops/shell', config: { allowSystemShellFallback: true, bashPath: process.execPath } },
+  const entry = { options: { name: 'dsh-ops-zx88/shell', config: { allowSystemShellFallback: true, bashPath: process.execPath } },
     parent: { tree: { write() { throw new Error('EntryTree.write() must not be used (#91/#108)') } } },
     async update({ config }) { entry.options.config = config; fiber.update(config, true) } }
   try {

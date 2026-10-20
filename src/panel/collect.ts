@@ -21,7 +21,7 @@
  * The fold reuses `bench/run.schema.json` field names where the two documents
  * describe the same fact; one live session has no `arms`/`results` counterpart.
  *
- * @module dsh-ops/panel/collect
+ * @module dsh-ops-zx88/panel/collect
  */
 
 import fsp from 'node:fs/promises'
@@ -57,7 +57,7 @@ const OPTIONAL_BUCKETS: readonly UsageBucket[] = Object.freeze(['reasoningTokens
 export class PanelConfigError extends Error {
   /** @param {string} message - what is wrong and what is accepted. */
   constructor(message: string) {
-    super(`dsh-ops panel config: ${message}`)
+    super(`dsh-ops-zx88 panel config: ${message}`)
     this.name = 'PanelConfigError'
   }
 }
@@ -483,7 +483,7 @@ export function createPanelCollector(options: CollectorOptions = {}) {
   function fail(key: string, error: unknown) {
     if (activity.cancelled(error)) return
     const reason = error instanceof Error ? error.message : String(error)
-    note(key, `dsh-ops panel: capture failed (${key}): ${reason}; this session continues uncaptured.`, 'warn')
+    note(key, `dsh-ops-zx88 panel: capture failed (${key}): ${reason}; this session continues uncaptured.`, 'warn')
   }
 
   /** Read the append log's first record and size, or undefined when it is unusable. */
@@ -508,7 +508,7 @@ export function createPanelCollector(options: CollectorOptions = {}) {
     if (existing !== undefined) return existing
     const paths = panelPaths(cwd, sessionId, { env })
     if (paths === undefined || typeof cwd !== 'string') {
-      note(`path:${String(cwd)}`, `dsh-ops panel: not capturing session ${JSON.stringify(sessionId)}: `
+      note(`path:${String(cwd)}`, `dsh-ops-zx88 panel: not capturing session ${JSON.stringify(sessionId)}: `
         + 'the session needs an absolute working directory outside the DSH home and a file-name-safe id.', 'warn')
       return undefined
     }

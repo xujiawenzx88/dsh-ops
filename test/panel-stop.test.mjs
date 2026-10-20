@@ -39,7 +39,7 @@ await test('stopping during initial I/O cancels all queued writes and waits for 
 })
 
 await test('stop waits for an issued append but never starts the queued append or final fold', async () => {
-  const cwd = fs.mkdtempSync(path.join(tmpdir(), 'dsh-ops-panel-stop-'))
+  const cwd = fs.mkdtempSync(path.join(tmpdir(), 'dsh-ops-zx88-panel-stop-'))
   try {
     const entered = deferred(), release = deferred()
     let block = false, writes = 0
@@ -71,7 +71,7 @@ await test('stop waits for an issued append but never starts the queued append o
 })
 
 await test('real settings capture toggle and Loader row disable physically stop writes, then re-enable cleanly', async () => {
-  const cwd = fs.mkdtempSync(path.join(tmpdir(), 'dsh-ops-panel-toggle-'))
+  const cwd = fs.mkdtempSync(path.join(tmpdir(), 'dsh-ops-zx88-panel-toggle-'))
   const fixture = await profileFixture('panel-toggle', Panel, { capture: true })
   const { ctx, patchPath, snapshot, mutate } = fixture
   const dir = path.join(cwd, '.dsh-ops/panel')

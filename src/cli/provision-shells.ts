@@ -1,12 +1,12 @@
 /**
- * `dsh-ops provision-shells`: turn the pinned upstream shell releases into the
+ * `dsh-ops-zx88 provision-shells`: turn the pinned upstream shell releases into the
  * local copies the shell rungs prefer — download, digest verification, unpacking,
  * and the receipt that records which pin produced each copy.
  *
  * Split out of `bin/dsh-ops.mjs`; the command's argv surface, output and exit
  * codes are unchanged.
  *
- * @module dsh-ops/cli/provision-shells
+ * @module dsh-ops-zx88/cli/provision-shells
  */
 
 import { spawnSync } from 'node:child_process'
@@ -526,7 +526,7 @@ export function commandProvisionShells({ kinds, force, dryRun, pinFile }: { kind
   // distribution's own bash, so there is nothing to install — say that instead of failing on an
   // empty pin table (report: the shell component's POSIX rung).
   if (process.platform !== 'win32') {
-    console.error(`dsh-ops provisions shells on Windows only; this host (${process.platform}-${process.arch}) already has its own bash,`
+    console.error(`dsh-ops-zx88 provisions shells on Windows only; this host (${process.platform}-${process.arch}) already has its own bash,`
       + " and the shell component resolves it (PATH, then /bin/bash, /usr/bin/bash, /usr/local/bin/bash). Use config.bashPath to pin an explicit executable instead.")
     return 1
   }

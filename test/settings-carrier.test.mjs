@@ -19,17 +19,17 @@ const rows = fixture => boot.composeEntries([boot.readProfilePatches('dsh', prof
 const backups = fixture => fs.readdirSync(fixture.profile.dir).filter(name => name.startsWith('.dsh-ops-settings-backup-'))
 const graph = ctx => ctx.get('clientModules').graph().entries.map(row => row.id)
 const source = `# Preserve operator comments and expression semantics.
-- id: dsh-ops-file
-  name: dsh-ops/file
+- id: dsh-ops-zx88-file
+  name: dsh-ops-zx88/file
   disabled: false
   config:
     extraGuidance: keep operator text
     configUpdateVersion: 2
-- id: dsh-ops-shell
-  name: dsh-ops/shell
+- id: dsh-ops-zx88-shell
+  name: dsh-ops-zx88/shell
   disabled: !!js process.platform !== 'win32'
-- id: dsh-ops-panel
-  name: dsh-ops/panel
+- id: dsh-ops-zx88-panel
+  name: dsh-ops-zx88/panel
   disabled: true
   config:
     capture: false
@@ -43,7 +43,7 @@ await test('default subpath preserves profiles; optional carrier survives reload
   const fixture = componentProfile('carrier-composition', bundle)
   fs.writeFileSync(fixture.profile.patchPath, source)
   const metadata = JSON.parse(fs.readFileSync(manifest(fixture), 'utf8'))
-  metadata.description = 'preserved profile metadata'; metadata.dependencies = { 'dsh-ops': '0.3.1' }
+  metadata.description = 'preserved profile metadata'; metadata.dependencies = { 'dsh-ops-zx88': '0.3.1' }
   fs.writeFileSync(manifest(fixture), JSON.stringify(metadata))
   const originalManifest = fs.readFileSync(manifest(fixture), 'utf8'), before = rows(fixture)
   let runtime = await fixture.boot()
@@ -68,38 +68,38 @@ await test('default subpath preserves profiles; optional carrier survives reload
     assert.deepEqual(rows(fixture), preview.afterRows)
     const resolution = await boot.createRuntimeResolution({ installAnchor: fixture.profile.installAnchor, home: fixture.profile.home,
       profile: boot.loadProfileDirectory('dsh', fixture.profile.dir, fixture.profile.installAnchor) })
-    assert.ok(resolution.localPackageNames.includes('dsh-ops'), 'the real runtime resolver accepts the nested bundle')
+    assert.ok(resolution.localPackageNames.includes('dsh-ops-zx88'), 'the real runtime resolver accepts the nested bundle')
     assert.equal(rows(fixture).length, 8, 'seven OPS rows plus unchanged foreign row')
     assert.equal(JSON.parse(fs.readFileSync(manifest(fixture), 'utf8')).description, metadata.description)
     assert.deepEqual(JSON.parse(fs.readFileSync(manifest(fixture), 'utf8')).dsh.profile.bundles, [CLIENT_BUNDLE])
     for (let restart = 0; restart < 2; restart++) {
       runtime = await fixture.boot()
       await runtime.ctx.plugin(ClientModuleRegistry)
-      assert.deepEqual(graph(runtime.ctx), ['dsh-ops'])
+      assert.deepEqual(graph(runtime.ctx), ['dsh-ops-zx88'])
       assert.equal(runtime.entries().length, 7)
-      assert.equal(runtime.entries().find(entry => entry.options.id === 'dsh-ops-file').options.config.extraGuidance, 'keep operator text')
-      const entry = runtime.entries().find(entry => entry.options.id === 'dsh-ops-file')
+      assert.equal(runtime.entries().find(entry => entry.options.id === 'dsh-ops-zx88-file').options.config.extraGuidance, 'keep operator text')
+      const entry = runtime.entries().find(entry => entry.options.id === 'dsh-ops-zx88-file')
       await entry.update({ disabled: true }); await runtime.ctx.loader.await()
       await waitFor(() => graph(runtime.ctx).length === 0)
       await entry.update({ disabled: false }); await runtime.ctx.loader.await()
-      await waitFor(() => graph(runtime.ctx).includes('dsh-ops'))
+      await waitFor(() => graph(runtime.ctx).includes('dsh-ops-zx88'))
       await shutdown(runtime.ctx)
     }
     await assert.rejects(carrierPreview(host, location(fixture)), /one-time migration/)
   } finally { await shutdown(runtime.ctx) }
 })
 await test('an explicitly disabled file carrier remains off until the builtin row switch enables it', async () => {
-  const fixture = componentProfile('carrier-disabled', bundle, [{ id: 'dsh-ops-file', name: 'dsh-ops/file', disabled: true, config: { configUpdateVersion: 2 } }])
+  const fixture = componentProfile('carrier-disabled', bundle, [{ id: 'dsh-ops-zx88-file', name: 'dsh-ops-zx88/file', disabled: true, config: { configUpdateVersion: 2 } }])
   const plan = await carrierPreview(host, location(fixture))
   await applyCarrier(host, plan)
   const runtime = await fixture.boot()
   try {
     await runtime.ctx.plugin(ClientModuleRegistry)
     assert.deepEqual(graph(runtime.ctx), [])
-    const entry = runtime.entries().find(entry => entry.options.id === 'dsh-ops-file')
+    const entry = runtime.entries().find(entry => entry.options.id === 'dsh-ops-zx88-file')
     assert.equal(entry.disabled, true)
     await entry.update({ disabled: false }); await runtime.ctx.loader.await()
-    await waitFor(() => graph(runtime.ctx).includes('dsh-ops'))
+    await waitFor(() => graph(runtime.ctx).includes('dsh-ops-zx88'))
   } finally { await shutdown(runtime.ctx) }
 })
 await test('stale preview, duplicate OPS rows and higher-priority named overrides refuse without writes', async () => {
@@ -108,16 +108,16 @@ await test('stale preview, duplicate OPS rows and higher-priority named override
   fs.appendFileSync(fixture.profile.patchPath, '\n# concurrent edit\n')
   await assert.rejects(applyCarrier(host, plan), /changed after the preview/)
   assert.deepEqual(backups(fixture), [])
-  const duplicate = componentProfile('carrier-duplicate', bundle, [{ insert: [{ id: 'dsh-ops-file', name: 'dsh-ops/file' }] }])
+  const duplicate = componentProfile('carrier-duplicate', bundle, [{ insert: [{ id: 'dsh-ops-zx88-file', name: 'dsh-ops-zx88/file' }] }])
   await assert.rejects(carrierPreview(host, location(duplicate)), /seven unique/)
   assert.deepEqual(backups(duplicate), [])
   const shadow = componentProfile('carrier-home-shadow', bundle)
-  fs.writeFileSync(path.join(shadow.profile.home, 'cordis.patch.yml'), '- id: dsh-ops-file\n  name: dsh-ops/file\n  disabled: true\n')
+  fs.writeFileSync(path.join(shadow.profile.home, 'cordis.patch.yml'), '- id: dsh-ops-zx88-file\n  name: dsh-ops-zx88/file\n  disabled: true\n')
   await assert.rejects(carrierPreview(host, location(shadow)), /External name-qualified/)
   assert.deepEqual(backups(shadow), [])
   // Matching current defaults is still a meaningful preference for later upgrades.
-  const inheritedConfig = yaml.parse(bundle)[0].insert.find(row => row.id === 'dsh-ops-file').config
-  fs.writeFileSync(path.join(shadow.profile.home, 'cordis.patch.yml'), JSON.stringify([{ id: 'dsh-ops-file', name: 'dsh-ops/file', config: inheritedConfig }]))
+  const inheritedConfig = yaml.parse(bundle)[0].insert.find(row => row.id === 'dsh-ops-zx88-file').config
+  fs.writeFileSync(path.join(shadow.profile.home, 'cordis.patch.yml'), JSON.stringify([{ id: 'dsh-ops-zx88-file', name: 'dsh-ops-zx88/file', config: inheritedConfig }]))
   await assert.rejects(carrierPreview(host, location(shadow)), /External name-qualified/)
   assert.deepEqual(backups(shadow), [])
 })
@@ -178,6 +178,6 @@ await test('CLI preview requires an explicit stopped-profile assertion before ap
   const applied = run('--yes', '--offline')
   assert.equal(applied.status, 0, applied.stderr); assert.match(applied.stdout, /Saved and verified/)
   assert.equal(backups(fixture).length, 1)
-  assert.equal(rows(fixture).find(row => row.id === 'dsh-ops-file').name, 'dsh-ops')
+  assert.equal(rows(fixture).find(row => row.id === 'dsh-ops-zx88-file').name, 'dsh-ops-zx88')
 })
 report('settings-carrier')

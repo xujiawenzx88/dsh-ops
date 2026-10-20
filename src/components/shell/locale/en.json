@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "dsh-ops-bash & host PowerShell",
+    "title": "dsh-ops-zx88-bash & host PowerShell",
     "description": "Prefer bash for general commands and use host PowerShell for Windows-native functionality."
   }
 }

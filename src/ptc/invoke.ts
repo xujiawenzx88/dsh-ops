@@ -38,7 +38,7 @@ export async function monitoredInvoke(ctx: Context, file: string, tool: ApiName,
       },
     })
   } catch (error) {
-    ctx.logger.warn('dsh-ops: host job admission unavailable; using bounded foreground execution: ' + String(error))
+    ctx.logger.warn('dsh-ops-zx88: host job admission unavailable; using bounded foreground execution: ' + String(error))
     return work ?? invoke(ctx, file, tool, args, exec, controller.signal, config)
   }
   const value = await work

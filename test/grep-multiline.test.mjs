@@ -29,7 +29,7 @@
  * Platform. Pure matching, no filesystem semantics beyond a temp file, so every
  * case runs on win32 as well.
  *
- * @module dsh-ops/test/grep-multiline
+ * @module dsh-ops-zx88/test/grep-multiline
  */
 
 import fs from 'node:fs'

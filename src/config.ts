@@ -1,5 +1,5 @@
 /**
- * Plugin configuration: one plain object read from the `dsh-ops` row in
+ * Plugin configuration: one plain object read from the `dsh-ops-zx88` row in
  * `cordis.yml`, validated here.
  *
  * Validation uses plain data and Standard Schema without host value imports. This host half must
@@ -8,7 +8,7 @@
  * fail to load). Validation is therefore explicit and fails loud, naming the
  * offending key, which is what the loader's own schema would have done.
  *
- * @module dsh-ops/config
+ * @module dsh-ops-zx88/config
  */
 
 

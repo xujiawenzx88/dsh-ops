@@ -46,7 +46,7 @@ await test('a missing bash publishes nothing and warns instead of failing', asyn
     // branch of the cause mapping (D8) — never a bare statement of the problem.
     assert.ok(warnings[0].includes('provision-shells --bash'), warnings[0])
     assert.ok(
-      warnings[0].includes('run `dsh-ops provision-shells --bash` to install the pinned upstream copy'),
+      warnings[0].includes('run `dsh-ops-zx88 provision-shells --bash` to install the pinned upstream copy'),
       warnings[0],
     )
     assert.equal(typeof dispose, 'function')

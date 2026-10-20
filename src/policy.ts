@@ -2,9 +2,9 @@ import { FILE_TOOLS, NATIVE_FILE_TOOLS, IN_PROCESS_TOOLS } from './capabilities/
 export { FILE_TOOLS, FILE_MUTATIONS, IN_PROCESS_TOOLS } from './capabilities/registry.js'
 
 /** Model-facing routing, kept in one section. No shared registry mutation. */
-export const TOOLING_SECTION = 'dsh-ops:repository-tooling'
+export const TOOLING_SECTION = 'dsh-ops-zx88:repository-tooling'
 // Legacy section name kept for consumers; the plugin no longer publishes it.
-export const HOST_SHELL_SECTION = 'dsh-ops:host-shell-policy'
+export const HOST_SHELL_SECTION = 'dsh-ops-zx88:host-shell-policy'
 export const SECTION_ORDERS = Object.freeze({ [TOOLING_SECTION]: 3250 })
 export const TOOL_PREFIX = 'ops_'
 // The plugin's second layer executes POSIX commands; pwsh7 uses the host tool.
@@ -104,5 +104,5 @@ export function hostShellEnforcement({ shellPolicy }: { shellPolicy?: string }) 
 }
 export function hostShellRefusal({ toolName, denied }: { toolName: string, denied: ReadonlySet<string> }) {
   if (!denied.has(toolName)) return undefined
-  return { kind: 'deny', reason: `Host tool ${toolName} is disabled by dsh-ops shellPolicy. Use an available file tool for file operations; otherwise request an operator policy change.` }
+  return { kind: 'deny', reason: `Host tool ${toolName} is disabled by dsh-ops-zx88 shellPolicy. Use an available file tool for file operations; otherwise request an operator policy change.` }
 }

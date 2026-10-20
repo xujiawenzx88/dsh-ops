@@ -16,8 +16,8 @@ interface Entry { context: Context; lifts: (() => void)[]; cleanupError?: string
 interface Plan { deny: string[]; failure?: string }
 const message = (error: unknown): string => error instanceof Error ? error.message : String(error)
 
-export const name = 'dsh-ops-hide-official'
-const blocked = (detail: string): string => `READINESS_BLOCKED (EXECUTOR_UNAVAILABLE): dsh-ops hide-official cannot verify selected replacements: ${detail}. Restore the selected OPS tools, remove the selection from replaceTools, or disable the dsh-ops-hide-official row.`
+export const name = 'dsh-ops-zx88-hide-official'
+const blocked = (detail: string): string => `READINESS_BLOCKED (EXECUTOR_UNAVAILABLE): dsh-ops-zx88 hide-official cannot verify selected replacements: ${detail}. Restore the selected OPS tools, remove the selection from replaceTools, or disable the dsh-ops-zx88-hide-official row.`
 
 export function apply(root: Context, raw?: unknown): void {
   const { replaceTools }: { replaceTools: OfficialReplacement[] } = resolveHidingConfig(raw)
@@ -36,7 +36,7 @@ export function apply(root: Context, raw?: unknown): void {
       const pending = entry.lifts.splice(0)
       const failed = []
       for (const lift of pending) {
-        if (!safeDispose(lift, error => fail(`dsh-ops: restriction cleanup failed: ${message(error)}`), 'official-tool restriction')) failed.push(lift)
+        if (!safeDispose(lift, error => fail(`dsh-ops-zx88: restriction cleanup failed: ${message(error)}`), 'official-tool restriction')) failed.push(lift)
       }
       entry.lifts.push(...failed)
       entry.cleanupError = failed.length > 0 ? 'host restriction cleanup failed; retrying before proceeding' : undefined
@@ -138,7 +138,7 @@ export function apply(root: Context, raw?: unknown): void {
       const reason = refusal(exec)
       return reason ? { kind: 'deny', reason, info: { name: 'ReadinessError', code: 'READINESS_BLOCKED' } } : next()
     })
-    if (typeof tools.guard === 'function') ctx.effect(() => ctx.tools.guard(refusal), 'dsh-ops: replacement surface guard')
+    if (typeof tools.guard === 'function') ctx.effect(() => ctx.tools.guard(refusal), 'dsh-ops-zx88: replacement surface guard')
     ctx.on('system-prompt/assemble', async (assembly, context, next) => {
       // Only this package's exact, short-lived inspection context may pass before
       // discovery publishes a selected replacement. Provider requests stay guarded.
@@ -171,7 +171,7 @@ export function apply(root: Context, raw?: unknown): void {
       stopped = true; mutating = true
       for (const entry of entries.values()) clear(entry)
       entries.clear()
-    }, 'dsh-ops: selected official-tool restrictions')
+    }, 'dsh-ops-zx88: selected official-tool restrictions')
     for (const agent of ctx.get('agents')?.list?.() ?? []) attach(agent)
     if (apiError.length) fail(blocked(`missing host API: ${apiError.join(', ')}`))
   })

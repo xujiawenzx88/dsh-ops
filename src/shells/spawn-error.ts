@@ -40,7 +40,7 @@ function workdirIsGone(workdir: unknown) {
  * artifact, so "fetch it from the registry" is not the advice it needs.
  */
 const SYSTEM_BASH_SPAWN_REMEDY = 'The system bash this deployment fell back to is gone; '
-  + 'reinstall it, or run `dsh-ops provision-shells --bash` for a copy the registry cannot take away.'
+  + 'reinstall it, or run `dsh-ops-zx88 provision-shells --bash` for a copy the registry cannot take away.'
 
 /**
  * The remedy one ENOENT deserves, chosen by where the executable came from.
@@ -55,12 +55,12 @@ const SYSTEM_BASH_SPAWN_REMEDY = 'The system bash this deployment fell back to i
  */
 const BASH_SPAWN_REMEDY: Readonly<Record<string, string>> = Object.freeze({
   bundled: "The bundled bash left the profile after it was resolved; restore the profile's "
-    + 'dependencies, or run `dsh-ops provision-shells --bash` to fetch the pinned copy from '
+    + 'dependencies, or run `dsh-ops-zx88 provision-shells --bash` to fetch the pinned copy from '
     + 'upstream releases instead.',
   provisioned: 'The provisioned copy under this DSH_HOME is gone; run '
-    + '`dsh-ops provision-shells --bash` again to reinstall the pinned upstream copy.',
+    + '`dsh-ops-zx88 provision-shells --bash` again to reinstall the pinned upstream copy.',
   config: 'The configured bashPath no longer exists; point bashPath at a real executable, or '
-    + 'clear it and run `dsh-ops provision-shells --bash`.',
+    + 'clear it and run `dsh-ops-zx88 provision-shells --bash`.',
   path: SYSTEM_BASH_SPAWN_REMEDY,
   'well-known': SYSTEM_BASH_SPAWN_REMEDY,
 })

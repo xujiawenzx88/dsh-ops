@@ -1,4 +1,4 @@
-# Native PTC enhancement — Windows x64, Linux x64, Apple Silicon
+# Native PTC enhancement — Windows x64
 
 0.4.0 PTC callers use [Outcome contracts](ptc-outcomes.md) / [PTC 结果契约](PTC结果契约.md).
 The historical worker/recovery details below remain applicable; SDK results now wrap canonical facts in `data`.
@@ -9,7 +9,7 @@ background component has been removed.
 
 ## Runtime-bearing installation and original DSH permission linkage
 
-0.3.1 ships native workers for `win32-x64`, `linux-x64` and `darwin-arm64`, each with a version/checksum receipt, plus the Windows Bash IPC proxies. Formal `verify:release` requires all three target pairs and validates every PE/ELF/Mach-O worker and the Windows IPC binary/source closure. Local `check --staged` verifies only local development outputs. Intel Mac and Windows/Linux ARM64 are not supported. Bash/pwsh payload packages remain Windows-only optional dependencies; POSIX uses host Bash. There is no postinstall download/build. Source builds use `npm run build:ptc`, plus `npm run build:bash-ipc` on Windows.
+This fork publishes one native worker, `win32-x64`, with a version/checksum receipt, plus the Windows Bash IPC proxies. Formal `verify:release` requires that target and validates the PE worker and the Windows IPC binary/source closure. Local `check --staged` verifies only local development outputs. Intel Mac and Windows/Linux ARM64 are not supported. Bash/pwsh payload packages remain Windows-only optional dependencies; other platforms are unsupported. There is no postinstall download/build. Source builds use `npm run build:ptc`, plus `npm run build:bash-ipc` on Windows.
 
 PTC/Bash use original per-call sandboxPolicy and sandbox.confine, reporting the
 host's full/partial enforcement honestly. Read-only permits existing result pages
@@ -25,7 +25,7 @@ Real Windows provider and pure PTC SDK acceptance is covered in the release gate
 
 The fixed file component follows DSH fs-sandbox's trusted-operation policy fence,
 not arbitrary-code isolation; shell and PTC code still require confinement.
-Runtime binaries target Windows x64, Linux x64 and macOS Apple Silicon; IPC proxies remain Windows x64 only.
+Runtime binaries target Windows x64 only in this fork; IPC proxies are Windows x64.
 
 In `workspace-write`, native batch/result operations and their audit records are
 permitted under the selected workspace root through DSH confinement. Read-only
@@ -53,7 +53,7 @@ Rust >=1.88 is required. Build uses `cargo build --release --locked` against
 `native/Cargo.toml`. No install scripts download binaries. On Windows, enable the
 session toolchain before building; do not add multi-version toolchains to global PATH.
 
-The `dsh-ops/ptc` bundle row is enabled by default after #170; existing explicit
+The `dsh-ops-zx88/ptc` bundle row is enabled by default after #170; existing explicit
 profile disablement is preserved. Config accepts `required` (default false), an optional
 absolute `binaryPath`, `allowedTools`, and `alwaysLoaded`; see [SDK loading](ptc-sdk-loading.md). `DSH_OPS_WORKER_BIN` can
 select a build; otherwise the component uses `runtime/<platform>-<arch>/dsh-ops-worker[.exe]` before `native/target/release`.

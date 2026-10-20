@@ -1,6 +1,6 @@
 /**
  * Argument, content and paging boundaries, ported from the ad-hoc `B-args` and
- * `G-semantics` probes in `dsh-ops-boundary-report.md`.
+ * `G-semantics` probes in `dsh-ops-zx88-boundary-report.md`.
  *
  * What this suite locks in:
  *
@@ -37,7 +37,7 @@
  * (L7) is asserted as self-healing, because it cannot be prevented — a `SIGKILL`
  * runs no cleanup path, so the next writer of the same file has to reclaim it.
  *
- * @module dsh-ops/test/linux-args
+ * @module dsh-ops-zx88/test/linux-args
  */
 
 import { createHash } from 'node:crypto'

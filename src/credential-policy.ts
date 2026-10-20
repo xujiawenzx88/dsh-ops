@@ -12,7 +12,7 @@
  * destination, including under danger-full-access. The key remains named
  * `denyCredentialReads` for compatibility: only its name is read-only.
  *
- * @module dsh-ops/credential-policy
+ * @module dsh-ops-zx88/credential-policy
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -169,7 +169,7 @@ export function credentialRoots({ home, env = process.env }: CredentialOptions =
 export function credentialRefusal(_candidate: string, _matched: string) {
   return {
     code: 'POLICY_DENIED',
-    message: 'The requested path is inside a credential location; the dsh-ops file tools neither read nor write credentials: reads, writes, copy/move destinations, replace targets and removal are refused.',
+    message: 'The requested path is inside a credential location; the dsh-ops-zx88 file tools neither read nor write credentials: reads, writes, copy/move destinations, replace targets and removal are refused.',
     nextAction: 'Use a path inside the workspace. An operator who really needs this path can add it to '
       + `${DENY_ENV} (which only widens the list) or disable the fence with denyCredentialReads: false.`,
   }

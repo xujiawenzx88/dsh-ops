@@ -1,5 +1,7 @@
 # Building and running dsh-ops on Linux x64
 
+> Not supported by `dsh-ops-zx88@0.1.0`: this fork is Windows x64 only. This upstream page is retained for future builds.
+
 Linux x64 is a supported target for the **file**, **ptc** and **shell**
 components. On Linux the shell component's `ops_bash` runs the distribution's own
 bash (see [Configuring the shell lane](#configuring-the-shell-lane)); the bundled

@@ -94,7 +94,7 @@ export function stagePlatformPackage(root, kind, { install, binary, platform = p
   const name = platformPackageName(kind, platform, arch)
   fs.mkdirSync(root, { recursive: true })
   fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({
-    name: 'dsh-ops',
+    name: 'dsh-ops-zx88',
     version: '0.1.0',
     optionalDependencies: { [name]: '0.1.0' },
   }))

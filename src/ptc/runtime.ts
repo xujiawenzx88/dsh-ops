@@ -7,7 +7,7 @@ export interface WorkerSelection { binaryPath?: string }
 export interface RuntimeOptions { packageRoot?: string; env?: NodeJS.ProcessEnv; platform?: string; arch?: string }
 export type WorkerResolution = { ok: true; file: string } | { ok: false; reason: string }
 export const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-export const PLATFORMS = Object.freeze(['win32-x64', 'linux-x64', 'darwin-arm64'])
+export const PLATFORMS = Object.freeze(['win32-x64'])
 export function workerName(platform: string = process.platform) { return platform === 'win32' ? 'dsh-ops-worker.exe' : 'dsh-ops-worker' }
 /**
  * Read a JSON file, or name it.
@@ -60,7 +60,7 @@ export function tryResolveWorker(config: WorkerSelection = {}, options: RuntimeO
 }
 
 export function resolveWorker(config: WorkerSelection = {}, { packageRoot = PACKAGE_ROOT, env = process.env, platform = process.platform, arch = process.arch }: RuntimeOptions = {}): string {
-  if (!PLATFORMS.includes(`${platform}-${arch}`)) throw new Error(`dsh-ops supports Windows x64, Linux x64 and macOS Apple Silicon (darwin-arm64) only; unsupported runtime target ${platform}-${arch}.`)
+  if (!PLATFORMS.includes(`${platform}-${arch}`)) throw new Error(`dsh-ops-zx88 supports Windows x64 only; unsupported runtime target ${platform}-${arch}.`)
   const explicit = config.binaryPath ?? env.DSH_OPS_WORKER_BIN
   const fromPackage = path.resolve(packageRoot, 'runtime', `${platform}-${arch}`, workerName(platform))
   const fromSourceTree = path.resolve(packageRoot, 'native', 'target', 'release', workerName(platform))
@@ -91,7 +91,7 @@ export function resolveWorker(config: WorkerSelection = {}, { packageRoot = PACK
     // from `spawn`, which reads as a sandbox problem rather than a missing `chmod`
     // (report L12).
     if (platform !== 'win32' && (stat.mode & 0o111) === 0) {
-      throw new Error(`Native worker ${file} is not executable (mode ${(stat.mode & 0o7777).toString(8).padStart(4, '0')}). Run chmod +x on it, or re-stage it with npm run build:ptc; dsh-ops never changes permissions on its own.`)
+      throw new Error(`Native worker ${file} is not executable (mode ${(stat.mode & 0o7777).toString(8).padStart(4, '0')}). Run chmod +x on it, or re-stage it with npm run build:ptc; dsh-ops-zx88 never changes permissions on its own.`)
     }
     // Verify the packaged candidate against its receipt. Two limits, stated so nobody
     // mistakes this for a trust boundary:
@@ -109,9 +109,9 @@ export function resolveWorker(config: WorkerSelection = {}, { packageRoot = PACK
         || receipt.sha256 !== createHash('sha256').update(fs.readFileSync(file)).digest('hex')) throw new Error('Native worker provenance mismatch.')
     } else {
       // Not silent: an unverified worker binary is a fact the operator should see.
-      console.warn(`dsh-ops: native worker selected without provenance verification — ${note}: ${file}`)
+      console.warn(`dsh-ops-zx88: native worker selected without provenance verification — ${note}: ${file}`)
     }
     return file
   }
-  throw new Error(`Native worker unavailable for ${platform}-${arch}. Tried:\n${skipped.map(entry => `  ${entry}`).join('\n')}\nInstall a runtime-bearing dsh-ops package, or run npm run build:ptc in the source checkout. No ACL repair, shell fallback or automatic download is performed.`)
+  throw new Error(`Native worker unavailable for ${platform}-${arch}. Tried:\n${skipped.map(entry => `  ${entry}`).join('\n')}\nInstall a runtime-bearing dsh-ops-zx88 package, or run npm run build:ptc in the source checkout. No ACL repair, shell fallback or automatic download is performed.`)
 }

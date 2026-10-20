@@ -26,7 +26,7 @@ const external = name => name === '@deepseek-ai/cordis' ? Cordis : name === '@de
 
 await test('shipped browser entry stays lazy and binds exactly three settings pages to the real host registry', async () => {
   const definition = capture(path.join(PACKAGE_ROOT, 'lib/client.js')), imports = []
-  assert.equal(definition.id, 'dsh-ops'); assert.equal(typeof definition.factory, 'function')
+  assert.equal(definition.id, 'dsh-ops-zx88'); assert.equal(typeof definition.factory, 'function')
   assert.deepEqual(imports, [])
   const plugin = definition.factory(name => { imports.push(name); return external(name) })
   assert.deepEqual([...new Set(imports)].sort(), ['react', 'react/jsx-runtime'])
@@ -44,7 +44,7 @@ await test('shipped browser entry stays lazy and binds exactly three settings pa
         return { started: true, exitCode: null, signal: 'aborted' }
       } })
       inner.provide('opsSettings', service)
-      inner.typert.register({ package: 'dsh-ops', face: 'host', schemas: [], model: { services: [], events: [], objects: [] }, invocations: RUNTIME_DESCRIPTORS })
+      inner.typert.register({ package: 'dsh-ops-zx88', face: 'host', schemas: [], model: { services: [], events: [], objects: [] }, invocations: RUNTIME_DESCRIPTORS })
       inner.effect(() => () => service.dispose())
       inner.provide('connection', { registerGenerationSource: () => () => {}, start: () => ({ stop() {} }), generation: { getSnapshot: () => undefined, subscribe: () => () => {} }, rpc: {
         open() { throw new Error('No streams in this fixture') },
@@ -71,7 +71,7 @@ await test('shipped browser entry stays lazy and binds exactly three settings pa
     assert.equal(result.ok, false); assert.match(result.error.message, /abort/i)
     assert.equal(dictionaries.namespace, 'dshOps')
     assert.deepEqual(Object.keys(dictionaries.values.en).sort(), Object.keys(dictionaries.values.zh).sort())
-    assert.deepEqual(ctx.get('slots').entries('plugins.row.config').map(value => value.options.key).sort(), ['dsh-ops#dsh-ops-discovery', 'dsh-ops#dsh-ops-hide-official', 'dsh-ops#dsh-ops-shell'])
+    assert.deepEqual(ctx.get('slots').entries('plugins.row.config').map(value => value.options.key).sort(), ['dsh-ops-zx88#dsh-ops-zx88-discovery', 'dsh-ops-zx88#dsh-ops-zx88-hide-official', 'dsh-ops-zx88#dsh-ops-zx88-shell'])
     assert.equal(document.querySelectorAll('style[data-dsh-ops-settings]').length, 1)
     await fiber.dispose()
     assert.equal(ctx.get('slots').entries('plugins.row.config').length, 0)
@@ -100,7 +100,7 @@ await test('browser package declares an optional client facet while the default 
   assert.equal(pkg.dsh.client.platform, 'web')
   assert.ok(pkg.dsh.client.inject.includes('@deepseek-ai/dsh-client-ui-plugin-manager'))
   assert.equal(pkg.exports['./file'].default, './lib/components/file/index.js')
-  assert.match(fs.readFileSync(path.join(PACKAGE_ROOT, 'cordis.patch.yml'), 'utf8'), /id: dsh-ops-file\s+name: dsh-ops\/file\s/)
+  assert.match(fs.readFileSync(path.join(PACKAGE_ROOT, 'cordis.patch.yml'), 'utf8'), /id: dsh-ops-zx88-file\s+name: dsh-ops-zx88\/file\s/)
 })
 dom.window.close()
 report('settings-client')

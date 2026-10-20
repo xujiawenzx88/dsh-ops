@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "dsh-ops",
+    "title": "dsh-ops-zx88",
     "description": "Provides optional Bash and native Rust tools for DSH to improve token efficiency; PowerShell remains host-managed"
   }
 }

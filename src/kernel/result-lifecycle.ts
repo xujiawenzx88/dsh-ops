@@ -74,7 +74,7 @@ export function expireResultSession(ctx: Pick<LifecycleHost, 'root' | 'logger'>,
     await Promise.allSettled(entry.work.values())
     for (const cleanup of entry.cleanup.values()) {
       try { await cleanup() }
-      catch { ctx.logger?.warn?.('dsh-ops: session result references expired; physical cache cleanup did not complete under current host authority. Temporary files remain for host or operator cleanup; no automatic retry is scheduled.') }
+      catch { ctx.logger?.warn?.('dsh-ops-zx88: session result references expired; physical cache cleanup did not complete under current host authority. Temporary files remain for host or operator cleanup; no automatic retry is scheduled.') }
     }
     entry.cleanup.clear(); state.sessions.delete(session)
   })
@@ -94,5 +94,5 @@ export function mountResultLifecycle(ctx: LifecycleHost): void {
   ctx.effect(() => async () => {
     if (--state.mounts !== 0) return
     await Promise.allSettled([...state.sessions.keys()].map(session => expireResultSession(ctx, session, false)))
-  }, 'dsh-ops: session result lifecycle')
+  }, 'dsh-ops-zx88: session result lifecycle')
 }

@@ -4,7 +4,7 @@
  *
  * The binaries themselves are not redistributed: {@link SHELL_UPSTREAM_PINS}
  * names the upstream release and digest each shell is pinned to, and
- * `dsh-ops provision-shells` is what turns those pointers into a local,
+ * `dsh-ops-zx88 provision-shells` is what turns those pointers into a local,
  * digest-checked copy.
  *
  * **A POSIX host has no pinned copy, on purpose.** The table exists because a
@@ -33,7 +33,7 @@ export type ShellKind = 'bash' | 'pwsh'
 /**
  * The platform packages a deployment MAY carry a shell in, and the subdirectory
  * each keeps its shell in. Nothing requires them: the pinned upstream download
- * (`dsh-ops provision-shells`) is the route that needs no package at all, and
+ * (`dsh-ops-zx88 provision-shells`) is the route that needs no package at all, and
  * this layout is still probed so a deployment that installed one — or a checkout
  * that vendors its own copy — is honoured. `BUNDLED_LAYOUT_ORDER` in
  * `lib/shells/paths.js` names the order of the two bundled layouts.
@@ -62,7 +62,7 @@ export function shellExecutable(kind: ShellKind, platform: string = process.plat
  * The upstream release each bundled shell is pinned to.
  *
  * THIS TABLE IS THE SINGLE SOURCE for "which upstream bytes does this
- * distribution point at". `dsh-ops provision-shells` downloads exactly these
+ * distribution point at". `dsh-ops-zx88 provision-shells` downloads exactly these
  * assets and checks exactly these digests, and the release build imports the
  * same entries to publish the pinned facts beside the packages it assembles —
  * so a version, a URL, or a digest is edited in one place.
@@ -155,7 +155,7 @@ export function shellUpstreamPin({ kind, platform = process.platform, arch = pro
 }
 
 /**
- * The provisioned-shell store: where `dsh-ops provision-shells` installs the
+ * The provisioned-shell store: where `dsh-ops-zx88 provision-shells` installs the
  * copies the plugin prefers over anything the machine happens to have.
  * @param {object} [options] - resolution inputs.
  * @param {NodeJS.ProcessEnv} [options.env] - the environment to read `DSH_HOME` from.

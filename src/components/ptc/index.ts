@@ -2,7 +2,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { apply as mount } from '../../ptc/index.js'
 import { resolvePtcConfig } from '../../config.js'
 import { editable, settingsConfig } from '../../settings/schema.js'
-export const name = 'dsh-ops-ptc'
+export const name = 'dsh-ops-zx88-ptc'
 export const Config = settingsConfig(resolvePtcConfig, {
   allowedTools: editable('array', 'PTC APIs available for SDK selection.', { type: 'string' }),
   alwaysLoaded: editable('array', 'PTC APIs published before SDK selection.', { type: 'string' }),

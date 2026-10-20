@@ -8,24 +8,24 @@ a reviewer can trust a green PR without re-running anything by hand.
 
 | Workflow | Trigger | Blocks a merge? | Purpose |
 | --- | --- | --- | --- |
-| `ci.yml` — **Cross-platform validation** | `push: main`, `pull_request: main`, `merge_group`, manual dispatch | **Yes** (via the single `CI required` check) | The functional gate on Windows, Linux and macOS, plus the Node floor, the source size gate, workflow lint and the tool trial |
+| `ci.yml` — **Cross-platform validation** | `push: main`, `pull_request: main`, `merge_group`, manual dispatch | **Yes** (via the single `CI required` check) | The functional gate on Windows x64, plus the Node floor, the source size gate, workflow lint and the tool trial |
 | `sync-master.yml` — **Sync master with main** | `push: main`, manual dispatch | No | Fast-forwards the `master` mirror; fast-forward only, so a divergent `master` fails loudly |
-| `release.yml` — **Release** | `push: v*` tags, manual dispatch | No (`disabled_manually` today) | Builds the three declared targets, gates them, and publishes the GitHub Release. Nothing here runs on a branch or a pull request |
+| `release.yml` — **Release** | `push: v*` tags, manual dispatch | No (`disabled_manually` today) | Builds the declared win32-x64 target, gates it, and publishes the GitHub Release. Nothing here runs on a branch or a pull request |
 
 ### Jobs inside `ci.yml`
 
 | Job | Runner | Blocking? | What it proves |
 | --- | --- | --- | --- |
-| `validate` | `windows-latest` (win32-x64), `ubuntu-24.04` (linux-x64), `macos-latest` (darwin-arm64) | **Yes** | `cargo test --workspace --locked`, the native worker builds, then `scripts/verify-gate.mjs --skip-install`: no unauthorised skips (`DSH_OPS_REQUIRE_RUNTIME=1` on POSIX turns a missing runtime into a failure), every suite file on disk was collected, and the packed artifact unpacks and passes `native-runtime check` |
-| `node-floor` | `ubuntu-24.04` | **Yes** | `package.json` promises `^22.19 \|\| >=24`; this runs the same gate on the declared **floor** so the promise is exercised rather than asserted |
+| `validate` | `windows-latest` (win32-x64) | **Yes** | `cargo test --workspace --locked`, the native worker builds, then `scripts/verify-gate.mjs --skip-install`: no unauthorised skips (`DSH_OPS_REQUIRE_RUNTIME=1` turns a missing runtime into a failure), every suite file on disk was collected, and the packed artifact unpacks and passes `native-runtime check` |
+| `node-floor` | `windows-latest` | **Yes** | `package.json` promises `^22.19 \|\| >=24`; this runs the same gate on the declared **floor** so the promise is exercised rather than asserted |
 | `workflow-lint` | `ubuntu-24.04` | **Yes** | `scripts/check-workflows.mjs`: every workflow parses, declares triggers/jobs/permissions, bounds each job with `timeout-minutes`, avoids `write-all` and `pull_request_target`, and keeps `ci.yml`'s aggregate check wired to every other job |
 | `source-size` | `ubuntu-24.04` | **Yes** | `scripts/check-file-size.mjs`: every tracked code file stays at or under 1000 lines. The file set comes from `git ls-files`, so a new module is in scope the moment it is added |
-| `tools-trial` | `ubuntu-24.04` | **No** (`continue-on-error`) | Boots a real host and calls every published tool; a broken tool shows up in its own job and in the uploaded `tools-trial-report` without blocking unrelated work |
+| `tools-trial` | `windows-latest` | **No** (`continue-on-error`) | Boots a real host and calls every published tool; a broken tool shows up in its own job and in the uploaded `tools-trial-report` without blocking unrelated work |
 | `ci-required` | `ubuntu-24.04` | — (this is the check to require) | Collapses the matrix into one status: it fails unless every blocking job succeeded, and merely reports `tools-trial` |
 
 `connectivity` of the required check matters more than its name: require **`CI required`**, not the
-per-platform names. The matrix expands into one check per runner, so requiring them by name means
-keeping three names in sync forever, and losing the gate the day a runner label changes.
+per-platform names. The matrix has one validation runner, so require the aggregate rather than the
+runner-specific name and keep the gate stable when a runner label changes.
 `scripts/check-workflows.mjs` fails if `ci-required` stops depending on every other job.
 
 ## Reproduce it locally

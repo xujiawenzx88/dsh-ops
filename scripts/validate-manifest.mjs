@@ -12,7 +12,7 @@
  * (icon and locale documents) being real, package-relative, and published by the
  * `files` whitelist.
  *
- * @module dsh-ops/validate-manifest
+ * @module dsh-ops-zx88/validate-manifest
  */
 
 import fs from 'node:fs'
@@ -34,6 +34,7 @@ import { PTC_API_TOOLS, definition } from '../lib/ptc/contract.js'
 import { resolveConfig, resolveDiscoveryConfig } from '../lib/config.js'
 import { COMPONENTS, componentEntry, componentEnabled, SHELL_DISABLED_EXPRESSION } from '../lib/components/defaults.js'
 import { resolveHidingConfig } from '../lib/official-tool-hiding.js'
+import { PLATFORMS } from '../lib/ptc/runtime.js'
 
 /** The repository root (`scripts/`'s parent). */
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -264,8 +265,8 @@ if (hostedNamespace === undefined) {
     `manifest ${declared.join(',')} vs contract ${expected.join(',')}`,
   )
   check(
-    hostedNamespace.serverName === 'dsh-ops',
-    'the native file namespace uses dsh-ops as its owner',
+    hostedNamespace.serverName === pkg.name,
+    `the native file namespace uses ${pkg.name} as its owner`,
     `got ${JSON.stringify(hostedNamespace.serverName)}`,
   )
   check(
@@ -484,23 +485,25 @@ if (display !== undefined) {
 }
 
 /** Payload the published package must carry, as `files` entries or paths they cover. */
-const ptc = manifestRaw.contributes?.['x-components']?.find(c => c.id === 'dsh-ops-ptc')
-check(ptc?.entry === 'dsh-ops/ptc' && ptc?.defaultEnabled === true, 'native PTC enhancement is enabled by default; presentation stays scoped')
+const ptc = manifestRaw.contributes?.['x-components']?.find(c => c.id === 'dsh-ops-zx88-ptc')
+check(ptc?.entry === `${pkg.name}/ptc` && ptc?.defaultEnabled === true, 'native PTC enhancement is enabled by default; presentation stays scoped')
 check(JSON.stringify(ptc?.tools) === JSON.stringify([...PTC_API_TOOLS, 'sdk'].map(publicToolName)), 'PTC declaration matches the generated tool contract')
 check(PTC_API_TOOLS.every(t => definition(t, () => {}).parameters.type === 'object'), 'PTC schemas remain structured')
-check(JSON.stringify(pkg.os) === '["win32","linux","darwin"]' && JSON.stringify(pkg.cpu) === '["x64","arm64"]' &&
-  JSON.stringify(ptc?.platforms) === '["win32","linux","darwin"]' && JSON.stringify(ptc?.architectures) === '["x64","arm64"]' &&
-  JSON.stringify(ptc?.targets) === '["win32-x64","linux-x64","darwin-arm64"]',
-  'Supported exact targets are Windows x64, Linux x64 and macOS Apple Silicon; Intel Mac is unsupported')
+const expectedOs = [...new Set(PLATFORMS.map(target => target.split('-')[0]))]
+const expectedArchitectures = [...new Set(PLATFORMS.map(target => target.split('-')[1]))]
+check(JSON.stringify(pkg.os) === JSON.stringify(expectedOs) && JSON.stringify(pkg.cpu) === JSON.stringify(expectedArchitectures) &&
+  JSON.stringify(ptc?.platforms) === JSON.stringify(expectedOs) && JSON.stringify(ptc?.architectures) === JSON.stringify(expectedArchitectures) &&
+  JSON.stringify(ptc?.targets) === JSON.stringify(PLATFORMS),
+  'Package and manifest declare exactly the supported runtime targets: Windows x64')
 /** Every component states the platforms it really serves, so a Linux claim cannot ride along. */
 const platformClaims = id => manifestRaw.contributes?.['x-components']?.find(c => c.id === id)?.platforms
-check(JSON.stringify(platformClaims('dsh-ops-shell')) === '["win32","linux","darwin"]',
-  'the shell component supports the declared targets using host bash on POSIX')
-check(JSON.stringify(platformClaims('dsh-ops-file')) === '["win32","linux","darwin"]',
+check(JSON.stringify(platformClaims('dsh-ops-zx88-shell')) === JSON.stringify(expectedOs),
+  'the shell component declares exactly the supported platforms')
+check(JSON.stringify(platformClaims('dsh-ops-zx88-file')) === JSON.stringify(expectedOs),
   'the file component supports the exact worker target matrix')
-check(platformClaims('dsh-ops-background') === undefined,
+check(platformClaims('dsh-ops-zx88-background') === undefined,
   'the removed background component is no longer declared')
-check(JSON.stringify(platformClaims('dsh-ops-panel')) === '["win32","linux","darwin"]',
+check(JSON.stringify(platformClaims('dsh-ops-zx88-panel')) === JSON.stringify(expectedOs),
   'the panel capture component supports the declared targets (static files, no platform payload)')
 /** The viewer is runtime output, so the template itself has to be in the package. */
 const panelTemplate = 'lib/panel/panel.html'

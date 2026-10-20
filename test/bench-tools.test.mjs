@@ -11,7 +11,7 @@
  * belongs to the opt-in workflow, and `npm run verify` keeps deterministic
  * checks only.
  *
- * @module dsh-ops/test/bench-tools
+ * @module dsh-ops-zx88/test/bench-tools
  */
 
 import fs from 'node:fs'

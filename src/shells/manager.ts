@@ -74,7 +74,7 @@ export function selectBashRuntime(source: 'managed' | 'git', options: BashRuntim
     .sort((a, b) => a.version < b.version ? 1 : a.version > b.version ? -1 : 0)
     .map(entry => path.join(entry.directory, relative)).find(isSpawnableFile) : undefined
   const file = source === 'managed' ? managed : source === 'git' ? gitBashCandidates(options)[0] : undefined
-  if (!file) throw new Error(source === 'managed' ? 'No managed Bash is installed; run dsh-ops bash-runtime install.' : 'No Git Bash installation found; set bashPath to an existing absolute executable.')
+  if (!file) throw new Error(source === 'managed' ? 'No managed Bash is installed; run dsh-ops-zx88 bash-runtime install.' : 'No Git Bash installation found; set bashPath to an existing absolute executable.')
   const absolute = path.resolve(file)
   return { source, file: absolute, config: { bashPath: absolute }, restricted: restrictedCompatibility(absolute, options) }
 }

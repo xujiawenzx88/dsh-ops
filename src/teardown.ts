@@ -10,7 +10,7 @@
  *
  * `safeDispose` isolates one callback and reports the failure, so callers can
  * iterate without their own try/catch and without losing the rest of the list.
- * @module dsh-ops/teardown
+ * @module dsh-ops-zx88/teardown
  */
 
 /**

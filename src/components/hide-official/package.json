@@ -1,5 +1,5 @@
 {
-  "name": "dsh-ops-hide-official",
+  "name": "dsh-ops-zx88-hide-official",
   "description": "Opt-in reviewed read/glob/grep alternatives with per-tool selection and scoped readiness checks.",
   "icon": "./icon.png",
   "type": "module"

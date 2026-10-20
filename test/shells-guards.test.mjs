@@ -8,7 +8,7 @@
  * through a real host and the machine's own bash in
  * `test/shells-session.test.mjs`.
  *
- * @module dsh-ops/test/shells-guards
+ * @module dsh-ops-zx88/test/shells-guards
  */
 
 import fs from 'node:fs'

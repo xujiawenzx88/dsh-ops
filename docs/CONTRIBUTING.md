@@ -113,14 +113,14 @@ What a skip means locally:
   `test/run.mjs` (every `test/*.test.mjs`
   in its own process with its own temporary `DSH_HOME`).
 - `node scripts/verify-gate.mjs --skip-install` — **the release gate**, exactly what
-  `.github/workflows/ci.yml` runs on Windows x64, Linux x64 and macOS arm64: worker unit tests, build
+  `.github/workflows/ci.yml` runs on Windows x64: worker unit tests, build
   and stage, manifest floor, every suite, the allowed-skip set, the suite inventory on disk, and the
   packed artifact.
 - `node test/run.mjs <filter>` runs only the suites whose file names contain `<filter>`, e.g.
   `node test/run.mjs mount file-operations`.
 
 How to read the gate and the expected numbers per host: [verify-locally.md](verify-locally.md).
-CI runs on every pull request and every push to `main`; a PR must be green on all three platforms.
+CI runs on every pull request and every push to `main`; a PR must be green on Windows x64.
 
 ## Writing tests
 

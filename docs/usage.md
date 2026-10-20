@@ -2,9 +2,9 @@
 
 The complete install, update and remove flow, plus every option of the command-line interface.
 
-## 0.4.0 candidate and component defaults
+## 0.1.0 fork and component defaults (upstream 0.4.0 candidate)
 
-This checkout is an unreleased candidate; acceptance uses the approved OPS 0.3.x BM-01 comparator and file/discovery BM-03 budget, with Bash still resident and the full total reported separately.
+This fork publishes the upstream 0.4.0 candidate source as `0.1.0` for Windows x64. Upstream acceptance uses the approved OPS 0.3.x BM-01 comparator and file/discovery BM-03 budget, with Bash still resident and the full total reported separately.
 See [candidate status](release-0.4.0.md). The seven rows enable file/PTC/discovery, enable shell only
 on Windows, and leave panel/TUI/replacements off in fresh profiles. Existing explicit switches and
 name-qualified settings survive upgrade. Only read_many/discover are initially resident in Native,
@@ -19,12 +19,14 @@ forms and the optional browser carrier. Use [manual acceptance](manual-validatio
 
 | Item | Requirement |
 | --- | --- |
-| OS | Windows x64, Linux x64 or macOS arm64; optional OPS Bash defaults on only on Windows |
+| OS | Windows x64 only in this fork; optional OPS Bash defaults on |
 | Node.js | `^22.19 \|\| >=24` (the `engines` field in `package.json`) |
 | Host | DSH `0.2.0-rc.2` |
 | Target application | Initialized |
 
 ### macOS arm64
+
+> Not supported by `dsh-ops-zx88@0.1.0`: this fork is Windows x64 only. The upstream instructions are retained for future builds.
 
 macOS carries no bundled shell payload, and the native worker is not part of the
 repository on any platform, so two extra steps apply.
@@ -39,8 +41,8 @@ node bin/native-runtime.mjs stage --platform darwin-arm64
 Then point the shell row at a bash the machine already has:
 
 ```yaml
-- id: dsh-ops-shell
-  name: dsh-ops/shell
+- id: dsh-ops-zx88-shell
+  name: dsh-ops-zx88/shell
   disabled: false
   config:
     bashPath: /opt/homebrew/bin/bash
@@ -58,29 +60,29 @@ capability matrix and the known limitations.
 
 ### Official plugin marketplace
 
-In the target DSH application's plugin marketplace, enter the npm package name **`dsh-ops`**, install, then enable. Installation belongs to the currently running profile, which is `desktop` for the desktop app. Neither Bash nor PowerShell binaries are npm dependencies. Bash is acquired separately through the runtime manager; PowerShell stays under host control. Installation runs no shell downloader and does not change system PATH.
+In the target DSH application's plugin marketplace, enter the npm package name **`dsh-ops-zx88`**, install, then enable. Installation belongs to the currently running profile, which is `desktop` for the desktop app. Neither Bash nor PowerShell binaries are npm dependencies. Bash is acquired separately through the runtime manager; PowerShell stays under host control. Installation runs no shell downloader and does not change system PATH.
 
 ### Optional Bash runtime
 
 Bash is no longer an npm dependency. On Windows, install the verified managed copy explicitly, or select an existing Git Bash:
 
 ```console
-dsh-ops bash-runtime status
-dsh-ops bash-runtime install
-dsh-ops bash-runtime git
-dsh-ops bash-runtime managed
-dsh-ops bash-runtime remove            # preview only
-dsh-ops bash-runtime remove --yes      # remove receipt-marked managed versions
+dsh-ops-zx88 bash-runtime status
+dsh-ops-zx88 bash-runtime install
+dsh-ops-zx88 bash-runtime git
+dsh-ops-zx88 bash-runtime managed
+dsh-ops-zx88 bash-runtime remove            # preview only
+dsh-ops-zx88 bash-runtime remove --yes      # remove receipt-marked managed versions
 ```
 
-`git` and `managed` print an absolute `bashPath` configuration for the host config editor; they do not edit a profile or PATH. Reload the shell component after applying the selection or installing/removing its runtime. Stop running Bash jobs before removal. Removal refuses links in the managed path and preserves unmarked versions, system Git and PowerShell. `install` reuses the pinned download and checksum checks from `provision-shells --bash`; `--dry-run` makes no download or change. Windows restricted modes still require the pinned MSYS IPC compatibility match. A different Git Bash remains a full-access choice; approval never repairs an incompatible restricted runtime. Linux/macOS continue using host Bash.
+`git` and `managed` print an absolute `bashPath` configuration for the host config editor; they do not edit a profile or PATH. Reload the shell component after applying the selection or installing/removing its runtime. Stop running Bash jobs before removal. Removal refuses links in the managed path and preserves unmarked versions, system Git and PowerShell. `install` reuses the pinned download and checksum checks from `provision-shells --bash`; `--dry-run` makes no download or change. Windows restricted modes still require the pinned MSYS IPC compatibility match. A different Git Bash remains a full-access choice; approval never repairs an incompatible restricted runtime. This fork does not ship or validate Linux/macOS targets.
 
 ### One-command npm installation
 
 ```console
-npx --yes dsh-ops@latest install --profile desktop
-npx --yes dsh-ops@latest install --profile web
-npx --yes dsh-ops@latest install --profile tui
+npx --yes dsh-ops-zx88@latest install --profile desktop
+npx --yes dsh-ops-zx88@latest install --profile web
+npx --yes dsh-ops-zx88@latest install --profile tui
 ```
 
 An explicit target profile is required. `tui` maps to the **dsh-TUI product's `dsh-tui` profile**, not the old `tui` directory. Initialize the target application first. This entry point delegates installation to the official DSH CLI rather than implementing separate profile locking and rollback logic.
@@ -90,9 +92,9 @@ Desktop must use the CLI bundled with the desktop application; the default auto-
 ### Using the official commands directly
 
 ```console
-dsh plugin --profile web add dsh-ops
-dsh plugin --profile dsh-tui add dsh-ops
-"<desktop installation>\resources\runtime\cli\bin\dsh.cmd" plugin --profile desktop add dsh-ops
+dsh plugin --profile web add dsh-ops-zx88
+dsh plugin --profile dsh-tui add dsh-ops-zx88
+"<desktop installation>\resources\runtime\cli\bin\dsh.cmd" plugin --profile desktop add dsh-ops-zx88
 ```
 
 The ordinary DSH CLI cannot manage the reserved `desktop` profile; do not confuse it with the desktop app's bundled entry point.
@@ -101,20 +103,20 @@ The ordinary DSH CLI cannot manage the reserved `desktop` profile; do not confus
 
 ## Update
 
-Repeat the same `npx --yes dsh-ops@latest install --profile ...` command, or use the official CLI's `add dsh-ops@latest`. Reload as requested by the application; restart it when replacing already-loaded code.
+Repeat the same `npx --yes dsh-ops-zx88@latest install --profile ...` command, or use the official CLI's `add dsh-ops-zx88@latest`. Reload as requested by the application; restart it when replacing already-loaded code.
 
 ---
 
 ## Remove and check status
 
 ```console
-npx --yes dsh-ops@latest status --profile desktop
-npx --yes dsh-ops@latest uninstall --profile desktop
+npx --yes dsh-ops-zx88@latest status --profile desktop
+npx --yes dsh-ops-zx88@latest uninstall --profile desktop
 ```
 
-Replace `desktop` with `web` or `tui` as appropriate. You can also uninstall in the marketplace or run the official `dsh plugin --profile ... remove dsh-ops`. Binaries are managed as profile plugin dependencies; uninstalling removes dependency references without deleting system shells, copies in other profiles or shared package-manager caches.
+Replace `desktop` with `web` or `tui` as appropriate. You can also uninstall in the marketplace or run the official `dsh plugin --profile ... remove dsh-ops-zx88`. Binaries are managed as profile plugin dependencies; uninstalling removes dependency references without deleting system shells, copies in other profiles or shared package-manager caches.
 
-Legacy explicitly provisioned `<DSH_HOME>/dsh-ops/` files (provisioned shells, and the FastCtx runtime earlier versions could provision) must be cleaned separately with `npx --yes dsh-ops@latest uninstall --yes`. The `~/.fastctx/` state left by the removed background component is kept by default; add `--purge-fastctx` explicitly to remove it as well.
+Legacy explicitly provisioned `<DSH_HOME>/dsh-ops/` files (provisioned shells, and the FastCtx runtime earlier versions could provision) must be cleaned separately with `npx --yes dsh-ops-zx88@latest uninstall --yes`. The `~/.fastctx/` state left by the removed background component is kept by default; add `--purge-fastctx` explicitly to remove it as well.
 
 ---
 
@@ -123,9 +125,9 @@ Legacy explicitly provisioned `<DSH_HOME>/dsh-ops/` files (provisioned shells, a
 OPS no longer bundles PowerShell or changes the host's `pwshPath`. Windows PowerShell 5.1, existing custom executors and old OPS provisioned copies remain untouched. To install or upgrade the standard PowerShell 7 installation, first inspect the plan:
 
 ```console
-dsh-ops upgrade-host-pwsh
-dsh-ops upgrade-host-pwsh --yes --dry-run
-dsh-ops upgrade-host-pwsh --yes
+dsh-ops-zx88 upgrade-host-pwsh
+dsh-ops-zx88 upgrade-host-pwsh --yes --dry-run
+dsh-ops-zx88 upgrade-host-pwsh --yes
 ```
 
 Only `--yes` executes WinGet; `--dry-run` always previews. The action uses the exact stable `Microsoft.PowerShell` package from the `winget` source and retains WinGet's installer and agreement prompts. It may require Windows elevation. Missing WinGet produces guidance without attempting installation; see [Microsoft's Windows installation guide](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows).
@@ -135,16 +137,16 @@ Restart DSH after successful installation so the host probes its executor again.
 ## Command-line interface
 
 ```console
-dsh-ops install --profile <desktop|web|tui> [--dsh-cli <path>]
-dsh-ops uninstall --profile <desktop|web|tui> [--dsh-cli <path>]
-dsh-ops status --profile <desktop|web|tui>
+dsh-ops-zx88 install --profile <desktop|web|tui> [--dsh-cli <path>]
+dsh-ops-zx88 uninstall --profile <desktop|web|tui> [--dsh-cli <path>]
+dsh-ops-zx88 status --profile <desktop|web|tui>
                                 Report target-profile installation (tui maps to dsh-tui)
-dsh-ops build-ptc              Build the independent native Rust worker (all platforms)
-dsh-ops uninstall [--yes] [--purge-fastctx]
-dsh-ops ladder [--json] [--config <file>]
+dsh-ops-zx88 build-ptc              Build the independent native Rust worker (all platforms)
+dsh-ops-zx88 uninstall [--yes] [--purge-fastctx]
+dsh-ops-zx88 ladder [--json] [--config <file>]
                                 prompt ladder actually renders; nothing is spawned
-dsh-ops upgrade-host-pwsh [--yes] [--dry-run]
-dsh-ops provision-shells [--bash] [--pwsh] [--force] [--dry-run] [--pin <file>]
+dsh-ops-zx88 upgrade-host-pwsh [--yes] [--dry-run]
+dsh-ops-zx88 provision-shells [--bash] [--pwsh] [--force] [--dry-run] [--pin <file>]
                                 their digests, and install them under <DSH_HOME>/dsh-ops/shells
 ```
 

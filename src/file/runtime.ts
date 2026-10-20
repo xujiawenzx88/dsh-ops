@@ -103,13 +103,13 @@ export class NativeFileTools {
     // Disable priming before awaiting active calls: their finally blocks must
     // not create a replacement after the component has begun shutting down.
     const warmDisposal = this.warm?.dispose()
-    safeDisposeAll([this.unregisterProvider].filter((dispose): dispose is () => void => typeof dispose === 'function'), error => this.report('dsh-ops: Native pager teardown failed: ' + error, 'warn'), 'result provider')
+    safeDisposeAll([this.unregisterProvider].filter((dispose): dispose is () => void => typeof dispose === 'function'), error => this.report('dsh-ops-zx88: Native pager teardown failed: ' + error, 'warn'), 'result provider')
     for (const controller of this.active.keys()) controller.abort(new Error('Native file component unloaded'))
     await Promise.allSettled(this.active.values())
     await warmDisposal
     // Isolate each teardown: one throwing worker registration must not strand the rest.
     safeDisposeAll(this.disposers.splice(0), (error, where) => {
-      this.report(`dsh-ops: ${where} teardown failed: ${error instanceof Error ? error.message : String(error)}`, 'warn')
+      this.report(`dsh-ops-zx88: ${where} teardown failed: ${error instanceof Error ? error.message : String(error)}`, 'warn')
     }, 'file runtime stop')
   }
 }

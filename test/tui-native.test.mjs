@@ -33,10 +33,10 @@ const { default: Subprocess } = await import('@deepseek-ai/dsh-subprocess-local'
 const root = new Context(); root.logger.level = 0
 const workspace = join(TEST_HOME, 'workspace'), composition = join(TEST_HOME, 'composition')
 mkdirSync(workspace); mkdirSync(join(composition, 'node_modules'), { recursive: true })
-symlinkSync(PACKAGE_ROOT, join(composition, 'node_modules', 'dsh-ops'), process.platform === 'win32' ? 'junction' : 'dir')
+symlinkSync(PACKAGE_ROOT, join(composition, 'node_modules', 'dsh-ops-zx88'), process.platform === 'win32' ? 'junction' : 'dir')
 writeFileSync(join(workspace, 'PRIVATE_FILE.txt'), 'PRIVATE_BODY\nsecond line\nthird line\n')
 writeFileSync(join(workspace, 'other.txt'), 'PRIVATE_OTHER\n')
-const id = 'dsh-ops-tui:overview', observed = createActivityStore()
+const id = 'dsh-ops-zx88-tui:overview', observed = createActivityStore()
 const scripts = new Map(), events = [], failures = [], modes = new Map()
 let modelCalls = 0, native, app, term, sessionId = 'native-fixture', showPanel = true
 const channel = () => ({ sessionId, version: events.length, cwd: workspace, working: false, spinnerMode: 'idle',
@@ -65,7 +65,7 @@ try {
   await root.plugin(Loader, { baseUrl: pathToFileURL(join(composition, 'cordis.yml')).href })
   await root.plugin({ name: hostRow.name, apply: hostRow.apply }); await root.plugin(TuiPanelRuntime)
   armAdmissionLoader(root)
-  await root.loader.create({ id: 'ops-sidebar', name: 'dsh-ops/tui', config: { recentLimit: 3 } })
+  await root.loader.create({ id: 'ops-sidebar', name: 'dsh-ops-zx88/tui', config: { recentLimit: 3 } })
   await root.loader.await()
   await waitFor(() => panelStore.get(id) !== undefined, { what: 'admitted native-test sidebar' })
   await root.plugin(Agents); await root.plugin(Sessions); await root.plugin(Projections)

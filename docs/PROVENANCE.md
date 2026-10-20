@@ -1,5 +1,15 @@
 # Provenance
 
+## Fork: dsh-ops-zx88
+
+This package is an unofficial renamed fork of
+[dsh-ops](https://github.com/T-Auto/dsh-ops), based on commit `1070479` and packaged
+as `dsh-ops-zx88@0.1.0`. The fork changes package/component identity, package metadata
+and documentation. It does not relicense or reattribute the upstream work; every
+provenance statement below applies unchanged. Only the `win32-x64` native worker and
+its Bash IPC proxies are staged and declared; this fork is Windows x64 only and does
+not validate Linux or macOS targets.
+
 What this repository is, where its parts came from, what was verified, and what
 was not.
 

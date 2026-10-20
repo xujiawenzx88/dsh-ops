@@ -253,17 +253,17 @@ await test('ops_bash turns a missing executable into the remedy its source deser
   // single line sent all of them to "repair the profile installation", which is
   // the wrong move for a configured path and for a system bash.
   const bundled = await runFor('bundled')
-  assert.equal(bundled.value.error, `${head}The bundled bash left the profile after it was resolved; restore the profile's dependencies, or run \`dsh-ops provision-shells --bash\` to fetch the pinned copy from upstream releases instead.`)
+  assert.equal(bundled.value.error, `${head}The bundled bash left the profile after it was resolved; restore the profile's dependencies, or run \`dsh-ops-zx88 provision-shells --bash\` to fetch the pinned copy from upstream releases instead.`)
   assert.equal(bundled.value.timedOut, false)
   assert.deepEqual(bundled.value.stdout, { text: '', truncated: false })
   assert.deepEqual(bundled.value.stderr, { text: '', truncated: false })
   assert.match(bundled.definition.output.render({}, bundled.value)[0].text, /The bundled bash left the profile after it was resolved/)
 
   const provisioned = await runFor('provisioned')
-  assert.equal(provisioned.value.error, `${head}The provisioned copy under this DSH_HOME is gone; run \`dsh-ops provision-shells --bash\` again to reinstall the pinned upstream copy.`)
+  assert.equal(provisioned.value.error, `${head}The provisioned copy under this DSH_HOME is gone; run \`dsh-ops-zx88 provision-shells --bash\` again to reinstall the pinned upstream copy.`)
 
   const config = await runFor('config')
-  assert.equal(config.value.error, `${head}The configured bashPath no longer exists; point bashPath at a real executable, or clear it and run \`dsh-ops provision-shells --bash\`.`)
+  assert.equal(config.value.error, `${head}The configured bashPath no longer exists; point bashPath at a real executable, or clear it and run \`dsh-ops-zx88 provision-shells --bash\`.`)
 
   const errors = [bundled.value.error, provisioned.value.error, config.value.error]
   assert.equal(new Set(errors).size, 3, 'one wording per source')
@@ -274,13 +274,13 @@ await test('ops_bash turns a missing executable into the remedy its source deser
   // The two system sources share the one remedy that cannot be a registry
   // fetch, and a source this table has never seen still gets a usable line
   // rather than nothing (D8).
-  const system = 'The system bash this deployment fell back to is gone; reinstall it, or run `dsh-ops provision-shells --bash` for a copy the registry cannot take away.'
+  const system = 'The system bash this deployment fell back to is gone; reinstall it, or run `dsh-ops-zx88 provision-shells --bash` for a copy the registry cannot take away.'
   for (const source of ['path', 'well-known']) {
     assert.equal((await runFor(source)).value.error, `${head}${system}`, `${source}: the system bash remedy`)
   }
   assert.equal(
     (await runFor('a-source-added-later')).value.error,
-    `${head}run \`dsh-ops provision-shells --bash\` to install the pinned upstream copy.`,
+    `${head}run \`dsh-ops-zx88 provision-shells --bash\` to install the pinned upstream copy.`,
     'an unmapped source still gets the generic remedy',
   )
 })

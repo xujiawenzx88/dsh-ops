@@ -28,7 +28,7 @@ export function mountRuntimeSettings(root: Context): void {
   root.inject(['typert', 'subprocess'], ctx => {
     const service = new RuntimeActions({ run: runtimeProcessRunner(ctx.subprocess) })
     ctx.provide('opsSettings', service)
-    ctx.typert.register({ package: 'dsh-ops', face: 'host', schemas: [], model: { services: [], events: [], objects: [] }, invocations: RUNTIME_DESCRIPTORS })
-    ctx.effect(() => () => service.dispose(), 'dsh-ops: runtime settings actions')
+    ctx.typert.register({ package: 'dsh-ops-zx88', face: 'host', schemas: [], model: { services: [], events: [], objects: [] }, invocations: RUNTIME_DESCRIPTORS })
+    ctx.effect(() => () => service.dispose(), 'dsh-ops-zx88: runtime settings actions')
   })
 }

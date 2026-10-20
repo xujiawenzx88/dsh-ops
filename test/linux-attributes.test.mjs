@@ -1,6 +1,6 @@
 /**
  * Filesystem attributes across an atomic replace, ported from the ad-hoc
- * `F-attrs` / `F2-mechanism` probes in `dsh-ops-boundary-report.md`.
+ * `F-attrs` / `F2-mechanism` probes in `dsh-ops-zx88-boundary-report.md`.
  *
  * This suite is POSIX-only by construction and skips as a whole on win32:
  * every case here reasons about inode identity (`nlink`, `blocks`), permission
@@ -35,7 +35,7 @@
  * which no filesystem in this gate provides. Its contract — the failure reports
  * `effectState: "applied"` rather than the default `"none"` — is held by reading.
  *
- * @module dsh-ops/test/linux-attributes
+ * @module dsh-ops-zx88/test/linux-attributes
  */
 
 import fs from 'node:fs'

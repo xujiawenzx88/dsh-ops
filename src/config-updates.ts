@@ -4,7 +4,7 @@
  * The 0.4 seven-row upgrade is additive bundle composition, not a config rewrite:
  * stable IDs and names preserve saved on/off/config overrides, and the Loader
  * adds discovery from cordis.patch.yml. Never copy the composed tree into a
- * profile or rename dsh-ops/file: name-qualified overrides would be skipped.
+ * profile or rename dsh-ops-zx88/file: name-qualified overrides would be skipped.
  * Explicit legacy panel capture:false is retained; no migration may start capture.
  */
 import type { Context } from '@deepseek-ai/cordis'
@@ -30,12 +30,12 @@ export function updatedConfig(value: unknown = {}, disableEvaluatedFallback = fa
   return next
 }
 
-// `dsh-ops/background` is a no-op stub that reads no config, so it needs no migration.
-const OWN_NAMES = new Set(['dsh-ops', 'dsh-ops/shell', 'dsh-ops/file'])
+// `dsh-ops-zx88/background` is a no-op stub that reads no config, so it needs no migration.
+const OWN_NAMES = new Set(['dsh-ops-zx88', 'dsh-ops-zx88/shell', 'dsh-ops-zx88/file'])
 const pending = new WeakSet()
 
 // #136's discipline, kept in the middle of #138's persistence: a missing editor and a refused save
-// are not faults an operator can act on during boot, and a host that mounts several dsh-ops rows
+// are not faults an operator can act on during boot, and a host that mounts several dsh-ops-zx88 rows
 // would otherwise repeat the same line on every activation of every row. Each is said once per
 // logger — in practice once per process — and the migration always stays in effect regardless.
 const notedInMemory = new WeakSet()
@@ -51,14 +51,14 @@ function firstSight(set: WeakSet<object>, logger: unknown): boolean {
 }
 function noteInMemoryOnly(ctx: Context, reason: string): void {
   if (!firstSight(notedInMemory, ctx.logger)) return
-  ctx.logger.info?.(`dsh-ops: config update ${CONFIG_UPDATE_VERSION} applied in memory only (${reason}); the migration is in effect for this activation.`)
+  ctx.logger.info?.(`dsh-ops-zx88: config update ${CONFIG_UPDATE_VERSION} applied in memory only (${reason}); the migration is in effect for this activation.`)
 }
 function warnSaveFailure(ctx: Context, error: unknown): void {
   if (!firstSight(warnedSaveFailure, ctx.logger)) return
   // Anything can be thrown: `error.message` on `undefined`/`null` would raise from inside the very
   // handler that promises to report a failed save, turning it into an unhandled rejection.
   const reason = error instanceof Error ? error.message : String(error)
-  ctx.logger.warn?.(`dsh-ops: config update ${CONFIG_UPDATE_VERSION} could not be saved: ${reason}; the migration stays in effect for this activation only.`)
+  ctx.logger.warn?.(`dsh-ops-zx88: config update ${CONFIG_UPDATE_VERSION} could not be saved: ${reason}; the migration stays in effect for this activation only.`)
 }
 
 /** Save only this component's raw owning row through the profile config editor.
@@ -92,7 +92,7 @@ export function mountConfigUpdates(ctx: Context, value: unknown): void {
   if (((raw?.configUpdateVersion ?? 0) as number) >= CONFIG_UPDATE_VERSION) return
   const entry = ctx.fiber?.entry
   // A row this plugin does not own is none of our business: say nothing (#138's scope guard keeps
-  // the no-op `dsh-ops/background` stub out of the save path). A context with no owning row at all
+  // the no-op `dsh-ops-zx88/background` stub out of the save path). A context with no owning row at all
   // still migrates, and says so once instead of warning on every activation (#136).
   if (!entry) { noteInMemoryOnly(ctx, 'this activation has no owning loader row'); return }
   if (!OWN_NAMES.has(entry.options?.name)) return
@@ -120,7 +120,7 @@ export function mountConfigUpdates(ctx: Context, value: unknown): void {
         // lock and passes *that* authoritative `current`. Returning a scheduled `next`
         // would silently drop any edit that landed in between (#138 review).
         await editor.edit(entry, current => updatedConfig(current ?? {}, raw?.allowSystemShellFallback === true))
-        ctx.logger?.info?.(`dsh-ops: config update ${CONFIG_UPDATE_VERSION} saved to the profile patch; legacy system shell fallback disabled (if previously true) and removed FastCtx keys dropped.`)
+        ctx.logger?.info?.(`dsh-ops-zx88: config update ${CONFIG_UPDATE_VERSION} saved to the profile patch; legacy system shell fallback disabled (if previously true) and removed FastCtx keys dropped.`)
       } catch (error) {
         // The editor owns the transaction: on failure it restores the patch file and
         // reconciles the previous patches before rethrowing, and it may already have
@@ -131,5 +131,5 @@ export function mountConfigUpdates(ctx: Context, value: unknown): void {
       } finally { pending.delete(entry) }
     })()
   })
-  ctx.effect(() => () => { cancelled = true; clearImmediate(immediate); pending.delete(entry) }, 'dsh-ops: pending config update')
+  ctx.effect(() => () => { cancelled = true; clearImmediate(immediate); pending.delete(entry) }, 'dsh-ops-zx88: pending config update')
 }

@@ -30,7 +30,7 @@ export const editable = (type: Field['type'], description: string, inner?: Field
 export function settingsConfig<T>(normalize: (value: unknown) => T, fields: Record<string, Field>) {
   return Object.assign(descriptor({ type: 'object', dict: fields }), {
     '~standard': {
-      version: 1 as const, vendor: 'dsh-ops',
+      version: 1 as const, vendor: 'dsh-ops-zx88',
       validate(value: unknown): { value: T } | { issues: { message: string }[] } {
         try { return { value: normalize(value) } }
         catch (error) { return { issues: [{ message: error instanceof Error ? error.message : String(error) }] } }

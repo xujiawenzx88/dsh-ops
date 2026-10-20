@@ -1,37 +1,28 @@
 <p align="center">
-  <img src="docs/assets/readme/dsh-ops-header.svg" alt="dsh-ops header" width="640">
+  <img src="docs/assets/readme/dsh-ops-header.svg" alt="dsh-ops-zx88 header" width="640">
 </p>
 
 <p align="center">
   <strong>English</strong> | <a href="README.md">中文</a>
 </p>
 
-<div align="center" style="text-align: center;">
-  <a href="https://trendshift.io/repositories/296103" title="Trendshift · JavaScript daily list">
-    <img src="https://trendshift.io/api/badge/trendshift/repositories/296103/daily?language=JavaScript" alt="Trendshift · JavaScript daily list" width="250" height="55" style="vertical-align: middle;">
-  </a>
-</div>
+> **Fork notice:** This package is an unofficial renamed fork of [T-Auto/dsh-ops](https://github.com/T-Auto/dsh-ops), published as `dsh-ops-zx88`. Original copyright and licenses are retained; see `NOTICE`. It is not endorsed by the upstream maintainers.
+
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/dsh-ops"><img alt="npm" src="https://img.shields.io/npm/v/dsh-ops?style=flat-square&color=6c5ce7"></a>
-  <a href="https://www.npmjs.com/package/dsh-ops"><img alt="npm downloads" src="https://img.shields.io/npm/dm/dsh-ops?style=flat-square&color=4b6fff"></a>
-  <a href="https://github.com/T-Auto/dsh-ops/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/T-Auto/dsh-ops?style=flat-square&color=eab308"></a>
-  <a href="https://upstar.dev/r/T-Auto/dsh-ops"><img alt="Upstar: #2 in JavaScript" src="https://upstar.dev/badge/T-Auto/dsh-ops.svg"></a>
+  <a href="https://www.npmjs.com/package/dsh-ops-zx88"><img alt="npm" src="https://img.shields.io/npm/v/dsh-ops-zx88?style=flat-square&color=6c5ce7"></a>
+  <a href="https://www.npmjs.com/package/dsh-ops-zx88"><img alt="npm downloads" src="https://img.shields.io/npm/dm/dsh-ops-zx88?style=flat-square&color=4b6fff"></a>
 </p>
 
-# dsh-ops
+# dsh-ops-zx88
 
 OPS adds bounded file and document tools to DSH. Native mode returns compact, line-numbered text;
 PTC code receives typed Outcome values from the same one-shot Rust worker. Host integration is
 strict TypeScript, compiled to the existing JavaScript package paths.
 
 > [!IMPORTANT]
-> This branch is the **0.4.0 release candidate**, not a published release. Approved acceptance requires
-> at least 40% less BM-01 output than OPS 0.3.x; the official reader is a separate comparison.
-> BM-03 limits file/discovery schemas to 400 tokens while keeping Bash at startup and reporting the
-> full total separately. Final measured evidence and functional CI are both required.
-> See [release status and limitations](docs/release-0.4.0.md). Commands using `@latest` below select
-> the published package; build and pack this checkout to evaluate the candidate.
+> This package is **Windows x64 only**. Its identity is `dsh-ops-zx88@0.1.0`, based on the upstream dsh-ops 0.4.0 candidate source. Upstream release gates and acceptance benchmarks are recorded in [release status](docs/release-0.4.0.md); this fork did not re-run them, so upstream performance claims are not independent results for this fork.
+> Install the published package with `npx --yes dsh-ops-zx88@latest install --profile desktop`.
 
 - Native starts with `ops_read_many` and `ops_discover`; eligible Windows sessions also receive
   `ops_bash`. Advanced tools activate in the owning agent's next provider request.
@@ -43,7 +34,7 @@ strict TypeScript, compiled to the existing JavaScript package paths.
 - Seven independently toggled rows preserve saved profile IDs and settings. Per-tool official
   replacements are off by default. [Settings](docs/configuration-reference.md) include validated
   built-in forms and optional browser pages with an explicit offline carrier migration.
-- Windows Bash is optional: install a verified managed copy with `dsh-ops bash-runtime install`
+- Windows Bash is optional: install a verified managed copy with `dsh-ops-zx88 bash-runtime install`
   or choose Git Bash through `bashPath`. PowerShell stays host-managed; its upgrade command previews
   the standard installation and requires `--yes` to execute. Neither shell is an npm payload.
 
@@ -58,7 +49,7 @@ The name “ops” means general operations, not an operations/SRE product.
 
 ### Official plugin marketplace
 
-In the target DSH application's plugin marketplace, enter the npm package name **`dsh-ops`**, choose a custom registry and enter `https://mirrors.huaweicloud.com/repository/npm/`, install, then enable it. Installing through npmmirror is currently not recommended — it has bugs.
+In the target DSH application's plugin marketplace, enter the npm package name **`dsh-ops-zx88`**, choose a custom registry and enter `https://mirrors.huaweicloud.com/repository/npm/`, install, then enable it. Installing through npmmirror is currently not recommended — it has bugs.
 
 Of course, if you are sure you can reach the official npm registry, pick the official registry; if you are not sure, follow the steps above.
 
@@ -69,9 +60,9 @@ Of course, if you are sure you can reach the official npm registry, pick the off
 #### Installation
 
 ```console
-npx --yes dsh-ops@latest install --profile desktop
-npx --yes dsh-ops@latest install --profile web
-npx --yes dsh-ops@latest install --profile tui
+npx --yes dsh-ops-zx88@latest install --profile desktop
+npx --yes dsh-ops-zx88@latest install --profile web
+npx --yes dsh-ops-zx88@latest install --profile tui
 ```
 
 An explicit target profile is required. `tui` maps to the **dsh-TUI product's `dsh-tui` profile**, not the old `tui` directory. Initialize the target application first. This entry point delegates installation to the official DSH CLI rather than implementing a separate profile lock and rollback logic.
@@ -81,33 +72,33 @@ Desktop must use the CLI bundled with the desktop application; the default auto-
 You can also use the official commands directly:
 
 ```console
-dsh plugin --profile web add dsh-ops
-dsh plugin --profile dsh-tui add dsh-ops
-"<desktop installation>\resources\runtime\cli\bin\dsh.cmd" plugin --profile desktop add dsh-ops
+dsh plugin --profile web add dsh-ops-zx88
+dsh plugin --profile dsh-tui add dsh-ops-zx88
+"<desktop installation>\resources\runtime\cli\bin\dsh.cmd" plugin --profile desktop add dsh-ops-zx88
 ```
 
 A regular DSH CLI cannot manage the reserved `desktop` profile; do not confuse it with the desktop app's own entry point.
 
 #### Update
 
-Re-run the same `npx --yes dsh-ops@latest install --profile ...`, or use the official CLI `add dsh-ops@latest`. Reload when the app asks; restart the app when replacing code that is already loaded.
+Re-run the same `npx --yes dsh-ops-zx88@latest install --profile ...`, or use the official CLI `add dsh-ops-zx88@latest`. Reload when the app asks; restart the app when replacing code that is already loaded.
 
 #### Uninstall and status
 
 ```console
-npx --yes dsh-ops@latest status --profile desktop
-npx --yes dsh-ops@latest uninstall --profile desktop
+npx --yes dsh-ops-zx88@latest status --profile desktop
+npx --yes dsh-ops-zx88@latest uninstall --profile desktop
 ```
 
-Replace `desktop` with `web` or `tui` as needed. You can also uninstall from the marketplace, or run the official `dsh plugin --profile ... remove dsh-ops`. Profile uninstall removes plugin dependency references. Remove separately downloaded Bash with `dsh-ops bash-runtime remove --yes`; this does not delete the system shell, copies in other profiles, or the package manager's shared cache.
+Replace `desktop` with `web` or `tui` as needed. You can also uninstall from the marketplace, or run the official `dsh plugin --profile ... remove dsh-ops-zx88`. Profile uninstall removes plugin dependency references. Remove separately downloaded Bash with `dsh-ops-zx88 bash-runtime remove --yes`; this does not delete the system shell, copies in other profiles, or the package manager's shared cache.
 
-Old files explicitly provisioned by earlier versions under `<DSH_HOME>/dsh-ops/` (provisioned shells, and the FastCtx runtime earlier versions could provision) need separate cleanup: `npx --yes dsh-ops@latest uninstall --yes`. The `~/.fastctx/` state left by the removed background component is not deleted by default; add `--purge-fastctx` when needed.
+Old files explicitly provisioned by earlier versions under `<DSH_HOME>/dsh-ops/` (provisioned shells, and the FastCtx runtime earlier versions could provision) need separate cleanup: `npx --yes dsh-ops-zx88@latest uninstall --yes`. The `~/.fastctx/` state left by the removed background component is not deleted by default; add `--purge-fastctx` when needed.
 
 The former `dsh-ops/background` component (FastCtx background jobs) has been removed. A profile that still has its row keeps loading: the row publishes nothing and logs one warning, and can be deleted.
 
 ## Optional read-only OPS sidebar
 
-Enable the `dsh-ops/tui` row in dsh-TUI and restart to add the OPS sidebar without stealing focus or executing tools. Without `tuiPanels`, only that optional row stays pending. See [Sidebar guide](docs/tui-panel.md). While focused, use `f` to filter, `n`/`p` for local pages and `a` to acknowledge all-session alerts; only bounded retained metadata is browsed, never fetched result pages.
+Enable the `dsh-ops-zx88/tui` row in dsh-TUI and restart to add the OPS sidebar without stealing focus or executing tools. Without `tuiPanels`, only that optional row stays pending. See [Sidebar guide](docs/tui-panel.md). While focused, use `f` to filter, `n`/`p` for local pages and `a` to acknowledge all-session alerts; only bounded retained metadata is browsed, never fetched result pages.
 
 ## Documentation
 
@@ -138,6 +129,8 @@ The Rust tools are based on [yc-duan](https://github.com/yc-duan)'s Codex plugin
 
 ## Maintainers
 
+These are the upstream dsh-ops maintainers and contributors; this fork is maintained by [xujiawenzx88](https://github.com/xujiawenzx88).
+
 <table>
   <tbody>
     <tr>
@@ -156,7 +149,3 @@ The Rust tools are based on [yc-duan](https://github.com/yc-duan)'s Codex plugin
 ## Contributors
 
 [![Contributors](https://contrib.rocks/image?repo=T-Auto/dsh-ops)](https://github.com/T-Auto/dsh-ops)
-
-## Star trend
-
-[![Star trend chart](https://api.star-history.com/svg?repos=T-Auto/dsh-ops&type=Date)](https://star-history.com/#T-Auto/dsh-ops&Date)

@@ -4,7 +4,7 @@
  * Ported from PR #40 (WTStarMark): `lib/credential-policy.js`, `lib/session-temp.js`, the
  * `deny_roots` traversal skip in the native worker and the "a binary file does not fail the whole
  * `replace`" fix are that PR's work. The assertions here are this branch's, because this branch does
- * not add #40's `dsh-ops-linux` component: the same behaviour is driven through the file bridge and
+ * not add #40's `dsh-ops-zx88-linux` component: the same behaviour is driven through the file bridge and
  * the native worker this branch actually ships, so what is asserted is the code that ships here.
  *
  * What this locks in:
@@ -26,7 +26,7 @@
  * session's temp files. That is the host sandbox's decision, not this plugin's; what the plugin
  * controls — which paths its own tools endorse — is what is asserted here.
  *
- * @module dsh-ops/test/credential-fence
+ * @module dsh-ops-zx88/test/credential-fence
  */
 
 import fs from 'node:fs'

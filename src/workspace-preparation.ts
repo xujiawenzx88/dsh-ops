@@ -53,7 +53,7 @@ const PREREQUISITE = /not owned by the current user|reparse point|Explicit effec
 export function classifyPreparationFailure(output: string, { root, script: file = script }: { root?: string; script?: string } = {}) {
   const tail = output.trim() || '(no output)'
   if (EXECUTION_POLICY.test(output)) {
-    return `PowerShell execution policy blocked dsh-ops's own preparation script ${file} even with -ExecutionPolicy Bypass, so the policy comes from Group Policy (MachinePolicy/UserPolicy). Ask an administrator, check \`powershell.exe -NoProfile -Command Get-ExecutionPolicy -List\`, or use danger-full-access for this session (it skips preparation). Output: ${tail}`
+    return `PowerShell execution policy blocked dsh-ops-zx88's own preparation script ${file} even with -ExecutionPolicy Bypass, so the policy comes from Group Policy (MachinePolicy/UserPolicy). Ask an administrator, check \`powershell.exe -NoProfile -Command Get-ExecutionPolicy -List\`, or use danger-full-access for this session (it skips preparation). Output: ${tail}`
   }
   if (PREREQUISITE.test(output)) {
     const reason = output.split(/\r?\n/).map(line => line.trim()).find(line => PREREQUISITE.test(line)) ?? tail

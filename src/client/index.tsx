@@ -8,22 +8,22 @@ import { ReplacementForm, DiscoveryForm } from './selections.js'
 import { ShellForm } from './shell-form.js'
 import type { SettingsProps } from './forms.js'
 import { SETTINGS_CSS } from './styles.js'
-export const name = 'dsh-ops-settings'
+export const name = 'dsh-ops-zx88-settings'
 export const inject = ['slots', 'locale', 'remote']
 export async function apply(ctx: Context): Promise<void> {
-  ctx.effect(() => ctx.locale.register('dshOps', { en, zh }), 'dsh-ops: settings dictionaries')
+  ctx.effect(() => ctx.locale.register('dshOps', { en, zh }), 'dsh-ops-zx88: settings dictionaries')
   await ctx.remote.$mount(RUNTIME_REMOTE)
   ctx.effect(() => {
     const style = document.createElement('style')
     style.dataset.dshOpsSettings = 'true'; style.textContent = SETTINGS_CSS; document.head.append(style)
     return () => style.remove()
-  }, 'dsh-ops: settings styles')
+  }, 'dsh-ops-zx88: settings styles')
   ctx.slots.inject('plugins.row.config', function* () {
-    yield ctx.slots.register({ name: 'plugins.row.config', key: 'dsh-ops#dsh-ops-hide-official', locale: 'dshOps' },
+    yield ctx.slots.register({ name: 'plugins.row.config', key: 'dsh-ops-zx88#dsh-ops-zx88-hide-official', locale: 'dshOps' },
       (props: SettingsProps) => props.view === 'summary' ? <>{props.t('replacements')}</> : <ReplacementForm {...props} />)
-    yield ctx.slots.register({ name: 'plugins.row.config', key: 'dsh-ops#dsh-ops-discovery', locale: 'dshOps' },
+    yield ctx.slots.register({ name: 'plugins.row.config', key: 'dsh-ops-zx88#dsh-ops-zx88-discovery', locale: 'dshOps' },
       (props: SettingsProps) => props.view === 'summary' ? <>{props.t('discovery')}</> : <DiscoveryForm {...props} />)
-    yield ctx.slots.register({ name: 'plugins.row.config', key: 'dsh-ops#dsh-ops-shell', locale: 'dshOps' },
+    yield ctx.slots.register({ name: 'plugins.row.config', key: 'dsh-ops-zx88#dsh-ops-zx88-shell', locale: 'dshOps' },
       (props: SettingsProps) => props.view === 'summary' ? <>{props.t('shell')}</> : <ShellForm {...props} api={ctx.remote.opsSettings} />)
   })
 }

@@ -20,7 +20,7 @@ import { sdkDefinition, requestedApis } from './sdk.js'
 import { ownPtcScopes } from './ownership.js'
 import { monitoredInvoke } from './invoke.js'
 export { resolvePtcConfig } from '../config.js'
-export const name = 'dsh-ops-ptc'
+export const name = 'dsh-ops-zx88-ptc'
 const apiTools = [...FILE_TOOLS, ...PTC_TOOLS]
 const publishedNames = [...apiTools, 'sdk'].map(publicToolName)
 const ptcDefinitions = new WeakSet<ToolDefinition>()
@@ -37,7 +37,7 @@ export function apply(root: Context, rawConfig: unknown): void {
   let file: string
   try { file = resolveWorker(config) } catch (error) {
     if (config.required) throw error
-    root.logger.warn('dsh-ops: ' + String(error)); return
+    root.logger.warn('dsh-ops-zx88: ' + String(error)); return
   }
   root.inject(['tools', 'systemPrompt', 'sandboxPolicy', 'subprocess'], async ctx => {
     const tools = ctx.get('tools'), prompt = ctx.get('systemPrompt')
@@ -61,7 +61,7 @@ export function apply(root: Context, rawConfig: unknown): void {
     const clear = (entry: Entry) => {
       entry.owned.clear()
       for (const dispose of entry.disposers.splice(0)) {
-        try { dispose() } catch (error) { ctx.logger.warn('dsh-ops: PTC teardown failed; continuing:', error) }
+        try { dispose() } catch (error) { ctx.logger.warn('dsh-ops-zx88: PTC teardown failed; continuing:', error) }
       }
     }
     const ptcOnly = async (agent: Agent, signal?: AbortSignal): Promise<boolean> => Boolean(ctx.get('ptcRuntime')) && isPtc(await inspectPresentation(prompt, agent, signal))
@@ -146,7 +146,7 @@ export function apply(root: Context, rawConfig: unknown): void {
           throw error
         } finally { ownership?.end(); mutating = false }
         ownership?.changedBelow()
-      }).catch(error => ctx.logger.warn('dsh-ops: PTC publication failed: ' + String(error)))
+      }).catch(error => ctx.logger.warn('dsh-ops-zx88: PTC publication failed: ' + String(error)))
       return chain
     }
     const attach = (agent: Agent): Promise<void> => {
@@ -219,7 +219,7 @@ export function apply(root: Context, rawConfig: unknown): void {
       const entry = entries.get(context.scope as Agent)
       return entry?.ptc && entry.owned.has(publicToolName('sdk'))
         ? 'OPS APIs return typed Outcome values. Inspect status before data; preserve partial coverage and continuation. Use ' + publicToolName('sdk') + ' to request advanced APIs by raw name; they become callable on the next model step. Process results locally in run_code and return only needed summaries. References do not grant authority.' : ''
-    } }), 'dsh-ops: progressive PTC guidance')
+    } }), 'dsh-ops-zx88: progressive PTC guidance')
     ctx.effect(() => async () => {
       stopped = true; ++epoch; mutating = true
       for (const controller of active.keys()) controller.abort(new Error('PTC component unloaded'))
@@ -227,7 +227,7 @@ export function apply(root: Context, rawConfig: unknown): void {
       await Promise.allSettled([...active.values()].map(work => work.promise))
       await Promise.allSettled([...entries.values()].map(entry => entry.fiber?.dispose()))
       entries.clear(); ownership?.dispose(); await chain
-    }, 'dsh-ops: PTC lifecycle')
+    }, 'dsh-ops-zx88: PTC lifecycle')
     for (const agent of entries.keys()) ownership.track(agent)
     ownership.refresh()
     for (const agent of new Set([...(ctx.get('agents')?.list() ?? []), ...ownership.agents()])) void attach(agent)

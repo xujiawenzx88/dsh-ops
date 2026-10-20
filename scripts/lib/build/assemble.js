@@ -5,7 +5,7 @@
  * assembly helpers remain for provenance and fixture checks; describePackages
  * no longer schedules shell payloads.
  *
- * @module dsh-ops/build/lib/assemble
+ * @module dsh-ops-zx88/build/lib/assemble
  */
 
 import fs from 'node:fs'
@@ -177,7 +177,7 @@ export async function stepAssemble(context) {
       for (const relative of treeFiles(stage)) {
         const file = path.join(stage, relative)
         if (fs.statSync(file).nlink > 1) {
-          const temporary = `${file}.dsh-ops-materialize`
+          const temporary = `${file}.dsh-ops-zx88-materialize`
           fs.copyFileSync(file, temporary)
           fs.unlinkSync(file)
           fs.renameSync(temporary, file)

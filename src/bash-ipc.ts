@@ -29,7 +29,7 @@ export function restrictedRemedy(file: string, source: string | undefined, why: 
   return `EXECUTOR_UNAVAILABLE: ops_bash cannot run the ${label}${file} in restricted modes (read-only / workspace-write): ${why} `
     +'By design, restricted modes run only the pinned MSYS whose DSH IPC compatibility proxies were verified; this is not a user authorization denial. '
     +'A custom bashPath or system Git for Windows works only in danger-full-access. '
-    +'Next steps: remove bashPath (and allowSystemShellFallback) so the bundled or provisioned pinned bash is used (`dsh-ops provision-shells --bash` if it is missing), '
+    +'Next steps: remove bashPath (and allowSystemShellFallback) so the bundled or provisioned pinned bash is used (`dsh-ops-zx88 provision-shells --bash` if it is missing), '
     +'or ask the user to switch the session to danger-full-access. Approvals never repair an incompatible confined runtime; do not bypass confinement.'
 }
 /** Whether restricted modes can run this bash, without copying or building anything. */
@@ -39,7 +39,7 @@ export function restrictedCompatibility(file: string, {platform=process.platform
   if(!fs.existsSync(dll))return {compatible:false,reason:`it has no usr/bin/msys-2.0.dll beside it (${dll}), which is not the supported MSYS payload layout.`}
   let receipt: Receipt
   try { receipt=JSON.parse(fs.readFileSync(path.join(proxies,'provenance.json'),'utf8')) as Receipt }
-  catch { return {compatible:false,reason:'this dsh-ops installation carries no Bash IPC compatibility receipt (runtime/win32-x64/bash-ipc/provenance.json).'} }
+  catch { return {compatible:false,reason:'this dsh-ops-zx88 installation carries no Bash IPC compatibility receipt (runtime/win32-x64/bash-ipc/provenance.json).'} }
   const msysSha256=hash(fs.readFileSync(dll))
   if(receipt.platform==='win32-x64' && receipt.msysSha256===msysSha256)return {compatible:true,reason:'its msys-2.0.dll matches the pinned MSYS build',msysSha256,expectedSha256:receipt.msysSha256}
   return {compatible:false,msysSha256,expectedSha256:receipt.msysSha256,
@@ -203,9 +203,9 @@ export function confinedBash(file: string, {home=process.env.DSH_HOME ?? path.jo
         try{
           const parent=path.dirname(target), base=path.basename(target)
           const stale=fs.readdirSync(parent).filter(name=>name.startsWith(`${base}.bad-`)).sort().slice(0,-2)
-          for(const name of stale){ fs.rmSync(path.join(parent,name),{recursive:true,force:true}); console.error(`dsh-ops: removed an older quarantined bash runtime: ${name}`) }
+          for(const name of stale){ fs.rmSync(path.join(parent,name),{recursive:true,force:true}); console.error(`dsh-ops-zx88: removed an older quarantined bash runtime: ${name}`) }
         }catch{ /* best effort — cleanup must never block recovery */ }
-        console.error(`dsh-ops: quarantined an unverifiable bash runtime generation at ${quarantine}; staging a fresh one. Delete it once no confined shell is running.`)
+        console.error(`dsh-ops-zx88: quarantined an unverifiable bash runtime generation at ${quarantine}; staging a fresh one. Delete it once no confined shell is running.`)
       }catch(error){
         throw Error(`Bash IPC runtime at ${target} failed verification and could not be quarantined (${errorMessage(error)}). `
           +'Stop any confined shell, then delete that directory and retry.')
