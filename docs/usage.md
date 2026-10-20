@@ -2,9 +2,9 @@
 
 The complete install, update and remove flow, plus every option of the command-line interface.
 
-## 0.1.0 fork and component defaults (upstream 0.4.0 candidate)
+## 0.1.1 fork and component defaults (upstream 0.4.0 candidate)
 
-This fork publishes the upstream 0.4.0 candidate source as `0.1.0` for Windows x64. Upstream acceptance uses the approved OPS 0.3.x BM-01 comparator and file/discovery BM-03 budget, with Bash still resident and the full total reported separately.
+This fork publishes the upstream 0.4.0 candidate source as `0.1.1` for Windows x64. Upstream acceptance uses the approved OPS 0.3.x BM-01 comparator and file/discovery BM-03 budget, with Bash still resident and the full total reported separately.
 See [candidate status](release-0.4.0.md). The seven rows enable file/PTC/discovery, enable shell only
 on Windows, and leave panel/TUI/replacements off in fresh profiles. Existing explicit switches and
 name-qualified settings survive upgrade. Only read_many/discover are initially resident in Native,
@@ -26,7 +26,7 @@ forms and the optional browser carrier. Use [manual acceptance](manual-validatio
 
 ### macOS arm64
 
-> Not supported by `dsh-ops-zx88@0.1.0`: this fork is Windows x64 only. The upstream instructions are retained for future builds.
+> Not supported by `dsh-ops-zx88@0.1.1`: this fork is Windows x64 only. The upstream instructions are retained for future builds.
 
 macOS carries no bundled shell payload, and the native worker is not part of the
 repository on any platform, so two extra steps apply.

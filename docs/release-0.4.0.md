@@ -1,7 +1,7 @@
 # 0.4.0 release candidate (upstream document)
 
 > **Fork note:** This document preserves the upstream dsh-ops release-candidate gate.
-> The fork publishes the upstream 0.4.0 source as `dsh-ops-zx88@0.1.0`; the benchmarks below were
+> The fork publishes the upstream 0.4.0 source as `dsh-ops-zx88@0.1.1`; the benchmarks below were
 > not re-run for the fork and do not automatically constitute independent validation.
 
 中文：[0.4.0 发布候选](0.4.0发布候选.md).

@@ -19,7 +19,7 @@
 OPS 为 DSH 增加有界文件与文档工具。Native 模式返回紧凑、带行号的文本；PTC 代码从同一个按调用启动的 Rust worker 获取类型化 Outcome。宿主集成使用严格 TypeScript，编译后保持已有 JavaScript 包路径。
 
 > [!IMPORTANT]
-> 本包的身份为 `dsh-ops-zx88@0.1.0`，内容对应上游 dsh-ops 0.4.0 候选源码。上游的发布门禁与验收基准记录在[发布状态与限制](docs/0.4.0发布候选.md)；本分支未重新执行这些基准，因此不把上游性能声明作为本分支的独立结论。
+> 本包的身份为 `dsh-ops-zx88@0.1.1`，内容对应上游 dsh-ops 0.4.0 候选源码。上游的发布门禁与验收基准记录在[发布状态与限制](docs/0.4.0发布候选.md)；本分支未重新执行这些基准，因此不把上游性能声明作为本分支的独立结论。
 > 安装已发布版本：`npx --yes dsh-ops-zx88@latest install --profile desktop`。
 
 - Native 默认提供 `ops_read_many` 与 `ops_discover`；符合条件的 Windows 会话另有 `ops_bash`。高级工具在所属 agent 的下一次供应商请求中激活。

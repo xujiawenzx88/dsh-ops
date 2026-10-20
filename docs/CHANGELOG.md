@@ -5,6 +5,13 @@ All notable changes to this package are recorded here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-10-20 (dsh-ops-zx88 fork)
+
+- `ops_write_file` accepts an explicit `encoding` (`auto` default, `utf-8`, `gb18030`, `utf-16le`, `utf-16be`). New files can now be created in any supported codec instead of UTF-8 only; an explicit codec overrides the codec detected on overwrite; and UTF-16 writes add a BOM unless the content starts with U+FEFF. `auto` keeps the previous behavior. Characters the codec cannot represent still refuse with `ERR_INVALID_ENCODING` and publish nothing.
+- `ops_write_file` 新增 `encoding` 参数（默认 `auto`，可选 `utf-8`、`gb18030`、`utf-16le`、`utf-16be`）。新文件不再固定为 UTF-8，可按指定编码创建；覆写时显式编码会覆盖检测到的编码；UTF-16 写入会在内容不以 U+FEFF 开头时补上 BOM。`auto` 保持原有行为。编码无法表示的字符仍以 `ERR_INVALID_ENCODING` 拒绝且不发布任何变更。
+- Re-stage the Windows x64 worker so `runtime/win32-x64/provenance.json` records version 0.1.1; the published tarball's worker hash and package version stay consistent.
+- 重新暂存 Windows x64 worker，使 `runtime/win32-x64/provenance.json` 记录 0.1.1；发布包的 worker 哈希与包版本保持一致。
+
 ## [0.1.0] - 2026-10-20 (dsh-ops-zx88 fork)
 
 - Publish the upstream dsh-ops 0.4.0 source as the unofficial Windows x64 fork `dsh-ops-zx88`:

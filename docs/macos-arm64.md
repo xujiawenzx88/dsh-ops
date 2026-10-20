@@ -1,6 +1,6 @@
 # macOS Apple Silicon (`darwin-arm64`)
 
-> Not supported by `dsh-ops-zx88@0.1.0`: this fork is Windows x64 only. This upstream page is retained for future builds.
+> Not supported by `dsh-ops-zx88@0.1.1`: this fork is Windows x64 only. This upstream page is retained for future builds.
 
 0.3.1 supports Apple Silicon, not Intel Mac. Exact native targets are `win32-x64`, `linux-x64` and `darwin-arm64`; the npm `os`/`cpu` projection is not a promise that every combination works.
 

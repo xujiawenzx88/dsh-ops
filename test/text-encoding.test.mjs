@@ -79,6 +79,40 @@ await test('overwriting a BOM-marked UTF-16BE file re-attaches its BOM', async (
   })
 })
 
+await test('write_file creates and converts files with an explicit encoding', async () => {
+  await withTempDir('encoding-write', async root => {
+    const gbTarget = path.join(root, 'gb-new.txt')
+    const gbWrite = await call('write_file', { path: gbTarget, content: '中\n', expectedRevision: 'absent', encoding: 'gb18030' }, root)
+    assert.equal(gbWrite.status, 'completed', JSON.stringify(gbWrite))
+    assert.deepEqual(fs.readFileSync(gbTarget), gb(Buffer.from([0xd6, 0xd0]), '\n'), 'a new file uses the requested codec')
+    assert.equal((await call('inspect_local_file', { path: gbTarget }, root)).items[0].text, '中')
+
+    const leTarget = path.join(root, 'le-new.txt')
+    const leWrite = await call('write_file', { path: leTarget, content: '你\n', expectedRevision: 'absent', encoding: 'utf-16le' }, root)
+    assert.equal(leWrite.status, 'completed', JSON.stringify(leWrite))
+    assert.deepEqual(fs.readFileSync(leTarget), gb(Buffer.from([0xff, 0xfe]), utf16('你\n')), 'explicit UTF-16LE adds the BOM that keeps it detectable')
+    assert.deepEqual((await call('inspect_local_file', { path: leTarget }, root)).items.map(item => item.text), ['\uFEFF你'])
+
+    const convertTarget = path.join(root, 'convert.txt')
+    fs.writeFileSync(convertTarget, 'plain\n')
+    const converted = await call('write_file', { path: convertTarget, content: '中文\n', expectedRevision: hash(Buffer.from('plain\n')), encoding: 'gb18030' }, root)
+    assert.equal(converted.status, 'completed', JSON.stringify(converted))
+    assert.deepEqual(fs.readFileSync(convertTarget), gb(Buffer.from([0xd6, 0xd0, 0xce, 0xc4]), '\n'), 'an explicit codec overrides the detected one')
+
+    const badTarget = path.join(root, 'bad.txt')
+    const refused = await call('write_file', { path: badTarget, content: '\uE5E5', expectedRevision: 'absent', encoding: 'gb18030' }, root)
+    assert.equal(refused.status, 'error', JSON.stringify(refused))
+    assert.equal(refused.error.code, 'ERR_INVALID_ENCODING')
+    assert.equal(fs.existsSync(badTarget), false, 'the refused write created nothing')
+
+    const unknownTarget = path.join(root, 'gbk.txt')
+    const unknown = await call('write_file', { path: unknownTarget, content: 'x', expectedRevision: 'absent', encoding: 'gbk' }, root)
+    assert.equal(unknown.status, 'error', JSON.stringify(unknown))
+    assert.equal(unknown.error.code, 'ERR_INVALID_ENCODING')
+    assert.equal(fs.existsSync(unknownTarget), false, 'an unknown encoding is refused before any file exists')
+  })
+})
+
 await test('read_many decodes each file and reports a binary sibling alone', async () => {
   await withTempDir('encoding-many', async root => {
     const gbFile = path.join(root, 'gb.txt'); fs.writeFileSync(gbFile, gb(Buffer.from([0xd6, 0xd0]), '\n'))

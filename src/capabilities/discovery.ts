@@ -12,7 +12,7 @@ export const DISCOVERY_TERMS = Object.freeze({
   glob: 'glob find search file paths patterns',
   grep: 'grep search content regex matching text count summary',
   replace: 'batch literal text replacement across files',
-  write_file: 'write create overwrite full file content atomic revision cas',
+  write_file: 'write create overwrite full file content encoding utf8 gb18030 utf16 atomic revision cas',
   edit_file: 'edit patch unique text atomic revision cas',
   diff: 'diff preview compare proposed file content',
   stat: 'stat metadata revision hash bytes size line count',

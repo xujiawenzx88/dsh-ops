@@ -21,7 +21,7 @@ PTC code receives typed Outcome values from the same one-shot Rust worker. Host 
 strict TypeScript, compiled to the existing JavaScript package paths.
 
 > [!IMPORTANT]
-> This package is **Windows x64 only**. Its identity is `dsh-ops-zx88@0.1.0`, based on the upstream dsh-ops 0.4.0 candidate source. Upstream release gates and acceptance benchmarks are recorded in [release status](docs/release-0.4.0.md); this fork did not re-run them, so upstream performance claims are not independent results for this fork.
+> This package is **Windows x64 only**. Its identity is `dsh-ops-zx88@0.1.1`, based on the upstream dsh-ops 0.4.0 candidate source. Upstream release gates and acceptance benchmarks are recorded in [release status](docs/release-0.4.0.md); this fork did not re-run them, so upstream performance claims are not independent results for this fork.
 > Install the published package with `npx --yes dsh-ops-zx88@latest install --profile desktop`.
 
 - Native starts with `ops_read_many` and `ops_discover`; eligible Windows sessions also receive

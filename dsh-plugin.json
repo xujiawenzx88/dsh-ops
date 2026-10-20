@@ -3,7 +3,7 @@
   "manifestVersion": "0.15",
   "id": "dsh-ops-zx88.native",
   "name": "dsh-ops-zx88",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT AND Apache-2.0",
   "facets": {
     "host": {

@@ -12,6 +12,8 @@ struct WriteArgs {
     content: String,
     expected_revision: String,
     #[serde(default)]
+    encoding: Option<String>,
+    #[serde(default)]
     dry_run: bool,
 }
 #[derive(Deserialize)]
@@ -65,15 +67,19 @@ pub(super) fn run(request: &Request) -> Result<Value> {
         "diff" => diff_file(request),
         "write_file" => {
             let args: WriteArgs = serde_json::from_value(request.args.clone())?;
+            let requested = match args.encoding.as_deref() {
+                Some(value) => text_encoding::parse(value)?,
+                None => None,
+            };
             write_single(
                 request,
                 &args.path,
                 &args.expected_revision,
                 args.dry_run,
-                // An overwrite keeps the existing file's codec, so untouched
-                // lines are written back byte-identically; a new file, or bytes
-                // no codec reads, is UTF-8 as before.
-                |original| text_encoding::encode_for_rewrite(original, &args.content),
+                // An explicit encoding wins; otherwise an overwrite keeps the
+                // existing file's codec, so untouched lines are written back
+                // byte-identically, and a new file is UTF-8 as before.
+                |original| text_encoding::encode_for_rewrite(original, &args.content, requested),
             )
         }
         "edit_file" | "edit_many" => {

@@ -129,22 +129,25 @@ pub fn encode(encoding: TextEncoding, text: &str) -> Result<Vec<u8>> {
     }
 }
 
-/// The codec a rewrite must use to keep an existing file's other bytes stable.
-/// A new file — or bytes no codec reads — is UTF-8, which is how write_file has
-/// always created and overwritten files.
-pub fn for_rewrite(original: Option<&[u8]>) -> TextEncoding {
-    original.and_then(detect).unwrap_or(TextEncoding::Utf8)
+/// The codec a write must use: an explicit `encoding` wins, otherwise an
+/// existing file's detected codec is preserved. A new file — or bytes no codec
+/// reads — is UTF-8, which is how write_file has always created files.
+pub fn for_rewrite(original: Option<&[u8]>, requested: Option<TextEncoding>) -> TextEncoding {
+    requested.or_else(|| original.and_then(detect)).unwrap_or(TextEncoding::Utf8)
 }
 
-/// Encode replacement content with the codec an existing file uses, re-attaching
+/// Encode replacement content with the codec the write must use, re-attaching
 /// the BOM the original carried when the content does not bring its own. Without
 /// this, overwriting a BOM-marked UTF-16 file with plain content would drop the
 /// only marker that identifies its encoding, and the next read would see binary.
-pub fn encode_for_rewrite(original: Option<&[u8]>, content: &str) -> Result<Vec<u8>> {
-    let encoding = for_rewrite(original);
-    let bom = match (encoding, original) {
-        (TextEncoding::Utf16Le, Some(original)) if original.starts_with(&[0xFF, 0xFE]) => Some(&[0xFF, 0xFE][..]),
-        (TextEncoding::Utf16Be, Some(original)) if original.starts_with(&[0xFE, 0xFF]) => Some(&[0xFE, 0xFF][..]),
+///
+/// An explicit UTF-16 `encoding` also adds a BOM: a new UTF-16LE file whose
+/// ASCII range is valid UTF-8 bytes could not be detected without one.
+pub fn encode_for_rewrite(original: Option<&[u8]>, content: &str, requested: Option<TextEncoding>) -> Result<Vec<u8>> {
+    let encoding = for_rewrite(original, requested);
+    let bom = match encoding {
+        TextEncoding::Utf16Le if requested.is_some() || original.is_some_and(|bytes| bytes.starts_with(&[0xFF, 0xFE])) => Some(&[0xFF, 0xFE][..]),
+        TextEncoding::Utf16Be if requested.is_some() || original.is_some_and(|bytes| bytes.starts_with(&[0xFE, 0xFF])) => Some(&[0xFE, 0xFF][..]),
         _ => None,
     };
     let mut bytes = match bom {
@@ -250,10 +253,11 @@ mod tests {
 
     #[test]
     fn for_rewrite_keeps_detected_bytes_and_defaults_to_utf8() {
-        assert_eq!(for_rewrite(Some(b"\xD6\xD0")), TextEncoding::Gb18030);
-        assert_eq!(for_rewrite(Some(b"plain")), TextEncoding::Utf8);
-        assert_eq!(for_rewrite(Some(&[0xFF, 0x00])), TextEncoding::Utf8);
-        assert_eq!(for_rewrite(None), TextEncoding::Utf8);
+        assert_eq!(for_rewrite(Some(b"\xD6\xD0"), None), TextEncoding::Gb18030);
+        assert_eq!(for_rewrite(Some(b"plain"), None), TextEncoding::Utf8);
+        assert_eq!(for_rewrite(Some(&[0xFF, 0x00]), None), TextEncoding::Utf8);
+        assert_eq!(for_rewrite(None, None), TextEncoding::Utf8);
+        assert_eq!(for_rewrite(Some(b"plain"), Some(TextEncoding::Utf16Le)), TextEncoding::Utf16Le, "an explicit codec wins");
     }
 
     #[test]
@@ -261,11 +265,38 @@ mod tests {
         let original = utf16("α", true);
         let mut expected = vec![0xFF, 0xFE];
         expected.extend(encode(TextEncoding::Utf16Le, "β").unwrap());
-        assert_eq!(encode_for_rewrite(Some(&original), "β").unwrap(), expected);
+        assert_eq!(encode_for_rewrite(Some(&original), "β", None).unwrap(), expected);
         // Content that brings its own U+FEFF is not doubled.
-        assert_eq!(encode_for_rewrite(Some(&original), "\u{FEFF}β").unwrap(), expected);
+        assert_eq!(encode_for_rewrite(Some(&original), "\u{FEFF}β", None).unwrap(), expected);
         // A new file, or UTF-8 bytes, stay UTF-8 without any BOM.
-        assert_eq!(encode_for_rewrite(None, "β").unwrap(), b"\xCE\xB2".to_vec());
-        assert_eq!(encode_for_rewrite(Some(b"plain"), "β").unwrap(), b"\xCE\xB2".to_vec());
+        assert_eq!(encode_for_rewrite(None, "β", None).unwrap(), b"\xCE\xB2".to_vec());
+        assert_eq!(encode_for_rewrite(Some(b"plain"), "β", None).unwrap(), b"\xCE\xB2".to_vec());
+    }
+
+    #[test]
+    fn explicit_encoding_selects_the_published_codec() {
+        // A new file follows the requested codec instead of defaulting to UTF-8.
+        assert_eq!(encode_for_rewrite(None, "中", Some(TextEncoding::Gb18030)).unwrap(), b"\xD6\xD0".to_vec());
+        assert_eq!(encode_for_rewrite(None, "中", Some(TextEncoding::Utf8)).unwrap(), "中".as_bytes().to_vec());
+        // UTF-16 is undetectable without a BOM, so an explicit request adds one.
+        let mut le = vec![0xFF, 0xFE];
+        le.extend(encode(TextEncoding::Utf16Le, "中").unwrap());
+        assert_eq!(encode_for_rewrite(None, "中", Some(TextEncoding::Utf16Le)).unwrap(), le);
+        // Content that already starts with U+FEFF keeps its own BOM exactly once.
+        assert_eq!(encode_for_rewrite(None, "\u{FEFF}中", Some(TextEncoding::Utf16Le)).unwrap(), le);
+        // An explicit codec overrides an existing file's codec in both directions.
+        assert_eq!(encode_for_rewrite(Some(b"plain"), "中", Some(TextEncoding::Gb18030)).unwrap(), b"\xD6\xD0".to_vec());
+        let utf16_le = utf16("α", true);
+        assert_eq!(encode_for_rewrite(Some(&utf16_le), "β", Some(TextEncoding::Utf8)).unwrap(), b"\xCE\xB2".to_vec());
+        assert_eq!(encode_for_rewrite(Some(b"plain"), "β", Some(TextEncoding::Utf16Be)).unwrap(), {
+            let mut bytes = vec![0xFE, 0xFF];
+            bytes.extend(encode(TextEncoding::Utf16Be, "β").unwrap());
+            bytes
+        });
+    }
+
+    #[test]
+    fn an_explicit_codec_refuses_unrepresentable_characters_for_new_files() {
+        assert!(encode_for_rewrite(None, "\u{E5E5}", Some(TextEncoding::Gb18030)).is_err());
     }
 }
